@@ -5,10 +5,12 @@ import { Card, CardHeader, CardBody } from '@heroui/react';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import FrequencyAnalysisWidget from '../components/widgets/FrequencyAnalysisWidget';
 import { AsciiDistributionWidget, BASE_OPTIONS } from '../components/widgets/AsciiDistributionWidget';
+import FrequencyStdDevWidget from '../components/widgets/FrequencyStdDev';
 
 const AVAILABLE_WIDGETS = {
   frequency: 'Frequency Analysis',
   ascii: 'ASCII Distribution',
+  freqstddev: 'Frequency Std Dev',
 };
 
 type WidgetKey = keyof typeof AVAILABLE_WIDGETS;
@@ -97,7 +99,7 @@ export default function DashboardPage() {
                 className={`px-3 py-1 rounded ${
                   widgets.includes(key as WidgetKey)
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-800 hover:bg-gray-900'
+                    : 'bg-gray-700 hover:bg-gray-800'
                 }`}
               >
                 {name}
@@ -120,6 +122,9 @@ export default function DashboardPage() {
               onBaseChange={setAsciiBase}
             />
           );
+        }
+        if (widget === 'freqstddev') {
+          return <FrequencyStdDevWidget key={widget} text={inputText} />;
         }
         return null;
       })}

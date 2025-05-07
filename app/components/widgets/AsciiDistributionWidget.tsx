@@ -159,7 +159,7 @@ export function AsciiDistributionWidget({
     <Card className="mb-4">
       <CardHeader>
         <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">ASCII Distribution</h3>
+          <h3 className="text-lg font-semibold mx-4">ASCII Distribution</h3>
           <select
             value={base}
             onChange={(e) => setBase(e.target.value as BaseType)}
