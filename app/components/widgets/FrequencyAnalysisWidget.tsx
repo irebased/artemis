@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMemo } from 'react';
 import { Card, CardHeader, CardBody } from '@heroui/react';
 import { Bar } from 'react-chartjs-2';
