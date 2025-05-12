@@ -13,27 +13,18 @@ import {
   Legend,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { BaseType } from '../../app/page';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels);
 
-export const BASE_OPTIONS = ['ascii', 'hex', 'decimal', 'base64', 'octal'] as const;
-type BaseType = (typeof BASE_OPTIONS)[number];
-
 export function AsciiDistributionWidget({
   text,
-  initialBase,
-  onBaseChange,
+  base,
 }: {
   text: string;
-  initialBase: BaseType;
-  onBaseChange: (newBase: BaseType) => void;
+  base: BaseType;
 }) {
-  const [base, setBase] = useState<BaseType>(initialBase);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    onBaseChange(base);
-  }, [base, onBaseChange]);
 
   const byteCounts = useMemo(() => {
     const counts = new Array(256).fill(0);
@@ -161,17 +152,6 @@ export function AsciiDistributionWidget({
       <CardHeader>
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold mx-4">ASCII Distribution</h3>
-          <select
-            value={base}
-            onChange={(e) => setBase(e.target.value as BaseType)}
-            className="p-2 border rounded"
-          >
-            {BASE_OPTIONS.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt.toUpperCase()}
-              </option>
-            ))}
-          </select>
         </div>
       </CardHeader>
       <CardBody>

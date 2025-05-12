@@ -4,17 +4,22 @@ import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardBody } from '@heroui/react';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import FrequencyAnalysisWidget from '../components/widgets/FrequencyAnalysisWidget';
-import { AsciiDistributionWidget, BASE_OPTIONS } from '../components/widgets/AsciiDistributionWidget';
+import { AsciiDistributionWidget } from '../components/widgets/AsciiDistributionWidget';
 import FrequencyStdDevWidget from '../components/widgets/FrequencyStdDev';
+import { IndexOfCoincidenceWidget } from '@/components/widgets/IndexOfCoincidenceWidget';
 
 const AVAILABLE_WIDGETS = {
   frequency: 'Frequency Analysis',
   ascii: 'ASCII Distribution',
   freqstddev: 'Frequency Std Dev',
+  coincidence: 'Index of Coincidence',
 };
 
+export const BASE_OPTIONS = ['ascii', 'hex', 'decimal', 'base64', 'octal'] as const;
+export type BaseType = (typeof BASE_OPTIONS)[number];
+
 type WidgetKey = keyof typeof AVAILABLE_WIDGETS;
-type BaseType = (typeof BASE_OPTIONS)[number];
+
 
 export default function DashboardPage() {
   const [inputText, setInputText] = useState('');
@@ -83,6 +88,20 @@ export default function DashboardPage() {
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Enter your text here..."
           />
+          <div className="mt-4">
+            <label className="mr-2 font-medium">Text encoding:</label>
+            <select
+              value={asciiBase}
+              onChange={(e) => setAsciiBase(e.target.value as BaseType)}
+              className="p-2 border rounded"
+            >
+              {BASE_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
         </CardBody>
       </Card>
 
@@ -118,13 +137,21 @@ export default function DashboardPage() {
             <AsciiDistributionWidget
               key={widget}
               text={inputText}
-              initialBase={asciiBase}
-              onBaseChange={setAsciiBase}
+              base={asciiBase}
             />
           );
         }
         if (widget === 'freqstddev') {
           return <FrequencyStdDevWidget key={widget} text={inputText} />;
+        }
+        if (widget === 'coincidence') {
+          return (
+            <IndexOfCoincidenceWidget
+              key={widget}
+              text={inputText}
+              base={asciiBase}
+            />
+          );
         }
         return null;
       })}
