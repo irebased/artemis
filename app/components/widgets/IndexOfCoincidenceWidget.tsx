@@ -12,6 +12,7 @@ import {
   Legend,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { BaseType } from '@/types/bases';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels);
 
@@ -23,8 +24,6 @@ const IC_BASELINES = {
   octal: { english: 0.20402, random: 0.12121 },
 } as const;
 
-type BaseType = keyof typeof IC_BASELINES;
-
 export function IndexOfCoincidenceWidget({
   text,
   base,
@@ -33,7 +32,7 @@ export function IndexOfCoincidenceWidget({
   base: BaseType;
 }) {
   const { ic, total, error } = useMemo(() => {
-    const symbols = [...text]; // raw characters
+    const symbols = text.split('');
 
     if (symbols.length < 2) return { ic: 0, total: 0, error: null };
 
@@ -118,6 +117,7 @@ export function IndexOfCoincidenceWidget({
               <strong>Index of Coincidence:</strong> {ic.toFixed(5)}
             </p>
             <div className="w-full" style={{ height: 300 }}>
+              {/* @ts-ignore */}
               <Bar data={data} options={options} />
             </div>
           </>

@@ -7,6 +7,7 @@ import FrequencyAnalysisWidget from '../components/widgets/FrequencyAnalysisWidg
 import { AsciiDistributionWidget } from '../components/widgets/AsciiDistributionWidget';
 import FrequencyStdDevWidget from '../components/widgets/FrequencyStdDev';
 import { IndexOfCoincidenceWidget } from '@/components/widgets/IndexOfCoincidenceWidget';
+import { BASE_OPTIONS, BaseType } from '@/types/bases';
 
 const AVAILABLE_WIDGETS = {
   frequency: 'Frequency Analysis',
@@ -14,9 +15,6 @@ const AVAILABLE_WIDGETS = {
   freqstddev: 'Frequency Std Dev',
   coincidence: 'Index of Coincidence',
 };
-
-export const BASE_OPTIONS = ['ascii', 'hex', 'decimal', 'base64', 'octal'] as const;
-export type BaseType = (typeof BASE_OPTIONS)[number];
 
 type WidgetKey = keyof typeof AVAILABLE_WIDGETS;
 
