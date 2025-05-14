@@ -27,6 +27,8 @@ export default function DashboardPage() {
   const [asciiBase, setAsciiBase] = useState<BaseType>('ascii');
   const [entropyMode, setEntropyMode] = useState<'raw' | 'sliding'>('raw');
   const [entropyWindow, setEntropyWindow] = useState<number>(64);
+  const [icMode, setIcMode] = useState<'summary' | 'period'>('summary');
+
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
@@ -35,6 +37,7 @@ export default function DashboardPage() {
     const baseParam = query.get('base');
     const modeParam = query.get('entropyMode');
     const windowParam = query.get('entropyWindow');
+    const icModeParam = query.get('icMode');
 
     if (widgetParam) {
       const widgetList = widgetParam
@@ -59,6 +62,11 @@ export default function DashboardPage() {
     if (windowParam && !isNaN(parseInt(windowParam))) {
       setEntropyWindow(parseInt(windowParam));
     }
+
+    if (icModeParam === 'summary' || icModeParam === 'period') {
+      setIcMode(icModeParam);
+    }
+
   }, []);
 
   useEffect(() => {
@@ -70,10 +78,11 @@ export default function DashboardPage() {
     if (asciiBase) params.set('base', asciiBase);
     if (entropyMode) params.set('entropyMode', entropyMode);
     if (entropyMode === 'sliding') params.set('entropyWindow', entropyWindow.toString());
+    if (icMode) params.set('icMode', icMode);
 
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState(null, '', newUrl);
-  }, [inputText, widgets, asciiBase, entropyMode, entropyWindow]);
+  }, [inputText, widgets, asciiBase, entropyMode, entropyWindow, icMode]);
 
   const toggleWidget = (widget: WidgetKey) => {
     setWidgets((prev) =>
@@ -156,6 +165,8 @@ export default function DashboardPage() {
               key={widget}
               text={inputText}
               base={asciiBase}
+              view={icMode}
+              onViewChange={setIcMode}
             />
           );
         }

@@ -26,6 +26,7 @@
     "@react-aria/visually-hidden": "3.8.22",
     "add": "^2.0.6",
     "chart.js": "^4.4.9",
+    "chartjs-plugin-annotation": "^3.1.0",
     "chartjs-plugin-datalabels": "^2.2.0",
     "clsx": "2.1.1",
     "framer-motion": "11.13.1",
