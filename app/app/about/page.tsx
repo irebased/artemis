@@ -59,6 +59,14 @@ export default function AboutPage() {
         sheltered by hills and hope, life would always be just a little sweeter, and dreams would always
         find a place to take root.</i>
       </details>
+      <br/>
+      <p>
+        For the random sample, I will take the full alphabet and repeat it a few times. This gives each character equivalent frequency,
+        creating an equally flat distribution of characters across the entire character set for any given base, which is pretty good for
+        simulating randomness. There are other ways to represent a perfectly random string in any base. This is not perfect if randomness
+        also considers a lack of repeating patterns (such as period) but for this tool I find it sufficient. The values are not computed
+        on the fly, they are hard-coded. So if you have better values and can share how you got to them, feel free to reach out.
+      </p>
     </div>
   );
 }
