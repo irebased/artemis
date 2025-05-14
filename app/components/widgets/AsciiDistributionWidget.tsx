@@ -110,7 +110,7 @@ export function AsciiDistributionWidget({
         font: {
           weight: 'bold',
         },
-        color: '#1e3a8a',
+        color: '#999',
       },
     },
     responsive: true,

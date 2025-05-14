@@ -60,7 +60,7 @@ export default function FrequencyAnalysisWidget({ text }: { text: string }) {
         font: {
           weight: 'bold',
         },
-        color: '#1e3a8a',
+        color: '#999',
       },
     },
     responsive: true,

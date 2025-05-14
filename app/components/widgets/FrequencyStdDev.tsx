@@ -74,7 +74,7 @@ export default function FrequencyStdDevWidget({ text }: { text: string }) {
         align: 'end',
         formatter: (value: number) => (value !== 0 ? value.toFixed(2) : ''),
         font: { weight: 'bold' },
-        color: '#064e3b',
+        color: '#999',
       },
     },
     responsive: true,

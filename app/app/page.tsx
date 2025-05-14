@@ -7,6 +7,7 @@ import FrequencyAnalysisWidget from '../components/widgets/FrequencyAnalysisWidg
 import { AsciiDistributionWidget } from '../components/widgets/AsciiDistributionWidget';
 import FrequencyStdDevWidget from '../components/widgets/FrequencyStdDev';
 import { IndexOfCoincidenceWidget } from '@/components/widgets/IndexOfCoincidenceWidget';
+import { ShannonEntropyWidget } from '@/components/widgets/ShannonEntropyWidget';
 import { BASE_OPTIONS, BaseType } from '@/types/bases';
 
 const AVAILABLE_WIDGETS = {
@@ -14,6 +15,7 @@ const AVAILABLE_WIDGETS = {
   ascii: 'ASCII Distribution',
   freqstddev: 'Frequency Std Dev',
   coincidence: 'Index of Coincidence',
+  entropy: 'Shannon Entropy',
 };
 
 type WidgetKey = keyof typeof AVAILABLE_WIDGETS;
@@ -23,49 +25,55 @@ export default function DashboardPage() {
   const [inputText, setInputText] = useState('');
   const [widgets, setWidgets] = useState<WidgetKey[]>([]);
   const [asciiBase, setAsciiBase] = useState<BaseType>('ascii');
+  const [entropyMode, setEntropyMode] = useState<'raw' | 'sliding'>('raw');
+  const [entropyWindow, setEntropyWindow] = useState<number>(64);
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     const widgetParam = query.get('widgets');
     const dataParam = query.get('data');
     const baseParam = query.get('base');
+    const modeParam = query.get('entropyMode');
+    const windowParam = query.get('entropyWindow');
 
     if (widgetParam) {
       const widgetList = widgetParam
         .split(',')
         .filter((w) => w in AVAILABLE_WIDGETS) as WidgetKey[];
       setWidgets(widgetList);
-    } else {
-      setWidgets([]);
     }
 
     if (dataParam) {
       const decoded = decompressFromEncodedURIComponent(dataParam);
-      if (decoded) {
-        setInputText(decoded);
-      }
+      if (decoded) setInputText(decoded);
     }
 
     if (baseParam && BASE_OPTIONS.includes(baseParam as BaseType)) {
       setAsciiBase(baseParam as BaseType);
+    }
+
+    if (modeParam === 'sliding' || modeParam === 'raw') {
+      setEntropyMode(modeParam);
+    }
+
+    if (windowParam && !isNaN(parseInt(windowParam))) {
+      setEntropyWindow(parseInt(windowParam));
     }
   }, []);
 
   useEffect(() => {
     const compressedText = compressToEncodedURIComponent(inputText);
     const params = new URLSearchParams();
-    if (widgets.length > 0) {
-      params.set('widgets', widgets.join(','));
-    }
-    if (inputText) {
-      params.set('data', compressedText);
-    }
-    if (asciiBase) {
-      params.set('base', asciiBase);
-    }
+
+    if (widgets.length > 0) params.set('widgets', widgets.join(','));
+    if (inputText) params.set('data', compressedText);
+    if (asciiBase) params.set('base', asciiBase);
+    if (entropyMode) params.set('entropyMode', entropyMode);
+    if (entropyMode === 'sliding') params.set('entropyWindow', entropyWindow.toString());
+
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState(null, '', newUrl);
-  }, [inputText, widgets, asciiBase]);
+  }, [inputText, widgets, asciiBase, entropyMode, entropyWindow]);
 
   const toggleWidget = (widget: WidgetKey) => {
     setWidgets((prev) =>
@@ -148,6 +156,19 @@ export default function DashboardPage() {
               key={widget}
               text={inputText}
               base={asciiBase}
+            />
+          );
+        }
+        if (widget === 'entropy') {
+          return (
+            <ShannonEntropyWidget
+              key={widget}
+              text={inputText}
+              base={asciiBase}
+              mode={entropyMode}
+              windowSize={entropyWindow}
+              onModeChange={setEntropyMode}
+              onWindowSizeChange={setEntropyWindow}
             />
           );
         }
