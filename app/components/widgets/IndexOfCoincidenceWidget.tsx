@@ -151,7 +151,7 @@ export function IndexOfCoincidenceWidget({
               </div>
             </div>
           ) : (
-            <div className="w-full" style={{ height: 300 }}>
+            <div className="w-full" style={{ height: 300, padding: "20px 0px" }}>
               <Line
                 data={periodChartData}
                 options={{
