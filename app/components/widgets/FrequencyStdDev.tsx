@@ -2,7 +2,6 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Card, CardHeader, CardBody } from '@heroui/react';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -99,30 +98,28 @@ export default function FrequencyStdDevWidget({ text, width, height }: { text: s
   };
 
   return (
-    <Card className="mb-4 h-full">
-      <CardHeader>
+    <>
+      <div className="mb-2">
         <h3 className="text-lg font-semibold">Frequency Standard Deviation</h3>
-      </CardHeader>
-      <CardBody className="h-full">
-        {text ? (
-          <>
-            <div className="mb-4">
-              <p>
-                <strong>Mean Frequency:</strong> {mean.toFixed(2)}
-              </p>
-              <p>
-                <strong>Standard Deviation:</strong> {stdDev.toFixed(2)}
-              </p>
-            </div>
-            <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%' }}>
-              <Bar data={data} options={options} />
-            </div>
-          </>
-        ) : (
-          <p>No data to display.</p>
-        )}
-      </CardBody>
-    </Card>
+      </div>
+      {text ? (
+        <>
+          <div className="mb-4">
+            <p>
+              <strong>Mean Frequency:</strong> {mean.toFixed(2)}
+            </p>
+            <p>
+              <strong>Standard Deviation:</strong> {stdDev.toFixed(2)}
+            </p>
+          </div>
+          <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%' }}>
+            <Bar data={data} options={options} />
+          </div>
+        </>
+      ) : (
+        <p>No data to display.</p>
+      )}
+    </>
   );
 }
 

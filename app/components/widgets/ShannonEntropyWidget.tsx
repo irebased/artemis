@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Card, CardHeader, CardBody } from '@heroui/react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -100,8 +99,8 @@ export function ShannonEntropyWidget({
   }, [text, base, mode, windowSize]);
 
   return (
-    <Card className="mb-4 h-full min-h-0">
-      <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+    <>
+      <div className="mb-2 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <h3 className="text-lg font-semibold">Shannon Entropy</h3>
         <div className="flex flex-wrap items-center gap-2 gap-y-1 justify-end">
           <label className="font-medium">Mode:</label>
@@ -128,72 +127,70 @@ export function ShannonEntropyWidget({
             </>
           )}
         </div>
-      </CardHeader>
-      <CardBody className="h-full min-h-0 flex flex-col">
-        {text ? (
-          mode === 'sliding' ? (
-            <div className="w-full h-full min-h-0" style={{ height: height ?? '100%', width: width ?? '100%' }}>
-              <Line
-                data={{
-                  labels: slidingSeries.map((_, i) => i.toString()),
-                  datasets: [
-                    {
-                      label: 'Entropy',
-                      data: slidingSeries,
-                      borderColor: 'rgba(59,130,246,1)',
-                      backgroundColor: 'rgba(59,130,246,0.3)',
-                      tension: 0.2,
-                      datalabels: { color: '#999' },
-                    },
-                  ],
-                }}
-                options={{
-                  plugins: {
-                    legend: { display: false },
-                    datalabels: {
-                      display: false,
-                    },
+      </div>
+      {text ? (
+        mode === 'sliding' ? (
+          <div className="w-full h-full min-h-0" style={{ height: height ?? '100%', width: width ?? '100%' }}>
+            <Line
+              data={{
+                labels: slidingSeries.map((_, i) => i.toString()),
+                datasets: [
+                  {
+                    label: 'Entropy',
+                    data: slidingSeries,
+                    borderColor: 'rgba(59,130,246,1)',
+                    backgroundColor: 'rgba(59,130,246,0.3)',
+                    tension: 0.2,
+                    datalabels: { color: '#999' },
                   },
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      grid: { color: 'rgba(0,0,0,0.05)' },
-                    },
-                    x: {
-                      display: false,
-                      grid: { display: false },
-                    },
+                ],
+              }}
+              options={{
+                plugins: {
+                  legend: { display: false },
+                  datalabels: {
+                    display: false,
                   },
-                }}
-              />
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                  },
+                  x: {
+                    display: false,
+                    grid: { display: false },
+                  },
+                },
+              }}
+            />
+          </div>
+        ) : (
+          <div className="flex-1 h-full w-full flex flex-col justify-center items-center space-y-2 min-h-0">
+            <div className="text-4xl font-bold">
+              {entropy.toFixed(5)} bits/symbol
             </div>
-          ) : (
-            <div className="flex-1 h-full w-full flex flex-col justify-center items-center space-y-2 min-h-0">
-              <div className="text-4xl font-bold">
-                {entropy.toFixed(5)} bits/symbol
-              </div>
-              <div className="text-sm text-gray-600 w-fit">
-                <div className="flex justify-between gap-12">
-                  <div>
-                    <strong>English avg:</strong> {baseline.english.toFixed(5)}
-                  </div>
-                  <div>
-                    <strong>Random avg:</strong> {baseline.random.toFixed(5)}
-                  </div>
+            <div className="text-sm text-gray-600 w-fit">
+              <div className="flex justify-between gap-12">
+                <div>
+                  <strong>English avg:</strong> {baseline.english.toFixed(5)}
+                </div>
+                <div>
+                  <strong>Random avg:</strong> {baseline.random.toFixed(5)}
                 </div>
               </div>
-              <div className="text-sm text-gray-600 text-center">
-                ({total} characters, {unique} unique)
-              </div>
             </div>
-          )
-        ) : (
-          <p>No input provided.</p>
-        )}
-      </CardBody>
-    </Card>
+            <div className="text-sm text-gray-600 text-center">
+              ({total} characters, {unique} unique)
+            </div>
+          </div>
+        )
+      ) : (
+        <p>No input provided.</p>
+      )}
+    </>
   );
 }
 

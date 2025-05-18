@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Card, CardHeader, CardBody } from '@heroui/react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -120,8 +119,8 @@ export function IndexOfCoincidenceWidget({
   };
 
   return (
-    <Card className="mb-4 h-full">
-      <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+    <>
+      <div className="mb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <h3 className="text-lg font-semibold">Index of Coincidence</h3>
         <div className="flex flex-wrap items-center gap-2 gap-y-1 justify-end">
           <label className="font-medium">View:</label>
@@ -134,83 +133,81 @@ export function IndexOfCoincidenceWidget({
             <option value="period">Period Analysis</option>
           </select>
         </div>
-      </CardHeader>
-      <CardBody className="h-full">
-        {text ? (
-          view === 'summary' ? (
-            <div className="space-y-2 flex flex-col items-center h-full">
-              <div className="text-4xl font-bold">{ic.toFixed(5)}</div>
-              <div className="text-sm text-gray-600 w-fit">
-                <div className="flex justify-between gap-12">
-                  <div>
-                    <strong>English avg:</strong> {baseline.english.toFixed(5)}
-                  </div>
-                  <div>
-                    <strong>Random avg:</strong> {baseline.random.toFixed(5)}
-                  </div>
+      </div>
+      {text ? (
+        view === 'summary' ? (
+          <div className="space-y-2 flex flex-col items-center h-full">
+            <div className="text-4xl font-bold">{ic.toFixed(5)}</div>
+            <div className="text-sm text-gray-600 w-fit">
+              <div className="flex justify-between gap-12">
+                <div>
+                  <strong>English avg:</strong> {baseline.english.toFixed(5)}
+                </div>
+                <div>
+                  <strong>Random avg:</strong> {baseline.random.toFixed(5)}
                 </div>
               </div>
-              <div className="text-sm text-gray-600 text-center">
-                ({total} characters, {Object.keys(freq).length} unique)
-              </div>
             </div>
-          ) : (
-            <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%', padding: '20px 0px' }}>
-              <Line
-                data={periodChartData}
-                options={{
-                  plugins: {
-                    legend: { display: true },
-                    datalabels: { display: false },
-                    tooltip: {
-                      callbacks: {
-                        afterBody: (ctx) => {
-                          const period = parseInt(ctx[0].label);
-                          return period === maxEntry.period ? '⬆ Likely period' : '';
-                        },
-                      },
-                    },
-                    annotation: {
-                      annotations: {
-                        verticalLine: {
-                          type: 'line',
-                          scaleID: 'x',
-                          value: maxEntry.period.toString(),
-                          borderColor: 'red',
-                          borderWidth: 2,
-                          label: {
-                            display: true,
-                            content: 'Likely Period',
-                            position: 'end',
-                            color: '#999',
-                          },
-                        },
-                      },
-                    },
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                      grid: { color: 'rgba(0,0,0,0.05)' },
-                    },
-                    x: {
-                      grid: { color: 'rgba(0,0,0,0.05)' },
-                    },
-                  },
-                  responsive: true,
-                  maintainAspectRatio: false,
-                }}
-              />
-              <p className="text-sm text-center text-gray-600 mt-2">
-                Peak IC at period <strong>{maxEntry.period}</strong>: {maxEntry.averageIC.toFixed(5)}
-              </p>
+            <div className="text-sm text-gray-600 text-center">
+              ({total} characters, {Object.keys(freq).length} unique)
             </div>
-          )
+          </div>
         ) : (
-          <p>No input provided.</p>
-        )}
-      </CardBody>
-    </Card>
+          <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%', padding: '20px 0px' }}>
+            <Line
+              data={periodChartData}
+              options={{
+                plugins: {
+                  legend: { display: true },
+                  datalabels: { display: false },
+                  tooltip: {
+                    callbacks: {
+                      afterBody: (ctx) => {
+                        const period = parseInt(ctx[0].label);
+                        return period === maxEntry.period ? '⬆ Likely period' : '';
+                      },
+                    },
+                  },
+                  annotation: {
+                    annotations: {
+                      verticalLine: {
+                        type: 'line',
+                        scaleID: 'x',
+                        value: maxEntry.period.toString(),
+                        borderColor: 'red',
+                        borderWidth: 2,
+                        label: {
+                          display: true,
+                          content: 'Likely Period',
+                          position: 'end',
+                          color: '#999',
+                        },
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                  },
+                  x: {
+                    grid: { color: 'rgba(0,0,0,0.05)' },
+                  },
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+              }}
+            />
+            <p className="text-sm text-center text-gray-600 mt-2">
+              Peak IC at period <strong>{maxEntry.period}</strong>: {maxEntry.averageIC.toFixed(5)}
+            </p>
+          </div>
+        )
+      ) : (
+        <p>No input provided.</p>
+      )}
+    </>
   );
 }
 

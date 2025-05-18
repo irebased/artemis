@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { useMemo } from 'react';
-import { Card, CardHeader, CardBody } from '@heroui/react';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -98,20 +97,18 @@ export default function FrequencyAnalysisWidget({ text, width, height }: { text:
   };
 
   return (
-    <Card className="mb-4 h-full">
-      <CardHeader>
+    <>
+      <div className="mb-2">
         <h3 className="text-lg font-semibold">Frequency Analysis</h3>
-      </CardHeader>
-      <CardBody className="h-full">
-        {labels.length > 0 ? (
-          <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%' }}>
-            <Bar data={data} options={options} />
-          </div>
-        ) : (
-          <p>No data to display.</p>
-        )}
-      </CardBody>
-    </Card>
+      </div>
+      {labels.length > 0 ? (
+        <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%' }}>
+          <Bar data={data} options={options} />
+        </div>
+      ) : (
+        <p>No data to display.</p>
+      )}
+    </>
   );
 }
 

@@ -2,7 +2,6 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Card, CardHeader, CardBody } from '@heroui/react';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -152,24 +151,20 @@ export function AsciiDistributionWidget({
   };
 
   return (
-    <Card className="mb-4 h-full">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold mx-4">ASCII Distribution</h3>
+    <>
+      <div className="mb-2 flex justify-between items-center">
+        <h3 className="text-lg font-semibold mx-4">ASCII Distribution</h3>
+      </div>
+      {error ? (
+        <p className="text-red-500">{error}</p>
+      ) : text ? (
+        <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%' }}>
+          <Bar data={data} options={options} />
         </div>
-      </CardHeader>
-      <CardBody className="h-full">
-        {error ? (
-          <p className="text-red-500">{error}</p>
-        ) : text ? (
-          <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%' }}>
-            <Bar data={data} options={options} />
-          </div>
-        ) : (
-          <p>No data to display.</p>
-        )}
-      </CardBody>
-    </Card>
+      ) : (
+        <p>No data to display.</p>
+      )}
+    </>
   );
 }
 
