@@ -14,7 +14,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels);
 
-export default function FrequencyAnalysisWidget({ text }: { text: string }) {
+export default function FrequencyAnalysisWidget({ text, width, height }: { text: string, width?: number, height?: number }) {
   const { labels, counts } = useMemo(() => {
     const freq: Record<string, number> = {};
     for (const char of text) {
@@ -97,18 +97,14 @@ export default function FrequencyAnalysisWidget({ text }: { text: string }) {
     },
   };
 
-  const barHeight = 20;
-  const minHeight = 300;
-  const chartHeight = Math.max(labels.length * barHeight, minHeight);
-
   return (
-    <Card className="mb-4">
+    <Card className="mb-4 h-full">
       <CardHeader>
         <h3 className="text-lg font-semibold">Frequency Analysis</h3>
       </CardHeader>
-      <CardBody>
+      <CardBody className="h-full">
         {labels.length > 0 ? (
-          <div className="w-full" style={{ height: chartHeight }}>
+          <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%' }}>
             <Bar data={data} options={options} />
           </div>
         ) : (
@@ -118,4 +114,6 @@ export default function FrequencyAnalysisWidget({ text }: { text: string }) {
     </Card>
   );
 }
+
+export const defaultGridSize = { w: 1, h: 1 };
 

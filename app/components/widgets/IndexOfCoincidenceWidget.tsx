@@ -71,11 +71,15 @@ export function IndexOfCoincidenceWidget({
   base,
   view,
   onViewChange,
+  width,
+  height,
 }: {
   text: string;
   base: keyof typeof IC_BASELINES;
   view: 'summary' | 'period';
   onViewChange: (view: 'summary' | 'period') => void;
+  width?: number;
+  height?: number;
 }) {
   const baseline = IC_BASELINES[base];
 
@@ -116,7 +120,7 @@ export function IndexOfCoincidenceWidget({
   };
 
   return (
-    <Card className="mb-4">
+    <Card className="mb-4 h-full">
       <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <h3 className="text-lg font-semibold">Index of Coincidence</h3>
         <div className="flex items-center gap-2">
@@ -131,10 +135,10 @@ export function IndexOfCoincidenceWidget({
           </select>
         </div>
       </CardHeader>
-      <CardBody>
+      <CardBody className="h-full">
         {text ? (
           view === 'summary' ? (
-            <div className="space-y-2 flex flex-col items-center">
+            <div className="space-y-2 flex flex-col items-center h-full">
               <div className="text-4xl font-bold">{ic.toFixed(5)}</div>
               <div className="text-sm text-gray-600 w-fit">
                 <div className="flex justify-between gap-12">
@@ -151,7 +155,7 @@ export function IndexOfCoincidenceWidget({
               </div>
             </div>
           ) : (
-            <div className="w-full" style={{ height: 300, padding: "20px 0px" }}>
+            <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%', padding: '20px 0px' }}>
               <Line
                 data={periodChartData}
                 options={{
@@ -209,3 +213,5 @@ export function IndexOfCoincidenceWidget({
     </Card>
   );
 }
+
+export const defaultGridSize = { w: 1, h: 1 };

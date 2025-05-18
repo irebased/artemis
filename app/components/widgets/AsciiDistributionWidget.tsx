@@ -20,9 +20,13 @@ ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartD
 export function AsciiDistributionWidget({
   text,
   base,
+  width,
+  height,
 }: {
   text: string;
   base: BaseType;
+  width?: number;
+  height?: number;
 }) {
   const [error, setError] = useState<string | null>(null);
 
@@ -148,17 +152,17 @@ export function AsciiDistributionWidget({
   };
 
   return (
-    <Card className="mb-4">
+    <Card className="mb-4 h-full">
       <CardHeader>
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-semibold mx-4">ASCII Distribution</h3>
         </div>
       </CardHeader>
-      <CardBody>
+      <CardBody className="h-full">
         {error ? (
           <p className="text-red-500">{error}</p>
         ) : text ? (
-          <div className="w-full" style={{ height: 400 }}>
+          <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%' }}>
             <Bar data={data} options={options} />
           </div>
         ) : (
@@ -168,3 +172,5 @@ export function AsciiDistributionWidget({
     </Card>
   );
 }
+
+export const defaultGridSize = { w: 2, h: 2 };

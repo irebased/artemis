@@ -16,7 +16,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels);
 
-export default function FrequencyStdDevWidget({ text }: { text: string }) {
+export default function FrequencyStdDevWidget({ text, width, height }: { text: string, width?: number, height?: number }) {
   const { labels, mean, stdDev, deviations } = useMemo(() => {
     const freq: Record<string, number> = {};
     for (const char of text) {
@@ -99,11 +99,11 @@ export default function FrequencyStdDevWidget({ text }: { text: string }) {
   };
 
   return (
-    <Card className="mb-4">
+    <Card className="mb-4 h-full">
       <CardHeader>
         <h3 className="text-lg font-semibold">Frequency Standard Deviation</h3>
       </CardHeader>
-      <CardBody>
+      <CardBody className="h-full">
         {text ? (
           <>
             <div className="mb-4">
@@ -114,7 +114,7 @@ export default function FrequencyStdDevWidget({ text }: { text: string }) {
                 <strong>Standard Deviation:</strong> {stdDev.toFixed(2)}
               </p>
             </div>
-            <div className="w-full" style={{ height: 400 }}>
+            <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%' }}>
               <Bar data={data} options={options} />
             </div>
           </>
@@ -125,3 +125,5 @@ export default function FrequencyStdDevWidget({ text }: { text: string }) {
     </Card>
   );
 }
+
+export const defaultGridSize = { w: 2, h: 2 };
