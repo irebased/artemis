@@ -123,7 +123,7 @@ export function IndexOfCoincidenceWidget({
     <Card className="mb-4 h-full">
       <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <h3 className="text-lg font-semibold">Index of Coincidence</h3>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 gap-y-1 justify-end">
           <label className="font-medium">View:</label>
           <select
             value={view}

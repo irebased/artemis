@@ -94,6 +94,20 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
+    const zParam = query.get('z');
+    if (zParam) {
+      try {
+        const decoded = JSON.parse(decompressFromEncodedURIComponent(zParam));
+        if (decoded.widgets) setWidgets(decoded.widgets);
+        if (decoded.data) setInputText(decoded.data);
+        if (decoded.base && BASE_OPTIONS.includes(decoded.base as BaseType)) setAsciiBase(decoded.base as BaseType);
+        if (decoded.entropyMode === 'sliding' || decoded.entropyMode === 'raw') setEntropyMode(decoded.entropyMode);
+        if (decoded.entropyWindow && !isNaN(parseInt(decoded.entropyWindow))) setEntropyWindow(Number(decoded.entropyWindow));
+        if (decoded.icMode === 'summary' || decoded.icMode === 'period') setIcMode(decoded.icMode);
+        if (decoded.layout) setLayouts(decoded.layout);
+        return;
+      } catch (e) {}
+    }
     const widgetParam = query.get('widgets');
     const dataParam = query.get('data');
     const baseParam = query.get('base');
@@ -139,19 +153,41 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
+    const paramsObj = {
+      widgets,
+      data: inputText,
+      base: asciiBase,
+      entropyMode,
+      entropyWindow,
+      icMode,
+      layout: layouts,
+    };
+    const compressed = compressToEncodedURIComponent(JSON.stringify(paramsObj));
+
+    // Build legacy params
     const compressedText = compressToEncodedURIComponent(inputText);
-    const params = new URLSearchParams();
+    const legacyParams = new URLSearchParams();
+    if (widgets.length > 0) legacyParams.set('widgets', widgets.join(','));
+    if (inputText) legacyParams.set('data', compressedText);
+    if (asciiBase) legacyParams.set('base', asciiBase);
+    if (entropyMode) legacyParams.set('entropyMode', entropyMode);
+    if (entropyMode === 'sliding') legacyParams.set('entropyWindow', entropyWindow.toString());
+    if (icMode) legacyParams.set('icMode', icMode);
+    if (layouts) {
+      const layoutParam = compressToEncodedURIComponent(JSON.stringify(layouts));
+      legacyParams.set('layout', layoutParam);
+    }
+    const legacyQuery = legacyParams.toString();
 
-    if (widgets.length > 0) params.set('widgets', widgets.join(','));
-    if (inputText) params.set('data', compressedText);
-    if (asciiBase) params.set('base', asciiBase);
-    if (entropyMode) params.set('entropyMode', entropyMode);
-    if (entropyMode === 'sliding') params.set('entropyWindow', entropyWindow.toString());
-    if (icMode) params.set('icMode', icMode);
-
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    // Decide which to use
+    let newUrl;
+    if (compressed.length + 2 < legacyQuery.length) {
+      newUrl = `${window.location.pathname}?z=${compressed}`;
+    } else {
+      newUrl = `${window.location.pathname}?${legacyQuery}`;
+    }
     window.history.replaceState(null, '', newUrl);
-  }, [inputText, widgets, asciiBase, entropyMode, entropyWindow, icMode]);
+  }, [inputText, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts]);
 
   const toggleWidget = (widget: WidgetKey) => {
     setWidgets((prev) =>

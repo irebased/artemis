@@ -100,10 +100,10 @@ export function ShannonEntropyWidget({
   }, [text, base, mode, windowSize]);
 
   return (
-    <Card className="mb-4 h-full">
+    <Card className="mb-4 h-full min-h-0">
       <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <h3 className="text-lg font-semibold">Shannon Entropy</h3>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 gap-y-1 justify-end">
           <label className="font-medium">Mode:</label>
           <select
             value={mode}
@@ -129,10 +129,10 @@ export function ShannonEntropyWidget({
           )}
         </div>
       </CardHeader>
-      <CardBody className="h-full">
+      <CardBody className="h-full min-h-0 flex flex-col">
         {text ? (
           mode === 'sliding' ? (
-            <div className="w-full h-full" style={{ height: height ?? 300, width: width ?? '100%' }}>
+            <div className="w-full h-full min-h-0" style={{ height: height ?? '100%', width: width ?? '100%' }}>
               <Line
                 data={{
                   labels: slidingSeries.map((_, i) => i.toString()),
@@ -170,7 +170,7 @@ export function ShannonEntropyWidget({
               />
             </div>
           ) : (
-            <div className="space-y-2 flex flex-col items-center h-full">
+            <div className="flex-1 h-full w-full flex flex-col justify-center items-center space-y-2 min-h-0">
               <div className="text-4xl font-bold">
                 {entropy.toFixed(5)} bits/symbol
               </div>
