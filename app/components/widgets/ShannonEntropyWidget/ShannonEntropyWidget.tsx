@@ -10,6 +10,7 @@ import {
   Legend,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { useShannonEntropyChart } from './useShannonEntropyChart';
 
 ChartJS.register(
   LineElement,
@@ -98,6 +99,8 @@ export function ShannonEntropyWidget({
     }
   }, [text, base, mode, windowSize]);
 
+  const { data, options } = useShannonEntropyChart(slidingSeries);
+
   return (
     <>
       <div className="mb-2 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
@@ -132,39 +135,8 @@ export function ShannonEntropyWidget({
         mode === 'sliding' ? (
           <div className="w-full h-full min-h-0" style={{ height: height ?? '100%', width: width ?? '100%' }}>
             <Line
-              data={{
-                labels: slidingSeries.map((_, i) => i.toString()),
-                datasets: [
-                  {
-                    label: 'Entropy',
-                    data: slidingSeries,
-                    borderColor: 'rgba(59,130,246,1)',
-                    backgroundColor: 'rgba(59,130,246,0.3)',
-                    tension: 0.2,
-                    datalabels: { color: '#999' },
-                  },
-                ],
-              }}
-              options={{
-                plugins: {
-                  legend: { display: false },
-                  datalabels: {
-                    display: false,
-                  },
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    grid: { color: 'rgba(0,0,0,0.05)' },
-                  },
-                  x: {
-                    display: false,
-                    grid: { display: false },
-                  },
-                },
-              }}
+              data={data}
+              options={options}
             />
           </div>
         ) : (

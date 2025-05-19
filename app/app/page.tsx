@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardBody } from '@heroui/react';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
-import FrequencyAnalysisWidget, { defaultGridSize as freqDefault } from '../components/widgets/FrequencyAnalysisWidget';
-import { AsciiDistributionWidget, defaultGridSize as asciiDefault } from '../components/widgets/AsciiDistributionWidget';
-import FrequencyStdDevWidget, { defaultGridSize as stddevDefault } from '../components/widgets/FrequencyStdDev';
-import { IndexOfCoincidenceWidget, defaultGridSize as icDefault } from '@/components/widgets/IndexOfCoincidenceWidget';
-import { ShannonEntropyWidget, defaultGridSize as entropyDefault } from '@/components/widgets/ShannonEntropyWidget';
+import FrequencyAnalysisWidget, { defaultGridSize as freqDefault } from '../components/widgets/FrequencyAnalysisWidget/FrequencyAnalysisWidget';
+import { AsciiDistributionWidget, defaultGridSize as asciiDefault } from '../components/widgets/AsciiDistributionWidget/AsciiDistributionWidget';
+import FrequencyStdDevWidget, { defaultGridSize as stddevDefault } from '../components/widgets/FrequencyStdDevWidget/FrequencyStdDev';
+import { IndexOfCoincidenceWidget, defaultGridSize as icDefault } from '@/components/widgets/IndexOfCoincidenceWidget/IndexOfCoincidenceWidget';
+import { ShannonEntropyWidget, defaultGridSize as entropyDefault } from '@/components/widgets/ShannonEntropyWidget/ShannonEntropyWidget';
 import { BASE_OPTIONS, BaseType } from '@/types/bases';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';

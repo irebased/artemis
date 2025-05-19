@@ -11,6 +11,7 @@ import {
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import annotationPlugin from 'chartjs-plugin-annotation';
+import { useIndexOfCoincidenceChart } from './useIndexOfCoincidenceChart';
 
 ChartJS.register(
   LineElement,
@@ -117,6 +118,8 @@ export function IndexOfCoincidenceWidget({
       },
     ],
   };
+
+  const { data, options } = useIndexOfCoincidenceChart(periodAnalysis, maxEntry);
 
   return (
     <>

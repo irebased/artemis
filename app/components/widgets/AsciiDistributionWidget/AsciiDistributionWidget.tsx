@@ -12,7 +12,8 @@ import {
   Legend,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { BaseType } from '../../app/page';
+import { BaseType } from '../../../app/page';
+import { useAsciiDistributionChart } from './useAsciiDistributionChart';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels);
 
@@ -82,73 +83,7 @@ export function AsciiDistributionWidget({
     return counts;
   }, [text, base]);
 
-  const data = {
-    labels: Array.from({ length: 256 }, (_, i) => i.toString()),
-    datasets: [
-      {
-        label: 'Count',
-        data: byteCounts,
-        borderWidth: 1,
-        backgroundColor: 'rgba(59, 130, 246, 0.7)',
-        hoverBackgroundColor: 'rgba(37, 99, 235, 0.8)',
-        borderColor: 'rgba(59, 130, 246, 0.7)',
-      },
-    ],
-  };
-
-  const options = {
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        callbacks: {
-          label: (context: any) => `Count: ${context.raw}`,
-        },
-      },
-      datalabels: {
-        anchor: 'end',
-        align: 'end',
-        formatter: (value: number) => (value > 0 ? value : ''),
-        font: {
-          weight: 'bold',
-        },
-        color: '#999',
-      },
-    },
-    responsive: true,
-    maintainAspectRatio: false,
-    borderSkipped: false,
-    animation: {
-      duration: 800,
-      easing: 'easeOutQuart',
-    },
-    scales: {
-      x: {
-        ticks: {
-          precision: 0,
-          maxRotation: 90,
-          minRotation: 90,
-        },
-        grid: {
-          drawBorder: false,
-          color: 'rgba(0,0,0,0.05)',
-        },
-      },
-      y: {
-        beginAtZero: true,
-        grid: {
-          drawBorder: false,
-          color: 'rgba(0,0,0,0.05)',
-        },
-      },
-    },
-    elements: {
-      bar: {
-        borderRadius: 3,
-      },
-    },
-  };
+  const { data, options } = useAsciiDistributionChart(byteCounts);
 
   return (
     <>

@@ -12,6 +12,7 @@ import {
   Legend,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { useFrequencyStdDevChart } from './useFrequencyStdDevChart';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels);
 
@@ -44,58 +45,7 @@ export default function FrequencyStdDevWidget({ text, width, height }: { text: s
     };
   }, [text]);
 
-  const data = {
-    labels,
-    datasets: [
-      {
-        label: 'Deviation from Mean',
-        data: deviations,
-        borderWidth: 1,
-        borderSkipped: false,
-        categoryPercentage: 1.0,
-        barPercentage: 1.0,
-        backgroundColor: 'rgba(16, 185, 129, 0.7)',
-        hoverBackgroundColor: 'rgba(5, 150, 105, 0.8)',
-      },
-    ],
-  };
-
-  const options = {
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: (context: any) => `Deviation: ${context.raw.toFixed(2)}`,
-        },
-      },
-      datalabels: {
-        anchor: 'end',
-        align: 'end',
-        formatter: (value: number) => (value !== 0 ? value.toFixed(2) : ''),
-        font: { weight: 'bold' },
-        color: '#999',
-      },
-    },
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: {
-      duration: 800,
-      easing: 'easeOutQuart',
-    },
-    scales: {
-      x: {
-        ticks: { precision: 0 },
-        grid: { drawBorder: false, color: 'rgba(0,0,0,0.05)' },
-      },
-      y: {
-        beginAtZero: false,
-        grid: { drawBorder: false, color: 'rgba(0,0,0,0.05)' },
-      },
-    },
-    elements: {
-      bar: { borderRadius: 3 },
-    },
-  };
+  const { data, options } = useFrequencyStdDevChart(labels, deviations);
 
   return (
     <>
