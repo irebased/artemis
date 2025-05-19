@@ -16,7 +16,12 @@ import { useFrequencyStdDevChart } from './useFrequencyStdDevChart';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels);
 
-export default function FrequencyStdDevWidget({ text, width, height, gridH }: { text: string, width?: number, height?: number, gridH?: number }) {
+export default function FrequencyStdDevWidget({ text, width, height, gridH }: {
+  text: string,
+  width?: number,
+  height?: number,
+  gridH?: number
+}) {
   const { labels, mean, stdDev, deviations } = useMemo(() => {
     const freq: Record<string, number> = {};
     for (const char of text) {

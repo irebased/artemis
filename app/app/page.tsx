@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Card, CardHeader, CardBody } from '@heroui/react';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import FrequencyAnalysisWidget, { defaultGridSize as freqDefault } from '../components/widgets/FrequencyAnalysisWidget/FrequencyAnalysisWidget';
@@ -75,6 +75,15 @@ function mergeLayoutsWithWidgets(layouts, widgets, cols) {
   return newLayouts;
 }
 
+// Utility function to process text based on ignore options
+function processText(text, { ignorePunctuation, ignoreWhitespace, ignoreCasing }) {
+  let result = text;
+  if (ignorePunctuation) result = result.replace(/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/g, '');
+  if (ignoreWhitespace) result = result.replace(/\s+/g, '');
+  if (ignoreCasing) result = result.toLowerCase();
+  return result;
+}
+
 export default function DashboardPage() {
   const {
     inputText, setInputText,
@@ -85,7 +94,13 @@ export default function DashboardPage() {
     icMode, setIcMode,
     layouts, setLayouts,
     handleLayoutChange,
+    ignorePunctuation, setIgnorePunctuation,
+    ignoreWhitespace, setIgnoreWhitespace,
+    ignoreCasing, setIgnoreCasing,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
+
+  // Compute adjusted text
+  const adjustedText = useMemo(() => processText(inputText, { ignorePunctuation, ignoreWhitespace, ignoreCasing }), [inputText, ignorePunctuation, ignoreWhitespace, ignoreCasing]);
 
   return (
     <div className="max-w-[1200px] mx-auto py-8 px-4">
@@ -113,6 +128,21 @@ export default function DashboardPage() {
                 </option>
               ))}
             </select>
+          </div>
+          <br/>
+          <div className="mb-4 flex flex-wrap gap-4">
+            <label className="flex items-center gap-1">
+              <input type="checkbox" checked={ignorePunctuation} onChange={e => setIgnorePunctuation(e.target.checked)} />
+              <span>Ignore punctuation</span>
+            </label>
+            <label className="flex items-center gap-1">
+              <input type="checkbox" checked={ignoreWhitespace} onChange={e => setIgnoreWhitespace(e.target.checked)} />
+              <span>Ignore whitespace</span>
+            </label>
+            <label className="flex items-center gap-1">
+              <input type="checkbox" checked={ignoreCasing} onChange={e => setIgnoreCasing(e.target.checked)} />
+              <span>Ignore casing</span>
+            </label>
           </div>
         </CardBody>
       </Card>
@@ -158,21 +188,21 @@ export default function DashboardPage() {
           let WidgetComponent = null;
           const layoutItem = layouts.lg.find((l) => l.i === widget) || { w: 1, h: 1 };
           if (widget === 'frequency') {
-            WidgetComponent = <FrequencyAnalysisWidget text={inputText} gridH={layoutItem.h} />;
+            WidgetComponent = <FrequencyAnalysisWidget text={adjustedText} gridH={layoutItem.h} />;
           } else if (widget === 'ascii') {
             WidgetComponent = (
               <AsciiDistributionWidget
-                text={inputText}
+                text={adjustedText}
                 base={asciiBase}
                 gridW={layoutItem.w}
               />
             );
           } else if (widget === 'freqstddev') {
-            WidgetComponent = <FrequencyStdDevWidget text={inputText} gridH={layoutItem.h} />;
+            WidgetComponent = <FrequencyStdDevWidget text={adjustedText} gridH={layoutItem.h} />;
           } else if (widget === 'coincidence') {
             WidgetComponent = (
               <IndexOfCoincidenceWidget
-                text={inputText}
+                text={adjustedText}
                 base={asciiBase}
                 view={icMode}
                 onViewChange={setIcMode}
@@ -181,7 +211,7 @@ export default function DashboardPage() {
           } else if (widget === 'entropy') {
             WidgetComponent = (
               <ShannonEntropyWidget
-                text={inputText}
+                text={adjustedText}
                 base={asciiBase}
                 mode={entropyMode}
                 windowSize={entropyWindow}

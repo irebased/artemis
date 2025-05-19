@@ -14,7 +14,12 @@ import { useFrequencyAnalysisChart } from './useFrequencyAnalysisChart';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels);
 
-export default function FrequencyAnalysisWidget({ text, width, height, gridH }: { text: string, width?: number, height?: number, gridH?: number }) {
+export default function FrequencyAnalysisWidget({ text, width, height, gridH }: {
+  text: string,
+  width?: number,
+  height?: number,
+  gridH?: number
+}) {
   const { labels, counts, percentages } = useMemo(() => {
     const freq: Record<string, number> = {};
     for (const char of text) {
