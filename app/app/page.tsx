@@ -97,6 +97,7 @@ export default function DashboardPage() {
     ignorePunctuation, setIgnorePunctuation,
     ignoreWhitespace, setIgnoreWhitespace,
     ignoreCasing, setIgnoreCasing,
+    asciiRange, setAsciiRange,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
 
   // Compute adjusted text
@@ -195,6 +196,8 @@ export default function DashboardPage() {
                 text={adjustedText}
                 base={asciiBase}
                 gridW={layoutItem.w}
+                asciiRange={asciiRange}
+                setAsciiRange={setAsciiRange}
               />
             );
           } else if (widget === 'freqstddev') {

@@ -17,6 +17,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   const [ignorePunctuation, setIgnorePunctuation] = useState(false);
   const [ignoreWhitespace, setIgnoreWhitespace] = useState(false);
   const [ignoreCasing, setIgnoreCasing] = useState(false);
+  const [asciiRange, setAsciiRange] = useState<'extended' | 'ascii' | 'input'>('extended');
 
   useEffect(() => {
     setLayouts(prev => mergeLayoutsWithWidgets(prev, widgets, COLS));
@@ -38,6 +39,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         if (typeof decoded.ignorePunctuation === 'boolean') setIgnorePunctuation(decoded.ignorePunctuation);
         if (typeof decoded.ignoreWhitespace === 'boolean') setIgnoreWhitespace(decoded.ignoreWhitespace);
         if (typeof decoded.ignoreCasing === 'boolean') setIgnoreCasing(decoded.ignoreCasing);
+        if (decoded.asciiRange === 'extended' || decoded.asciiRange === 'ascii' || decoded.asciiRange === 'input') setAsciiRange(decoded.asciiRange);
         return;
       } catch (e) {}
     }
@@ -51,6 +53,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const ignorePunctParam = query.get('ignorePunctuation');
     const ignoreWSParam = query.get('ignoreWhitespace');
     const ignoreCaseParam = query.get('ignoreCasing');
+    const asciiRangeParam = query.get('asciiRange');
 
     if (widgetParam) {
       const widgetList = widgetParam
@@ -83,6 +86,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     if (ignorePunctParam !== null) setIgnorePunctuation(ignorePunctParam === 'true');
     if (ignoreWSParam !== null) setIgnoreWhitespace(ignoreWSParam === 'true');
     if (ignoreCaseParam !== null) setIgnoreCasing(ignoreCaseParam === 'true');
+    if (asciiRangeParam === 'extended' || asciiRangeParam === 'ascii' || asciiRangeParam === 'input') setAsciiRange(asciiRangeParam);
   }, []);
 
   useEffect(() => {
@@ -97,6 +101,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       ignorePunctuation,
       ignoreWhitespace,
       ignoreCasing,
+      asciiRange,
     };
     const compressed = compressToEncodedURIComponent(JSON.stringify(paramsObj));
     const compressedText = compressToEncodedURIComponent(inputText);
@@ -114,6 +119,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     legacyParams.set('ignorePunctuation', String(ignorePunctuation));
     legacyParams.set('ignoreWhitespace', String(ignoreWhitespace));
     legacyParams.set('ignoreCasing', String(ignoreCasing));
+    legacyParams.set('asciiRange', asciiRange);
     const legacyQuery = legacyParams.toString();
     let newUrl;
     if (compressed.length + 2 < legacyQuery.length) {
@@ -122,7 +128,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       newUrl = `${window.location.pathname}?${legacyQuery}`;
     }
     window.history.replaceState(null, '', newUrl);
-  }, [inputText, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, ignorePunctuation, ignoreWhitespace, ignoreCasing]);
+  }, [inputText, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, ignorePunctuation, ignoreWhitespace, ignoreCasing, asciiRange]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -137,6 +143,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       ignorePunctuation,
       ignoreWhitespace,
       ignoreCasing,
+      asciiRange,
     };
     const compressed = compressToEncodedURIComponent(JSON.stringify(paramsObj));
     const compressedText = compressToEncodedURIComponent(inputText);
@@ -154,9 +161,10 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     params.set('ignorePunctuation', String(ignorePunctuation));
     params.set('ignoreWhitespace', String(ignoreWhitespace));
     params.set('ignoreCasing', String(ignoreCasing));
+    params.set('asciiRange', asciiRange);
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState(null, '', newUrl);
-  }, [widgets, inputText, asciiBase, entropyMode, entropyWindow, icMode, ignorePunctuation, ignoreWhitespace, ignoreCasing]);
+  }, [widgets, inputText, asciiBase, entropyMode, entropyWindow, icMode, ignorePunctuation, ignoreWhitespace, ignoreCasing, asciiRange]);
 
   return {
     inputText, setInputText,
@@ -170,5 +178,6 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     ignorePunctuation, setIgnorePunctuation,
     ignoreWhitespace, setIgnoreWhitespace,
     ignoreCasing, setIgnoreCasing,
+    asciiRange, setAsciiRange,
   };
 }

@@ -23,15 +23,18 @@ export function AsciiDistributionWidget({
   width,
   height,
   gridW,
+  asciiRange,
+  setAsciiRange,
 }: {
   text: string;
   base: BaseType;
   width?: number;
   height?: number;
   gridW?: number;
+  asciiRange: 'extended' | 'ascii' | 'input';
+  setAsciiRange: (v: 'extended' | 'ascii' | 'input') => void;
 }) {
   const [error, setError] = useState<string | null>(null);
-  const [rangeMode, setRangeMode] = useState<'extended' | 'ascii' | 'input'>('extended');
 
   const byteCounts = useMemo(() => {
     const counts = new Array(256).fill(0);
@@ -89,9 +92,9 @@ export function AsciiDistributionWidget({
   const { filteredCounts, labels, minIdx, maxIdx } = useMemo(() => {
     let start = 0, end = 255;
     let minIdx, maxIdx;
-    if (rangeMode === 'ascii') {
+    if (asciiRange === 'ascii') {
       end = 127;
-    } else if (rangeMode === 'input') {
+    } else if (asciiRange === 'input') {
       minIdx = byteCounts.findIndex((c) => c > 0);
       maxIdx = byteCounts.length - 1 - [...byteCounts].reverse().findIndex((c) => c > 0);
       if (minIdx === -1 || maxIdx === -1) {
@@ -103,7 +106,7 @@ export function AsciiDistributionWidget({
     const filteredCounts = byteCounts.slice(start, end + 1);
     const labels = Array.from({ length: end - start + 1 }, (_, i) => (start + i).toString());
     return { filteredCounts, labels, minIdx: start, maxIdx: end };
-  }, [byteCounts, rangeMode]);
+  }, [byteCounts, asciiRange]);
 
   const { data, options } = useAsciiDistributionChart(filteredCounts, gridW, labels);
 
@@ -113,8 +116,8 @@ export function AsciiDistributionWidget({
         <h3 className="text-lg font-semibold mx-2">ASCII Distribution</h3>
         <select
           className="p-1 border rounded text-xs max-w-full"
-          value={rangeMode}
-          onChange={e => setRangeMode(e.target.value as 'extended' | 'ascii' | 'input')}
+          value={asciiRange}
+          onChange={e => setAsciiRange(e.target.value as 'extended' | 'ascii' | 'input')}
         >
           <option value="extended">Extended ASCII (0-255)</option>
           <option value="ascii">ASCII (0-127)</option>
