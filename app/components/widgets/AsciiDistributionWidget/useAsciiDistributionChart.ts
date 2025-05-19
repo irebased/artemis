@@ -1,8 +1,8 @@
 import { ChartData, ChartOptions } from 'chart.js';
 
-export function useAsciiDistributionChart(byteCounts: number[], gridW?: number) {
+export function useAsciiDistributionChart(byteCounts: number[], gridW?: number, labels?: string[]) {
   const data: ChartData<'bar'> = {
-    labels: Array.from({ length: 256 }, (_, i) => i.toString()),
+    labels: labels || Array.from({ length: 256 }, (_, i) => i.toString()),
     datasets: [
       {
         label: 'Count',

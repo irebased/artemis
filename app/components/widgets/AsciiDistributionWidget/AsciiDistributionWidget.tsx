@@ -31,6 +31,7 @@ export function AsciiDistributionWidget({
   gridW?: number;
 }) {
   const [error, setError] = useState<string | null>(null);
+  const [rangeMode, setRangeMode] = useState<'extended' | 'ascii' | 'input'>('extended');
 
   const byteCounts = useMemo(() => {
     const counts = new Array(256).fill(0);
@@ -85,12 +86,40 @@ export function AsciiDistributionWidget({
     return counts;
   }, [text, base]);
 
-  const { data, options } = useAsciiDistributionChart(byteCounts, gridW);
+  const { filteredCounts, labels, minIdx, maxIdx } = useMemo(() => {
+    let start = 0, end = 255;
+    let minIdx, maxIdx;
+    if (rangeMode === 'ascii') {
+      end = 127;
+    } else if (rangeMode === 'input') {
+      minIdx = byteCounts.findIndex((c) => c > 0);
+      maxIdx = byteCounts.length - 1 - [...byteCounts].reverse().findIndex((c) => c > 0);
+      if (minIdx === -1 || maxIdx === -1) {
+        start = 0; end = 0;
+      } else {
+        start = minIdx; end = maxIdx;
+      }
+    }
+    const filteredCounts = byteCounts.slice(start, end + 1);
+    const labels = Array.from({ length: end - start + 1 }, (_, i) => (start + i).toString());
+    return { filteredCounts, labels, minIdx: start, maxIdx: end };
+  }, [byteCounts, rangeMode]);
+
+  const { data, options } = useAsciiDistributionChart(filteredCounts, gridW, labels);
 
   return (
     <>
-      <div className="mb-2 flex justify-between items-center">
-        <h3 className="text-lg font-semibold mx-4">ASCII Distribution</h3>
+      <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center">
+        <h3 className="text-lg font-semibold mx-2">ASCII Distribution</h3>
+        <select
+          className="p-1 border rounded text-xs max-w-full"
+          value={rangeMode}
+          onChange={e => setRangeMode(e.target.value as 'extended' | 'ascii' | 'input')}
+        >
+          <option value="extended">Extended ASCII (0-255)</option>
+          <option value="ascii">ASCII (0-127)</option>
+          <option value="input">Input Range only</option>
+        </select>
       </div>
       {error ? (
         <p className="text-red-500">{error}</p>
