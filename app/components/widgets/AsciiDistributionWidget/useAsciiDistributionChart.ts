@@ -1,55 +1,98 @@
-import { ChartData, ChartOptions } from 'chart.js';
+import { useMemo } from 'react';
 
-export function useAsciiDistributionChart(byteCounts: number[], gridW?: number, labels?: string[]) {
-  const data: ChartData<'bar'> = {
-    labels: labels || Array.from({ length: 256 }, (_, i) => i.toString()),
-    datasets: [
-      {
-        label: 'Count',
-        data: byteCounts,
-        borderWidth: 1,
-        backgroundColor: 'rgba(59, 130, 246, 0.7)',
-        hoverBackgroundColor: 'rgba(37, 99, 235, 0.8)',
-        borderColor: 'rgba(59, 130, 246, 0.7)',
-      },
-    ],
-  };
+export function useAsciiDistributionChart(texts, base, asciiRange) {
+  const data = useMemo(() => {
+    const distributions = texts.map(input => {
+      const counts = new Array(256).fill(0);
+      for (const char of input.text) {
+        const code = char.charCodeAt(0);
+        if (code < 256) {
+          counts[code]++;
+        }
+      }
+      return {
+        text: input.text,
+        color: input.color,
+        counts
+      };
+    });
 
-  const options: ChartOptions<'bar'> = {
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: { label: (context: any) => `Count: ${context.raw}` },
-      },
-      datalabels: {
-        anchor: 'end',
-        align: 'end',
-        display: () => {
-          const w = gridW || 1;
-          const density = data.labels ? data.labels.length / (8 * w) : 0;
-          return density < 1;
-        },
-        formatter: (value: number) => (value > 0 ? value : ''),
-        font: { weight: 'bold' },
-        color: '#999',
-      },
-    },
+    let start = 0;
+    let end = 256;
+    if (asciiRange === 'ascii') {
+      end = 128;
+    } else if (asciiRange === 'input') {
+      const usedCodes = new Set();
+      distributions.forEach(dist => {
+        dist.counts.forEach((count, code) => {
+          if (count > 0) usedCodes.add(code);
+        });
+      });
+      if (usedCodes.size > 0) {
+        const usedCodesArr = Array.from(usedCodes) as number[];
+        start = Math.min(...usedCodesArr);
+        end = Math.max(...usedCodesArr) + 1;
+      }
+    }
+
+    const datasets = distributions.map(dist => ({
+      label: `Text ${dist.text.slice(0, 20)}${dist.text.length > 20 ? '...' : ''}`,
+      data: dist.counts.slice(start, end),
+      backgroundColor: dist.color,
+      borderColor: dist.color,
+      borderWidth: 1,
+    }));
+
+    const labels = Array.from({ length: end - start }, (_, i) => {
+      const code = start + i;
+      return code;
+    });
+    return {
+      labels,
+      datasets,
+    };
+  }, [texts, base, asciiRange]);
+
+  const options = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
-    animation: { duration: 800, easing: 'easeOutQuart' },
-    scales: {
-      x: {
-        ticks: { precision: 0, maxRotation: 90, minRotation: 90 },
-        grid: { color: 'rgba(0,0,0,0.05)' },
+    plugins: {
+      legend: {
+        position: 'top',
       },
-      y: {
-        beginAtZero: true,
-        grid: { color: 'rgba(0,0,0,0.05)' },
-        max: Math.max(...byteCounts) * 1.1,
+      title: {
+        display: false,
+        text: '',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const label = context.dataset.label || '';
+            const value = context.parsed.y;
+            return `${label}: ${value}`;
+          }
+        }
+      },
+      datalabels: {
+        display: false,
       },
     },
-    elements: { bar: { borderRadius: 3 } },
-  };
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Count'
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: base.toUpperCase()
+        }
+      }
+    }
+  }), [texts, base, asciiRange]);
 
   return { data, options };
 }

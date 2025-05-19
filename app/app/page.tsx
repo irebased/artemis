@@ -1,19 +1,19 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Card, CardHeader, CardBody } from '@heroui/react';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import FrequencyAnalysisWidget, { defaultGridSize as freqDefault } from '../components/widgets/FrequencyAnalysisWidget/FrequencyAnalysisWidget';
-import { AsciiDistributionWidget, defaultGridSize as asciiDefault } from '../components/widgets/AsciiDistributionWidget/AsciiDistributionWidget';
+import AsciiDistributionWidget, { defaultGridSize as asciiDefault } from '../components/widgets/AsciiDistributionWidget/AsciiDistributionWidget';
 import FrequencyStdDevWidget, { defaultGridSize as stddevDefault } from '../components/widgets/FrequencyStdDevWidget/FrequencyStdDev';
-import { IndexOfCoincidenceWidget, defaultGridSize as icDefault } from '@/components/widgets/IndexOfCoincidenceWidget/IndexOfCoincidenceWidget';
-import { ShannonEntropyWidget, defaultGridSize as entropyDefault } from '@/components/widgets/ShannonEntropyWidget/ShannonEntropyWidget';
+import IndexOfCoincidenceWidget, { defaultGridSize as icDefault } from '@/components/widgets/IndexOfCoincidenceWidget/IndexOfCoincidenceWidget';
+import ShannonEntropyWidget, { defaultGridSize as entropyDefault } from '@/components/widgets/ShannonEntropyWidget/ShannonEntropyWidget';
 import { BASE_OPTIONS, BaseType } from '@/types/bases';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import WidgetContainer from '../components/widgets/WidgetContainer';
-import { useDashboardParams } from './useDashboardParams';
+import { useDashboardParams, INPUT_COLORS } from './useDashboardParams';
 
 const AVAILABLE_WIDGETS = {
   frequency: 'Frequency Analysis',
@@ -36,7 +36,7 @@ const WIDGET_DEFAULTS: Record<string, { w: number; h: number }> = {
 };
 
 const BREAKPOINTS = { lg: 1024, md: 768, sm: 0 };
-const COLS = { lg: 3, md: 2, sm: 1 };
+const COLS = { lg: 4, md: 2, sm: 1 };
 
 function generateLayout(widgets, cols) {
   return widgets.map((widget, i) => ({
@@ -75,7 +75,6 @@ function mergeLayoutsWithWidgets(layouts, widgets, cols) {
   return newLayouts;
 }
 
-// Utility function to process text based on ignore options
 function processText(text, { ignorePunctuation, ignoreWhitespace, ignoreCasing }) {
   let result = text;
   if (ignorePunctuation) result = result.replace(/[!"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]/g, '');
@@ -86,36 +85,126 @@ function processText(text, { ignorePunctuation, ignoreWhitespace, ignoreCasing }
 
 export default function DashboardPage() {
   const {
-    inputText, setInputText,
-    widgets, setWidgets,
-    asciiBase, setAsciiBase,
-    entropyMode, setEntropyMode,
-    entropyWindow, setEntropyWindow,
-    icMode, setIcMode,
-    layouts, setLayouts,
+    inputs,
+    setInputs,
+    widgets,
+    setWidgets,
+    asciiBase,
+    setAsciiBase,
+    entropyMode,
+    setEntropyMode,
+    entropyWindow,
+    setEntropyWindow,
+    icMode,
+    setIcMode,
+    layouts,
+    setLayouts,
     handleLayoutChange,
-    ignorePunctuation, setIgnorePunctuation,
-    ignoreWhitespace, setIgnoreWhitespace,
-    ignoreCasing, setIgnoreCasing,
-    asciiRange, setAsciiRange,
+    ignorePunctuation,
+    setIgnorePunctuation,
+    ignoreWhitespace,
+    setIgnoreWhitespace,
+    ignoreCasing,
+    setIgnoreCasing,
+    asciiRange,
+    setAsciiRange,
+    setInputsForUrlSync,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
 
-  // Compute adjusted text
-  const adjustedText = useMemo(() => processText(inputText, { ignorePunctuation, ignoreWhitespace, ignoreCasing }), [inputText, ignorePunctuation, ignoreWhitespace, ignoreCasing]);
+  const [activeInput, setActiveInput] = useState<{ id: number; text: string; color: string }>(inputs[0] || { id: 1, text: '', color: INPUT_COLORS[0] });
+  const [pills, setPills] = useState<{ id: number; text: string; color: string }[]>(inputs.slice(1));
+
+  useEffect(() => {
+    if (inputs.length > 0) {
+      setActiveInput(inputs[0]);
+      setPills(inputs.slice(1));
+    }
+  }, [inputs]);
+
+  useEffect(() => {
+    setInputsForUrlSync([activeInput, ...pills].filter(input => input.text.trim() !== ''));
+  }, [activeInput, pills, setInputsForUrlSync]);
+
+  const updateAllInputs = useCallback((newActive, newPills) => {
+    setActiveInput(newActive);
+    setPills(newPills);
+    setInputs([newActive, ...newPills]);
+  }, [setInputs]);
+
+  const handleAddInput = useCallback(() => {
+    if (!activeInput.text.trim() || pills.length >= 4) return;
+    const nextColor = INPUT_COLORS[(pills.length + 1) % INPUT_COLORS.length];
+    const newPill = { ...activeInput, color: activeInput.color };
+    const newActive = { id: Date.now(), text: '', color: nextColor };
+    updateAllInputs(newActive, [...pills, newPill]);
+  }, [activeInput, pills, updateAllInputs]);
+
+  const handleRemovePill = useCallback((id: number) => {
+    const newPills = pills.filter(p => p.id !== id);
+    const allInputs = [activeInput, ...newPills].map((input, idx) => ({ ...input, color: INPUT_COLORS[idx] }));
+    updateAllInputs(allInputs[0], allInputs.slice(1));
+  }, [activeInput, pills, updateAllInputs]);
+
+  const handlePillClick = useCallback((pill) => {
+    const newPills = pills.map(p => (p.id === pill.id ? { ...activeInput } : p));
+    updateAllInputs(pill, newPills);
+  }, [activeInput, pills, updateAllInputs]);
+
+  const handleTextChange = useCallback((e) => {
+    setActiveInput({ ...activeInput, text: e.target.value });
+  }, [activeInput]);
+
+  const adjustedTexts = useMemo(() =>
+    [activeInput, ...pills]
+      .filter(input => input.text.trim() !== '')
+      .map(input => ({
+        ...input,
+        text: processText(input.text, { ignorePunctuation, ignoreWhitespace, ignoreCasing })
+      }))
+  , [activeInput, pills, ignorePunctuation, ignoreWhitespace, ignoreCasing]);
 
   return (
-    <div className="max-w-[1200px] mx-auto py-8 px-4">
+    <div className="max-w-[1600px] mx-auto py-8 px-4">
       <Card className="mb-6">
         <CardHeader>
-          <h2 className="text-xl font-semibold">Input Text</h2>
+          <h2 className="text-xl font-semibold">Input Texts</h2>
         </CardHeader>
         <CardBody>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {pills.map((pill) => (
+              <div
+                key={pill.id}
+                className="flex items-center px-3 py-1 rounded-full cursor-pointer"
+                style={{ backgroundColor: pill.color, color: '#fff' }}
+                onClick={() => handlePillClick(pill)}
+              >
+                <span className="mr-2">{pill.text.slice(0, 10) + (pill.text.length > 10 ? '…' : '')}</span>
+                <button
+                  className="ml-2 text-white hover:text-gray-200 focus:outline-none"
+                  onClick={e => { e.stopPropagation(); handleRemovePill(pill.id); }}
+                  aria-label="Remove text"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
           <textarea
             className="w-full h-40 p-2 border rounded resize-none"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Enter your text here..."
+            style={{border: `1px solid ${INPUT_COLORS[(pills.length) % INPUT_COLORS.length]}`}}
+            value={activeInput.text}
+            onChange={handleTextChange}
+            placeholder={`Enter text here...`}
           />
+          <div className="flex w-100 justify-end">
+              <button
+                onClick={handleAddInput}
+              className={`mt-4 px-4 py-2 rounded ${activeInput.text.trim() && pills.length < 4 ? 'bg-blue-500 text-white hover:bg-blue-600' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+              disabled={!activeInput.text.trim() || pills.length >= 4}
+            >
+              Add Another Text
+            </button>
+          </div>
           <div className="mt-4">
             <label className="mr-2 font-medium">Text encoding:</label>
             <select
@@ -178,7 +267,7 @@ export default function DashboardPage() {
         layouts={layouts}
         breakpoints={BREAKPOINTS}
         cols={COLS}
-        rowHeight={250}
+        rowHeight={200}
         isResizable={true}
         onLayoutChange={handleLayoutChange}
         measureBeforeMount={false}
@@ -189,11 +278,11 @@ export default function DashboardPage() {
           let WidgetComponent = null;
           const layoutItem = layouts.lg.find((l) => l.i === widget) || { w: 1, h: 1 };
           if (widget === 'frequency') {
-            WidgetComponent = <FrequencyAnalysisWidget text={adjustedText} gridH={layoutItem.h} />;
+            WidgetComponent = <FrequencyAnalysisWidget texts={adjustedTexts} gridH={layoutItem.h} />;
           } else if (widget === 'ascii') {
             WidgetComponent = (
               <AsciiDistributionWidget
-                text={adjustedText}
+                texts={adjustedTexts}
                 base={asciiBase}
                 gridW={layoutItem.w}
                 asciiRange={asciiRange}
@@ -201,11 +290,11 @@ export default function DashboardPage() {
               />
             );
           } else if (widget === 'freqstddev') {
-            WidgetComponent = <FrequencyStdDevWidget text={adjustedText} gridH={layoutItem.h} />;
+            WidgetComponent = <FrequencyStdDevWidget texts={adjustedTexts} gridH={layoutItem.h} />;
           } else if (widget === 'coincidence') {
             WidgetComponent = (
               <IndexOfCoincidenceWidget
-                text={adjustedText}
+                texts={adjustedTexts}
                 base={asciiBase}
                 view={icMode}
                 onViewChange={setIcMode}
@@ -214,7 +303,7 @@ export default function DashboardPage() {
           } else if (widget === 'entropy') {
             WidgetComponent = (
               <ShannonEntropyWidget
-                text={adjustedText}
+                texts={adjustedTexts}
                 base={asciiBase}
                 mode={entropyMode}
                 windowSize={entropyWindow}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Line } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   LineElement,
@@ -8,10 +8,14 @@ import {
   LinearScale,
   Tooltip,
   Legend,
+  BarElement,
+  Title,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { useIndexOfCoincidenceChart } from './useIndexOfCoincidenceChart';
+import { InputData } from '@/app/useDashboardParams';
+import { BaseType } from '@/types/bases';
 
 ChartJS.register(
   LineElement,
@@ -21,7 +25,9 @@ ChartJS.register(
   Tooltip,
   Legend,
   ChartDataLabels,
-  annotationPlugin
+  annotationPlugin,
+  BarElement,
+  Title
 );
 
 const IC_BASELINES = {
@@ -66,152 +72,130 @@ function analyzePeriodIC(
   return results;
 }
 
-export function IndexOfCoincidenceWidget({
-  text,
-  base,
-  view,
-  onViewChange,
-  width,
-  height,
-}: {
-  text: string;
-  base: keyof typeof IC_BASELINES;
-  view: 'summary' | 'period';
-  onViewChange: (view: 'summary' | 'period') => void;
+interface IndexOfCoincidenceWidgetProps {
+  texts: InputData[];
+  base: BaseType;
   width?: number;
   height?: number;
-}) {
+  view: 'summary' | 'period';
+  onViewChange: (view: 'summary' | 'period') => void;
+}
+
+export const defaultGridSize = { w: 2, h: 2 };
+
+export default function IndexOfCoincidenceWidget({
+  texts,
+  base,
+  width,
+  height,
+  view,
+  onViewChange,
+}: IndexOfCoincidenceWidgetProps) {
+  // Baseline values
   const baseline = IC_BASELINES[base];
 
-  const { ic, total, freq } = useMemo(() => {
-    const freq: Record<string, number> = {};
-    for (const char of text) {
-      freq[char] = (freq[char] || 0) + 1;
-    }
-    const total = text.length;
-    const numerator = Object.values(freq).reduce((acc, f) => acc + f * (f - 1), 0);
-    const denominator = total * (total - 1);
-    const ic = denominator > 0 ? numerator / denominator : 0;
-    return { ic, total, freq };
-  }, [text]);
+  // Calculate results for each input
+  const results = useMemo(() => {
+    return texts.map(input => {
+      const text = input.text;
+      const n = text.length;
+      if (n < 2) return { text, color: input.color, ic: 0, periodics: [], total: n, unique: 0 };
+      // Calculate character frequencies
+      const freq: Record<string, number> = {};
+      for (const char of text) {
+        freq[char] = (freq[char] || 0) + 1;
+      }
+      // Calculate IC
+      const sum = Object.values(freq).reduce((acc, count) => acc + count * (count - 1), 0);
+      const ic = sum / (n * (n - 1));
+      // Calculate periodic ICs (up to period 20)
+      const periodics = [];
+      for (let period = 2; period <= Math.min(20, Math.floor(n / 2)); period++) {
+        const groups: string[][] = Array.from({ length: period }, () => []);
+        for (let i = 0; i < n; i++) {
+          groups[i % period].push(text[i]);
+        }
+        const groupICs = groups.map(group => {
+          const groupFreq: Record<string, number> = {};
+          for (const char of group) {
+            groupFreq[char] = (groupFreq[char] || 0) + 1;
+          }
+          const groupN = group.length;
+          if (groupN < 2) return 0;
+          const groupSum = Object.values(groupFreq).reduce((acc, count) => acc + count * (count - 1), 0);
+          return groupSum / (groupN * (groupN - 1));
+        });
+        const avgIC = groupICs.reduce((a, b) => a + b, 0) / groupICs.length;
+        periodics.push({ period, ic: avgIC });
+      }
+      return {
+        text,
+        color: input.color,
+        ic,
+        periodics,
+        total: n,
+        unique: Object.keys(freq).length,
+      };
+    });
+  }, [texts, base]);
 
-  const periodAnalysis = useMemo(() => {
-    const maxPeriod = Math.min(100, Math.floor(text.length / 2));
-    return analyzePeriodIC(text, maxPeriod, baseline.english);
-  }, [text, baseline.english]);
-
-  const maxEntry = periodAnalysis.reduce(
-    (max, entry) => (entry.averageIC > max.averageIC ? entry : max),
-    { period: 0, averageIC: 0 }
-  );
-
-  const periodChartData = {
-    labels: periodAnalysis.map((r) => r.period.toString()),
-    datasets: [
-      {
-        label: 'Avg IC',
-        data: periodAnalysis.map((r) => r.averageIC),
-        borderColor: 'rgba(59, 130, 246, 1)',
-        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-        datalabels: { color: '#999' },
-        tension: 0.3,
-      },
-    ],
-  };
-
-  const { data, options } = useIndexOfCoincidenceChart(periodAnalysis, maxEntry);
+  // Use chart hook for chart data and options
+  const { data: periodLineData, options: lineOptions } = useIndexOfCoincidenceChart(results, view, baseline);
 
   return (
-    <>
-      <div className="mb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-        <h3 className="text-lg font-semibold">Index of Coincidence</h3>
-        <div className="flex flex-wrap items-center gap-2 gap-y-1 justify-end">
-          <label className="font-medium">View:</label>
+    <div className="w-full h-full flex flex-col">
+      <div className="mb-4 flex flex-row items-center justify-between gap-2">
+        <h3 className="text-lg font-semibold mb-0">Index of Coincidence</h3>
+        <div>
+          <label className="mr-2">View:</label>
           <select
             value={view}
             onChange={(e) => onViewChange(e.target.value as 'summary' | 'period')}
-            className="p-1 border rounded"
+            className="p-2 border rounded"
           >
             <option value="summary">Summary</option>
-            <option value="period">Period Analysis</option>
+            <option value="period">Periodic Analysis</option>
           </select>
         </div>
       </div>
-      {text ? (
-        view === 'summary' ? (
-          <div className="space-y-2 flex flex-col items-center h-full">
-            <div className="text-4xl font-bold">{ic.toFixed(5)}</div>
-            <div className="text-sm text-gray-600 w-fit">
-              <div className="flex justify-between gap-12">
-                <div>
-                  <strong>English avg:</strong> {baseline.english.toFixed(5)}
-                </div>
-                <div>
-                  <strong>Random avg:</strong> {baseline.random.toFixed(5)}
-                </div>
-              </div>
-            </div>
-            <div className="text-sm text-gray-600 text-center">
-              ({total} characters, {Object.keys(freq).length} unique)
-            </div>
+      {view === 'summary' ? (
+        <div className="overflow-x-auto">
+          <div className="flex gap-8 mb-2 text-gray-400">
+            <span>English avg: <span className="font-mono">{baseline.english.toFixed(5)}</span></span>
+            <span>Random avg: <span className="font-mono">{baseline.random.toFixed(5)}</span></span>
           </div>
-        ) : (
-          <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%', padding: '20px 0px' }}>
-            <Line
-              data={periodChartData}
-              options={{
-                plugins: {
-                  legend: { display: true },
-                  datalabels: { display: false },
-                  tooltip: {
-                    callbacks: {
-                      afterBody: (ctx) => {
-                        const period = parseInt(ctx[0].label);
-                        return period === maxEntry.period ? '⬆ Likely period' : '';
-                      },
-                    },
-                  },
-                  annotation: {
-                    annotations: {
-                      verticalLine: {
-                        type: 'line',
-                        scaleID: 'x',
-                        value: maxEntry.period.toString(),
-                        borderColor: 'red',
-                        borderWidth: 2,
-                        label: {
-                          display: true,
-                          content: 'Likely Period',
-                          position: 'end',
-                          color: '#999',
-                        },
-                      },
-                    },
-                  },
-                },
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    grid: { color: 'rgba(0,0,0,0.05)' },
-                  },
-                  x: {
-                    grid: { color: 'rgba(0,0,0,0.05)' },
-                  },
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-              }}
-            />
-            <p className="text-sm text-center text-gray-600 mt-2">
-              Peak IC at period <strong>{maxEntry.period}</strong>: {maxEntry.averageIC.toFixed(5)}
-            </p>
-          </div>
-        )
+          <table className="min-w-full text-sm">
+            <thead>
+              <tr>
+                <th className="text-left p-2">Text</th>
+                <th className="text-left p-2">IC</th>
+                <th className="text-left p-2">Total chars</th>
+                <th className="text-left p-2">Unique chars</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.map((r, i) => (
+                <tr key={i}>
+                  <td className="p-2" style={{ color: r.color }}>
+                    {r.text.slice(0, 20)}{r.text.length > 20 ? '...' : ''}
+                  </td>
+                  <td className="p-2 font-bold text-2xl" style={{ color: r.color }}>{r.ic.toFixed(5)}</td>
+                  <td className="p-2 text-gray-400">{r.total}</td>
+                  <td className="p-2 text-gray-400">{r.unique}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
-        <p>No input provided.</p>
+        <div className="flex-1 w-full h-full relative">
+          {periodLineData ? (
+            <Line data={periodLineData} options={lineOptions} className="absolute inset-0 w-full h-full" />
+          ) : (
+            <p>No data to display.</p>
+          )}
+        </div>
       )}
-    </>
+    </div>
   );
 }
-
-export const defaultGridSize = { w: 1, h: 1 };

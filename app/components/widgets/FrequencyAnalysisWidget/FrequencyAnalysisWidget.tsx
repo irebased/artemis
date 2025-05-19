@@ -8,49 +8,32 @@ import {
   LinearScale,
   Tooltip,
   Legend,
+  Title,
 } from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { InputData } from '@/app/useDashboardParams';
 import { useFrequencyAnalysisChart } from './useFrequencyAnalysisChart';
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels);
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, Title);
 
-export default function FrequencyAnalysisWidget({ text, width, height, gridH }: {
-  text: string,
-  width?: number,
-  height?: number,
-  gridH?: number
-}) {
-  const { labels, counts, percentages } = useMemo(() => {
-    const freq: Record<string, number> = {};
-    for (const char of text) {
-      freq[char] = (freq[char] || 0) + 1;
-    }
-    const total = text.length || 1;
-    const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
-    return {
-      labels: sorted.map(([char]) => (char === ' ' ? '[space]' : char)),
-      counts: sorted.map(([, count]) => count),
-      percentages: sorted.map(([, count]) => (count / total) * 100),
-    };
-  }, [text]);
-
-  const { data, options } = useFrequencyAnalysisChart(labels, counts, percentages, gridH);
-
-  return (
-    <>
-      <div className="mb-2">
-        <h3 className="text-lg font-semibold">Frequency Analysis</h3>
-      </div>
-      {labels.length > 0 ? (
-        <div className="w-full h-full" style={{ height: height ?? '100%', width: width ?? '100%' }}>
-          <Bar data={data} options={options} />
-        </div>
-      ) : (
-        <p>No data to display.</p>
-      )}
-    </>
-  );
+interface FrequencyAnalysisWidgetProps {
+  texts: InputData[];
+  width?: number;
+  height?: number;
+  gridH?: number;
 }
 
-export const defaultGridSize = { w: 1, h: 1 };
+export const defaultGridSize = { w: 2, h: 2 };
+
+export default function FrequencyAnalysisWidget({ texts, width, height, gridH }: FrequencyAnalysisWidgetProps) {
+  const { data, options } = useFrequencyAnalysisChart(texts);
+
+  return (
+    <div className="w-full h-full flex flex-col">
+      <h3 className="text-lg font-semibold mb-2">Frequency Analysis</h3>
+      <div className="flex-1 w-full h-full relative">
+        <Bar data={data} options={options} className="absolute inset-0 w-full h-full" />
+      </div>
+    </div>
+  );
+}
 

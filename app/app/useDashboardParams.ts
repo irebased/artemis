@@ -19,11 +19,8 @@ function makeBase64UrlUnsafe(base64url: string): string {
 function compressLZMA(input) {
   return new Promise((resolve, reject) => {
     try {
-      // Convert string to Uint8Array if needed
       const inputData = typeof input === 'string' ? new TextEncoder().encode(input) : input;
-      // Compress with maximum level
       const compressed = pako.deflate(inputData, { level: 9 });
-      // Convert to base64 and make URL safe
       const base64 = btoa(String.fromCharCode.apply(null, compressed));
       resolve(makeBase64UrlSafe(base64));
     } catch (error) {
@@ -36,13 +33,9 @@ function compressLZMA(input) {
 function decompressLZMA(base64url) {
   return new Promise((resolve, reject) => {
     try {
-      // Convert URL-safe base64 back to standard base64
       const base64 = makeBase64UrlUnsafe(base64url);
-      // Convert base64 to Uint8Array
       const compressed = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-      // Decompress
       const decompressed = pako.inflate(compressed);
-      // Convert back to string
       const result = new TextDecoder().decode(decompressed);
       resolve(result);
     } catch (error) {
@@ -51,8 +44,16 @@ function decompressLZMA(base64url) {
   });
 }
 
+export type InputData = {
+  id: number;
+  text: string;
+  color: string;
+};
+
+export const INPUT_COLORS = ['#3b82f6', '#ef4444', '#22c55e', '#eab308', '#a855f7'];
+
 export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets) {
-  const [inputText, setInputText] = useState('');
+  const [inputs, setInputs] = useState<InputData[]>([{ id: 1, text: '', color: INPUT_COLORS[0] }]);
   const [widgets, setWidgets] = useState<string[]>([]);
   const [asciiBase, setAsciiBase] = useState<BaseType>('ascii');
   const [entropyMode, setEntropyMode] = useState<'raw' | 'sliding'>('raw');
@@ -68,47 +69,30 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   const [ignoreCasing, setIgnoreCasing] = useState(false);
   const [asciiRange, setAsciiRange] = useState<'extended' | 'ascii' | 'input'>('extended');
 
-  useEffect(() => {
-    setLayouts(prev => mergeLayoutsWithWidgets(prev, widgets, COLS));
-  }, [widgets]);
+  const [inputsForUrlSync, setInputsForUrlSync] = useState<InputData[] | null>(null);
+
+  const addInput = useCallback(() => {
+    if (inputs.length < 5) {
+      setInputs(prev => [...prev, {
+        id: prev.length + 1,
+        text: '',
+        color: INPUT_COLORS[prev.length]
+      }]);
+    }
+  }, [inputs.length]);
+
+  const removeInput = useCallback((id: number) => {
+    setInputs(prev => prev.filter(input => input.id !== id));
+  }, []);
+
+  const updateInputText = useCallback((id: number, text: string) => {
+    setInputs(prev => prev.map(input =>
+      input.id === id ? { ...input, text } : input
+    ));
+  }, []);
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
-    const lzdataParam = query.get('lzdata');
-    const zParam = query.get('z');
-    const dataParam = query.get('data'); // legacy param
-
-    if (lzdataParam) {
-      // Try pako decompression first
-      decompressLZMA(lzdataParam).then((json) => {
-        try {
-          const decoded = JSON.parse(json as string);
-          if (decoded.widgets) setWidgets(decoded.widgets);
-          if (decoded.data) setInputText(decoded.data);
-          if (decoded.base && BASE_OPTIONS.includes(decoded.base as BaseType)) setAsciiBase(decoded.base as BaseType);
-          if (decoded.entropyMode === 'sliding' || decoded.entropyMode === 'raw') setEntropyMode(decoded.entropyMode);
-          if (decoded.entropyWindow && !isNaN(parseInt(decoded.entropyWindow))) setEntropyWindow(Number(decoded.entropyWindow));
-          if (decoded.icMode === 'summary' || decoded.icMode === 'period') setIcMode(decoded.icMode);
-          if (decoded.layout) setLayouts(decoded.layout);
-          if (typeof decoded.ignorePunctuation === 'boolean') setIgnorePunctuation(decoded.ignorePunctuation);
-          if (typeof decoded.ignoreWhitespace === 'boolean') setIgnoreWhitespace(decoded.ignoreWhitespace);
-          if (typeof decoded.ignoreCasing === 'boolean') setIgnoreCasing(decoded.ignoreCasing);
-          if (decoded.asciiRange === 'extended' || decoded.asciiRange === 'ascii' || decoded.asciiRange === 'input') setAsciiRange(decoded.asciiRange);
-        } catch (e) {
-          console.error('Failed to parse decompressed data:', e);
-        }
-      }).catch((e) => {
-        console.error('Failed to decompress data:', e);
-      });
-    } else if (zParam) {
-      // Handle legacy z param
-      const decoded = decompressFromEncodedURIComponent(zParam);
-      if (decoded) setInputText(decoded);
-    } else if (dataParam) {
-      // Handle legacy data param
-      const decoded = decompressFromEncodedURIComponent(dataParam);
-      if (decoded) setInputText(decoded);
-    }
 
     const widgetParam = query.get('widgets');
     const baseParam = query.get('base');
@@ -120,6 +104,44 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const ignoreWSParam = query.get('ignoreWhitespace');
     const ignoreCaseParam = query.get('ignoreCasing');
     const asciiRangeParam = query.get('asciiRange');
+
+    // Async load inputs
+    const decompressPromises: Promise<InputData | null>[] = [];
+    for (let i = 1; i <= 5; i++) {
+      const lzdataParam = query.get(`lzdata${i}`);
+      if (lzdataParam) {
+        decompressPromises.push(
+          decompressLZMA(lzdataParam)
+            .then((json) => {
+              try {
+                const decoded = JSON.parse(json as string);
+                if (decoded.data) {
+                  return {
+                    id: i,
+                    text: decoded.data,
+                    color: INPUT_COLORS[i - 1]
+                  };
+                }
+              } catch (e) {
+                console.error(`Failed to parse decompressed data for input ${i}:`, e);
+              }
+              return null;
+            })
+            .catch((e) => {
+              console.error(`Failed to decompress data for input ${i}:`, e);
+              return null;
+            })
+        );
+      }
+    }
+    if (decompressPromises.length > 0) {
+      Promise.all(decompressPromises).then((results) => {
+        const loadedInputs = results.filter(Boolean) as InputData[];
+        if (loadedInputs.length > 0) {
+          setInputs(loadedInputs);
+        }
+      });
+    }
 
     if (widgetParam) {
       const widgetList = widgetParam
@@ -139,20 +161,26 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     if (icModeParam === 'summary' || icModeParam === 'period') {
       setIcMode(icModeParam);
     }
-    const lzlayoutParam = query.get('lzdata_layout');
-    if (lzlayoutParam) {
-      decompressLZMA(lzlayoutParam).then((json) => {
-        try {
-          const decoded = JSON.parse(json as string);
-          setLayouts(decoded);
-        } catch (e) {}
-      });
-    } else if (layoutParam) {
-      // legacy: decompress with lz-string
+    if (layoutParam) {
       try {
         const decoded = JSON.parse(decompressFromEncodedURIComponent(layoutParam));
         setLayouts(decoded);
       } catch (e) {}
+    }
+    const lzlayoutParam = query.get('lzdata_layout');
+    if (lzlayoutParam) {
+      decompressLZMA(lzlayoutParam)
+        .then((json) => {
+          try {
+            const decoded = JSON.parse(json as string);
+            setLayouts(decoded);
+          } catch (e) {
+            console.error('Failed to parse decompressed layout:', e);
+          }
+        })
+        .catch((e) => {
+          console.error('Failed to decompress layout:', e);
+        });
     }
     if (ignorePunctParam !== null) setIgnorePunctuation(ignorePunctParam === 'true');
     if (ignoreWSParam !== null) setIgnoreWhitespace(ignoreWSParam === 'true');
@@ -161,35 +189,45 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   }, []);
 
   useEffect(() => {
-    const paramsObj = {
-      widgets,
-      data: inputText,
-      base: asciiBase,
-      entropyMode,
-      entropyWindow,
-      icMode,
-      layout: layouts,
-      ignorePunctuation,
-      ignoreWhitespace,
-      ignoreCasing,
-      asciiRange,
-    };
+    // Use override if provided, else use internal state
+    const urlInputs = inputsForUrlSync || inputs;
+    const compressPromises = urlInputs.map(input =>
+      compressLZMA(JSON.stringify({ data: input.text }))
+    );
 
-    // Use pako compression for new URLs
-    compressLZMA(JSON.stringify(paramsObj)).then((lzdataRaw) => {
-      const lzdata = lzdataRaw as string;
-      const newUrl = `${window.location.pathname}?lzdata=${lzdata}`;
-      window.history.replaceState(null, '', newUrl);
-    }).catch((e) => {
-      console.error('Failed to compress data:', e);
+    Promise.all(compressPromises).then(compressedData => {
+      const params = new URLSearchParams();
+
+      if (widgets.length > 0) params.set('widgets', widgets.join(','));
+      if (asciiBase) params.set('base', asciiBase);
+      if (entropyMode) params.set('entropyMode', entropyMode);
+      if (entropyMode === 'sliding') params.set('entropyWindow', entropyWindow.toString());
+      if (icMode) params.set('icMode', icMode);
+      if (layouts) {
+        compressLZMA(JSON.stringify(layouts)).then((lzlayoutRaw) => {
+          const lzlayout = lzlayoutRaw as string;
+          params.set('lzdata_layout', lzlayout);
+          params.set('ignorePunctuation', String(ignorePunctuation));
+          params.set('ignoreWhitespace', String(ignoreWhitespace));
+          params.set('ignoreCasing', String(ignoreCasing));
+          params.set('asciiRange', asciiRange);
+
+          compressedData.forEach((data, index) => {
+            params.set(`lzdata${index + 1}`, data as string);
+          });
+
+          const newUrl = `${window.location.pathname}?${params.toString()}`;
+          window.history.replaceState(null, '', newUrl);
+        });
+      }
     });
-  }, [inputText, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, ignorePunctuation, ignoreWhitespace, ignoreCasing, asciiRange]);
+  }, [inputs, inputsForUrlSync, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, ignorePunctuation, ignoreWhitespace, ignoreCasing, asciiRange]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
     const paramsObj = {
       widgets,
-      data: inputText,
+      data: inputs.map(input => input.text),
       base: asciiBase,
       entropyMode,
       entropyWindow,
@@ -204,7 +242,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       const lzdata = lzdataRaw as string;
       const legacyParams = new URLSearchParams();
       if (widgets.length > 0) legacyParams.set('widgets', widgets.join(','));
-      if (inputText) legacyParams.set('data', compressToEncodedURIComponent(inputText));
+      if (inputs.length > 0) legacyParams.set('data', inputs.map(input => compressToEncodedURIComponent(input.text)).join(','));
       if (asciiBase) legacyParams.set('base', asciiBase);
       if (entropyMode) legacyParams.set('entropyMode', entropyMode);
       if (entropyMode === 'sliding') legacyParams.set('entropyWindow', entropyWindow.toString());
@@ -241,20 +279,35 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         window.history.replaceState(null, '', newUrl);
       }
     });
-  }, [widgets, inputText, asciiBase, entropyMode, entropyWindow, icMode, ignorePunctuation, ignoreWhitespace, ignoreCasing, asciiRange]);
+  }, [widgets, inputs, asciiBase, entropyMode, entropyWindow, icMode, ignorePunctuation, ignoreWhitespace, ignoreCasing, asciiRange]);
 
   return {
-    inputText, setInputText,
-    widgets, setWidgets,
-    asciiBase, setAsciiBase,
-    entropyMode, setEntropyMode,
-    entropyWindow, setEntropyWindow,
-    icMode, setIcMode,
-    layouts, setLayouts,
+    inputs,
+    setInputs,
+    setInputsForUrlSync,
+    addInput,
+    removeInput,
+    updateInputText,
+    widgets,
+    setWidgets,
+    asciiBase,
+    setAsciiBase,
+    entropyMode,
+    setEntropyMode,
+    entropyWindow,
+    setEntropyWindow,
+    icMode,
+    setIcMode,
+    layouts,
+    setLayouts,
     handleLayoutChange,
-    ignorePunctuation, setIgnorePunctuation,
-    ignoreWhitespace, setIgnoreWhitespace,
-    ignoreCasing, setIgnoreCasing,
-    asciiRange, setAsciiRange,
+    ignorePunctuation,
+    setIgnorePunctuation,
+    ignoreWhitespace,
+    setIgnoreWhitespace,
+    ignoreCasing,
+    setIgnoreCasing,
+    asciiRange,
+    setAsciiRange,
   };
 }

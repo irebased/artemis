@@ -1,39 +1,59 @@
-import { ChartData, ChartOptions } from 'chart.js';
+import { useMemo } from 'react';
 
-export function useShannonEntropyChart(slidingSeries: number[]) {
-  const data: ChartData<'line'> = {
-    labels: slidingSeries.map((_, i) => i.toString()),
-    datasets: [
-      {
-        label: 'Entropy',
-        data: slidingSeries,
-        borderColor: 'rgba(59,130,246,1)',
-        backgroundColor: 'rgba(59,130,246,0.3)',
-        tension: 0.2,
-        datalabels: { color: '#999' },
-      },
-    ],
-  };
+export function useShannonEntropyChart(results, windowSize) {
+  const data = useMemo(() => {
+    if (!results.length || !results[0].sliding.length) return null;
+    const labels = Array.from({ length: results[0].sliding.length }, (_, i) => i.toString());
+    const datasets = results.map(r => ({
+      label: `Text ${r.text.slice(0, 20)}${r.text.length > 20 ? '...' : ''}`,
+      data: r.sliding,
+      borderColor: r.color,
+      backgroundColor: r.color,
+      fill: false,
+      tension: 0.2,
+    }));
+    return { labels, datasets };
+  }, [results, windowSize]);
 
-  const options: ChartOptions<'line'> = {
-    plugins: {
-      legend: { display: false },
-      datalabels: { display: false },
-    },
+  const options = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top' as const,
+      },
+      title: {
+        display: false,
+        text: '',
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const value = context.parsed.y.toFixed(4);
+            return `${context.dataset.label}: ${value}`;
+          }
+        }
+      },
+      datalabels: {
+        display: false,
+      },
+    },
     scales: {
       y: {
         beginAtZero: true,
-        grid: { color: 'rgba(0,0,0,0.05)' },
-        max: Math.max(...slidingSeries) * 1.1,
+        title: {
+          display: true,
+          text: 'Entropy (bits)'
+        }
       },
       x: {
-        display: false,
-        grid: { display: false },
-      },
-    },
-  };
+        title: {
+          display: true,
+          text: 'Position'
+        }
+      }
+    }
+  }), [results, windowSize]);
 
   return { data, options };
 }
