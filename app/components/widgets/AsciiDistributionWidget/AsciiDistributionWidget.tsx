@@ -22,11 +22,13 @@ export function AsciiDistributionWidget({
   base,
   width,
   height,
+  gridW,
 }: {
   text: string;
   base: BaseType;
   width?: number;
   height?: number;
+  gridW?: number;
 }) {
   const [error, setError] = useState<string | null>(null);
 
@@ -83,7 +85,7 @@ export function AsciiDistributionWidget({
     return counts;
   }, [text, base]);
 
-  const { data, options } = useAsciiDistributionChart(byteCounts);
+  const { data, options } = useAsciiDistributionChart(byteCounts, gridW);
 
   return (
     <>

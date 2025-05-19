@@ -1,6 +1,6 @@
 import { ChartData, ChartOptions } from 'chart.js';
 
-export function useFrequencyStdDevChart(labels: string[], deviations: number[]) {
+export function useFrequencyStdDevChart(labels: string[], deviations: number[], gridH?: number) {
   const data: ChartData<'bar'> = {
     labels,
     datasets: [
@@ -26,6 +26,11 @@ export function useFrequencyStdDevChart(labels: string[], deviations: number[]) 
       datalabels: {
         anchor: 'end',
         align: 'end',
+        display: () => {
+          const h = gridH || 1;
+          const density = labels.length / (10 * h);
+          return density < 1;
+        },
         formatter: (value: number) => (value !== 0 ? value.toFixed(2) : ''),
         font: { weight: 'bold' },
         color: '#999',

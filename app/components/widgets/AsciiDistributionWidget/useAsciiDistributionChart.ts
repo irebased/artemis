@@ -1,6 +1,6 @@
 import { ChartData, ChartOptions } from 'chart.js';
 
-export function useAsciiDistributionChart(byteCounts: number[]) {
+export function useAsciiDistributionChart(byteCounts: number[], gridW?: number) {
   const data: ChartData<'bar'> = {
     labels: Array.from({ length: 256 }, (_, i) => i.toString()),
     datasets: [
@@ -24,6 +24,11 @@ export function useAsciiDistributionChart(byteCounts: number[]) {
       datalabels: {
         anchor: 'end',
         align: 'end',
+        display: () => {
+          const w = gridW || 1;
+          const density = data.labels ? data.labels.length / (8 * w) : 0;
+          return density < 1;
+        },
         formatter: (value: number) => (value > 0 ? value : ''),
         font: { weight: 'bold' },
         color: '#999',

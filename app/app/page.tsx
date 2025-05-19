@@ -156,17 +156,19 @@ export default function DashboardPage() {
       >
         {widgets.map((widget) => {
           let WidgetComponent = null;
+          const layoutItem = layouts.lg.find((l) => l.i === widget) || { w: 1, h: 1 };
           if (widget === 'frequency') {
-            WidgetComponent = <FrequencyAnalysisWidget text={inputText} />;
+            WidgetComponent = <FrequencyAnalysisWidget text={inputText} gridH={layoutItem.h} />;
           } else if (widget === 'ascii') {
             WidgetComponent = (
               <AsciiDistributionWidget
                 text={inputText}
                 base={asciiBase}
+                gridW={layoutItem.w}
               />
             );
           } else if (widget === 'freqstddev') {
-            WidgetComponent = <FrequencyStdDevWidget text={inputText} />;
+            WidgetComponent = <FrequencyStdDevWidget text={inputText} gridH={layoutItem.h} />;
           } else if (widget === 'coincidence') {
             WidgetComponent = (
               <IndexOfCoincidenceWidget

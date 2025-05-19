@@ -1,6 +1,6 @@
 import { ChartData, ChartOptions } from 'chart.js';
 
-export function useFrequencyAnalysisChart(labels: string[], counts: number[], percentages: number[]) {
+export function useFrequencyAnalysisChart(labels: string[], counts: number[], percentages: number[], gridH?: number) {
   const data: ChartData<'bar'> = {
     labels,
     datasets: [
@@ -30,6 +30,11 @@ export function useFrequencyAnalysisChart(labels: string[], counts: number[], pe
       datalabels: {
         anchor: 'end',
         align: 'end',
+        display: () => {
+          const h = gridH || 1;
+          const density = labels.length / (10 * h);
+          return density < 1;
+        },
         formatter: (value: number, context: any) => {
           const percent = percentages[context.dataIndex];
           return `${value} (${percent.toFixed(1)}%)`;
@@ -46,7 +51,7 @@ export function useFrequencyAnalysisChart(labels: string[], counts: number[], pe
         beginAtZero: true,
         ticks: { precision: 0 },
         grid: { color: 'rgba(0,0,0,0.05)' },
-        max: Math.max(...counts) * 1.1,
+        max: Math.max(...counts) * 1.35,
       },
       y: {
         grid: { color: 'rgba(0,0,0,0.05)' },
