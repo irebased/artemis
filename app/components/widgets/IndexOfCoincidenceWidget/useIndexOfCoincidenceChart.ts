@@ -2,14 +2,8 @@ import { useMemo } from 'react';
 import { ChartOptions, ChartData } from 'chart.js';
 
 export function useIndexOfCoincidenceChart(results, view, baseline) {
-  // Summary view: no chart
-  if (view === 'summary') {
-    return { data: null, options: null };
-  }
-
-  // Periodic analysis view: line chart
   const data = useMemo(() => {
-    if (!results.length || !results[0].periodics.length) return null;
+    if (view === 'summary' || !results.length || !results[0].periodics.length) return null;
     const labels = results[0].periodics.map(p => `${p.period}`);
     const datasets = results.map(r => ({
       label: `Text ${r.text.slice(0, 20)}${r.text.length > 20 ? '...' : ''}`,
@@ -20,10 +14,10 @@ export function useIndexOfCoincidenceChart(results, view, baseline) {
       tension: 0.2,
     }));
     return { labels, datasets };
-  }, [results]);
+  }, [results, view]);
 
   const options = useMemo(() => {
-    // Add annotation for likely period (max IC) for each input
+    if (view === 'summary' || !data) return null;
     let annotations = {};
     if (data && data.datasets) {
       data.datasets.forEach((ds, idx) => {
@@ -82,7 +76,7 @@ export function useIndexOfCoincidenceChart(results, view, baseline) {
         }
       }
     };
-  }, [data]);
+  }, [data, view]);
 
   return { data, options };
 }
