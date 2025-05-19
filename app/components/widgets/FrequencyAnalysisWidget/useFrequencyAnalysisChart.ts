@@ -1,6 +1,6 @@
 import { ChartData, ChartOptions } from 'chart.js';
 
-export function useFrequencyAnalysisChart(labels: string[], counts: number[]) {
+export function useFrequencyAnalysisChart(labels: string[], counts: number[], percentages: number[]) {
   const data: ChartData<'bar'> = {
     labels,
     datasets: [
@@ -19,12 +19,21 @@ export function useFrequencyAnalysisChart(labels: string[], counts: number[]) {
     plugins: {
       legend: { display: false },
       tooltip: {
-        callbacks: { label: (context: any) => `Count: ${context.raw}` },
+        callbacks: {
+          label: (context: any) => {
+            const count = context.raw;
+            const percent = percentages[context.dataIndex];
+            return `Count: ${count} (${percent.toFixed(1)}%)`;
+          },
+        },
       },
       datalabels: {
         anchor: 'end',
         align: 'end',
-        formatter: (value: number) => value,
+        formatter: (value: number, context: any) => {
+          const percent = percentages[context.dataIndex];
+          return `${value} (${percent.toFixed(1)}%)`;
+        },
         font: { weight: 'bold' },
         color: '#999',
       },

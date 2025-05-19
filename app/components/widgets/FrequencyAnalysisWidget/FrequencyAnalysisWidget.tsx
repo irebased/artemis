@@ -15,21 +15,21 @@ import { useFrequencyAnalysisChart } from './useFrequencyAnalysisChart';
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels);
 
 export default function FrequencyAnalysisWidget({ text, width, height }: { text: string, width?: number, height?: number }) {
-  const { labels, counts } = useMemo(() => {
+  const { labels, counts, percentages } = useMemo(() => {
     const freq: Record<string, number> = {};
     for (const char of text) {
       freq[char] = (freq[char] || 0) + 1;
     }
-
+    const total = text.length || 1;
     const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
-
     return {
       labels: sorted.map(([char]) => (char === ' ' ? '[space]' : char)),
       counts: sorted.map(([, count]) => count),
+      percentages: sorted.map(([, count]) => (count / total) * 100),
     };
   }, [text]);
 
-  const { data, options } = useFrequencyAnalysisChart(labels, counts);
+  const { data, options } = useFrequencyAnalysisChart(labels, counts, percentages);
 
   return (
     <>
