@@ -40,6 +40,7 @@ export function useAsciiDistributionChart(byteCounts: number[]) {
       y: {
         beginAtZero: true,
         grid: { color: 'rgba(0,0,0,0.05)' },
+        max: Math.max(...byteCounts) * 1.1,
       },
     },
     elements: { bar: { borderRadius: 3 } },

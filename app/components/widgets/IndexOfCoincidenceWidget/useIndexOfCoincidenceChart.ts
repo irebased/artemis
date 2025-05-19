@@ -49,6 +49,7 @@ export function useIndexOfCoincidenceChart(periodAnalysis: { period: number; ave
       y: {
         beginAtZero: true,
         grid: { color: 'rgba(0,0,0,0.05)' },
+        max: Math.max(...periodAnalysis.map(r => r.averageIC)) * 1.1,
       },
       x: {
         grid: { color: 'rgba(0,0,0,0.05)' },

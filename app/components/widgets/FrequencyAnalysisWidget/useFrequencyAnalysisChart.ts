@@ -37,6 +37,7 @@ export function useFrequencyAnalysisChart(labels: string[], counts: number[]) {
         beginAtZero: true,
         ticks: { precision: 0 },
         grid: { color: 'rgba(0,0,0,0.05)' },
+        max: Math.max(...counts) * 1.1,
       },
       y: {
         grid: { color: 'rgba(0,0,0,0.05)' },

@@ -26,6 +26,7 @@ export function useShannonEntropyChart(slidingSeries: number[]) {
       y: {
         beginAtZero: true,
         grid: { color: 'rgba(0,0,0,0.05)' },
+        max: Math.max(...slidingSeries) * 1.1,
       },
       x: {
         display: false,

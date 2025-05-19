@@ -38,10 +38,12 @@ export function useFrequencyStdDevChart(labels: string[], deviations: number[]) 
       x: {
         ticks: { precision: 0 },
         grid: { color: 'rgba(0,0,0,0.05)' },
+        max: Math.max(...deviations) * 1.1,
       },
       y: {
         beginAtZero: false,
         grid: { color: 'rgba(0,0,0,0.05)' },
+        ticks: { autoSkip: true, maxTicksLimit: 10 },
       },
     },
     elements: { bar: { borderRadius: 3 } },
