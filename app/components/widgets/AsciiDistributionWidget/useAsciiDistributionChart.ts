@@ -1,10 +1,93 @@
 import { useMemo } from 'react';
+import { BaseType } from '@/types/bases';
+
+function customBase64Decode(str: string): string {
+  // Base64 character set
+  const base64Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+  // Remove any non-base64 characters
+  str = str.replace(/[^A-Za-z0-9+/]/g, '');
+
+  // Add padding if needed
+  const pad = str.length % 4;
+  if (pad) {
+    str += '='.repeat(4 - pad);
+  }
+
+  let result = '';
+  let i = 0;
+
+  while (i < str.length) {
+    // Get 4 base64 characters
+    const chunk = str.slice(i, i + 4);
+    if (chunk.length < 4) break;
+
+    // Convert to 3 bytes
+    const b1 = base64Chars.indexOf(chunk[0]);
+    const b2 = base64Chars.indexOf(chunk[1]);
+    const b3 = base64Chars.indexOf(chunk[2]);
+    const b4 = base64Chars.indexOf(chunk[3]);
+
+    if (b1 === -1 || b2 === -1) break;
+
+    // First byte
+    result += String.fromCharCode((b1 << 2) | (b2 >> 4));
+
+    // Second byte
+    if (b3 !== -1) {
+      result += String.fromCharCode(((b2 & 0x0F) << 4) | (b3 >> 2));
+    }
+
+    // Third byte
+    if (b4 !== -1) {
+      result += String.fromCharCode(((b3 & 0x03) << 6) | b4);
+    }
+
+    i += 4;
+  }
+
+  return result;
+}
+
+function decodeText(text: string, base: BaseType): string {
+  try {
+    switch (base) {
+      case 'base64':
+        return customBase64Decode(text);
+      case 'hex':
+        // Only attempt hex decoding if the text looks like hex
+        if (/^[0-9A-Fa-f\s]*$/.test(text)) {
+          return text.match(/.{1,2}/g)?.map(byte => String.fromCharCode(parseInt(byte, 16))).join('') || '';
+        }
+        return text;
+      case 'decimal':
+        // Only attempt decimal decoding if the text looks like decimal numbers
+        if (/^[0-9\s]*$/.test(text)) {
+          return text.split(/\s+/).map(num => String.fromCharCode(parseInt(num, 10))).join('');
+        }
+        return text;
+      case 'octal':
+        // Only attempt octal decoding if the text looks like octal numbers
+        if (/^[0-7\s]*$/.test(text)) {
+          return text.split(/\s+/).map(num => String.fromCharCode(parseInt(num, 8))).join('');
+        }
+        return text;
+      case 'ascii':
+      default:
+        return text;
+    }
+  } catch (e) {
+    console.error('Error decoding text:', e);
+    return text; // Return original text if decoding fails
+  }
+}
 
 export function useAsciiDistributionChart(texts, base, asciiRange) {
   const data = useMemo(() => {
     const distributions = texts.map(input => {
+      const decodedText = decodeText(input.text, base);
       const counts = new Array(256).fill(0);
-      for (const char of input.text) {
+      for (const char of decodedText) {
         const code = char.charCodeAt(0);
         if (code < 256) {
           counts[code]++;
