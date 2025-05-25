@@ -1,34 +1,22 @@
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  Title,
+} from 'chart.js';
 import { useMemo } from 'react';
 
-export function useFrequencyAnalysisChart(texts) {
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, Title);
+
+export const defaultGridSize = { w: 2, h: 2 };
+
+export function useFrequencyAnalysisChart({ frequencies, sortedChars }) {
   const data = useMemo(() => {
-    const frequencies = texts.map(input => {
-      const freq = {};
-      const total = input.text.length;
-      for (const char of input.text) {
-        freq[char] = (freq[char] || 0) + 1;
-      }
-
-      const percentages = {};
-      for (const [char, count] of Object.entries(freq)) {
-        // @ts-ignore
-        percentages[char] = (count / total) * 100;
-      }
-      return {
-        text: input.text,
-        color: input.color,
-        frequencies: percentages
-      };
-    });
-
-    const allChars = new Set();
-    frequencies.forEach(freq => {
-      Object.keys(freq.frequencies).forEach(char => allChars.add(char));
-    });
-    const sortedChars = Array.from(allChars).sort();
     const datasets = frequencies.map(freq => ({
       label: `Text ${freq.text.slice(0, 20)}${freq.text.length > 20 ? '...' : ''}`,
-      // @ts-ignore
       data: sortedChars.map(char => freq.frequencies[char] || 0),
       backgroundColor: freq.color,
       borderColor: freq.color,
@@ -38,7 +26,7 @@ export function useFrequencyAnalysisChart(texts) {
       labels: sortedChars,
       datasets,
     };
-  }, [texts]);
+  }, [frequencies, sortedChars]);
 
   const options = useMemo(() => ({
     responsive: true,
@@ -80,7 +68,7 @@ export function useFrequencyAnalysisChart(texts) {
         }
       }
     }
-  }), [texts]);
+  }), [frequencies, sortedChars]);
 
   return { data, options };
 }
