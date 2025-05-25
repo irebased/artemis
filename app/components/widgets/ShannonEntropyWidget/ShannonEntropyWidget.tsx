@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import { Ciphertext } from '@/types/ciphertext';
 import { useShannonEntropy, ENTROPY_BASELINES, BaseType } from './useShannonEntropy';
 import { useShannonEntropyChart, defaultGridSize } from './useShannonEntropyChart';
+import Modal from '@/components/Modal';
 
 interface ShannonEntropyWidgetProps {
   inputs: Ciphertext[];
@@ -44,63 +45,57 @@ export default function ShannonEntropyWidget({
           Settings
         </button>
       </div>
-      {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white dark:bg-gray-900 p-6 rounded shadow-lg min-w-[320px]">
-            <h4 className="text-lg font-semibold mb-4">Shannon Entropy Settings</h4>
-            <div className="mb-4 flex flex-col gap-4">
-              <div>
-                <div className="font-semibold mb-1">Display format</div>
-                <label className="flex items-center gap-2 mb-1">
-                  <input
-                    type="radio"
-                    name="entropy-mode"
-                    value="raw"
-                    checked={mode === 'raw'}
-                    onChange={() => handleModeChange('raw')}
-                  />
-                  Raw entropy
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="entropy-mode"
-                    value="sliding"
-                    checked={mode === 'sliding'}
-                    onChange={() => handleModeChange('sliding')}
-                  />
-                  Sliding window
-                </label>
-              </div>
-              {mode === 'sliding' && (
-                <div>
-                  <div className="font-semibold mb-1">Sliding window settings</div>
-                  <label className="flex items-center gap-2">
-                    <span>Window size:</span>
-                    <select
-                      value={windowSize}
-                      onChange={e => handleWindowSizeChange(Number(e.target.value))}
-                      className="p-1 border rounded text-sm"
-                    >
-                      {[16, 32, 64, 128, 256].map(sz => (
-                        <option key={sz} value={sz}>{sz}</option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              )}
+      <Modal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        title="Shannon Entropy Settings"
+      >
+        <div>
+          <div className="font-semibold text-lg mb-3">Display format</div>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  name="entropy-mode"
+                  value="raw"
+                  checked={mode === 'raw'}
+                  onChange={() => handleModeChange('raw')}
+                  className="w-4 h-4"
+                />
+                <span>Raw entropy</span>
+              </label>
+              <label className="flex items-center gap-3">
+                <input
+                  type="radio"
+                  name="entropy-mode"
+                  value="sliding"
+                  checked={mode === 'sliding'}
+                  onChange={() => handleModeChange('sliding')}
+                  className="w-4 h-4"
+                />
+                <span>Sliding window</span>
+              </label>
             </div>
-            <div className="flex justify-end gap-2">
-              <button
-                className="px-3 py-1 border rounded text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
-                onClick={() => setShowSettings(false)}
-              >
-                Close
-              </button>
+            <div>
+              <div className="font-semibold mb-2">Sliding window settings</div>
+              <label className={`flex items-center gap-3 ${mode !== 'sliding' ? 'opacity-50' : ''}`}>
+                <span className="min-w-[100px]">Window size:</span>
+                <select
+                  value={windowSize}
+                  onChange={e => handleWindowSizeChange(Number(e.target.value))}
+                  className="p-2 border rounded text-sm w-24"
+                  disabled={mode !== 'sliding'}
+                >
+                  {[16, 32, 64, 128, 256].map(sz => (
+                    <option key={sz} value={sz}>{sz}</option>
+                  ))}
+                </select>
+              </label>
             </div>
           </div>
         </div>
-      )}
+      </Modal>
       {mode === 'raw' ? (
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
@@ -116,7 +111,7 @@ export default function ShannonEntropyWidget({
               {results.map((r, i) => (
                 <tr key={i}>
                   <td className="p-2" style={{ color: r.color }}>
-                  <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: r.color, display: 'inline-block' }} />
+                    <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: r.color, display: 'inline-block' }} />
                     {r.text.slice(0, 7)}{r.text.length > 7 ? '...' : ''}
                   </td>
                   <td className="p-2 font-bold">{r.entropy.toFixed(4)}</td>
