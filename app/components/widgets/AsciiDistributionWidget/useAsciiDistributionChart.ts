@@ -1,5 +1,19 @@
 import { useMemo } from 'react';
 import { BaseType } from '@/types/bases';
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  Title,
+} from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels, Title);
+
+export const defaultGridSize = { w: 2, h: 2 };
 
 function customBase64Decode(str: string): string {
   // Base64 character set
@@ -82,42 +96,8 @@ function decodeText(text: string, base: BaseType): string {
   }
 }
 
-export function useAsciiDistributionChart(texts, base, asciiRange) {
+export function useAsciiDistributionChart({ distributions, start, end }, base) {
   const data = useMemo(() => {
-    const distributions = texts.map(input => {
-      const decodedText = decodeText(input.text, base);
-      const counts = new Array(256).fill(0);
-      for (const char of decodedText) {
-        const code = char.charCodeAt(0);
-        if (code < 256) {
-          counts[code]++;
-        }
-      }
-      return {
-        text: input.text,
-        color: input.color,
-        counts
-      };
-    });
-
-    let start = 0;
-    let end = 256;
-    if (asciiRange === 'ascii') {
-      end = 128;
-    } else if (asciiRange === 'input') {
-      const usedCodes = new Set();
-      distributions.forEach(dist => {
-        dist.counts.forEach((count, code) => {
-          if (count > 0) usedCodes.add(code);
-        });
-      });
-      if (usedCodes.size > 0) {
-        const usedCodesArr = Array.from(usedCodes) as number[];
-        start = Math.min(...usedCodesArr);
-        end = Math.max(...usedCodesArr) + 1;
-      }
-    }
-
     const datasets = distributions.map(dist => ({
       label: `Text ${dist.text.slice(0, 20)}${dist.text.length > 20 ? '...' : ''}`,
       data: dist.counts.slice(start, end),
@@ -125,7 +105,6 @@ export function useAsciiDistributionChart(texts, base, asciiRange) {
       borderColor: dist.color,
       borderWidth: 1,
     }));
-
     const labels = Array.from({ length: end - start }, (_, i) => {
       const code = start + i;
       return code;
@@ -134,7 +113,7 @@ export function useAsciiDistributionChart(texts, base, asciiRange) {
       labels,
       datasets,
     };
-  }, [texts, base, asciiRange]);
+  }, [distributions, start, end]);
 
   const options = useMemo(() => ({
     responsive: true,
@@ -175,7 +154,7 @@ export function useAsciiDistributionChart(texts, base, asciiRange) {
         }
       }
     }
-  }), [texts, base, asciiRange]);
+  }), [distributions, start, end, base]);
 
   return { data, options };
 }

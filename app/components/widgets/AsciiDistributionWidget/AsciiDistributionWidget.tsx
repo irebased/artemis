@@ -13,61 +13,47 @@ import {
   Title,
 } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { BaseType } from '../../../app/page';
-import { useAsciiDistributionChart } from './useAsciiDistributionChart';
+import { BaseType } from '@/types/bases';
 import { InputData } from '@/app/useDashboardParams';
-
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels, Title);
+import { useAsciiDistribution, defaultGridSize } from './useAsciiDistribution';
+import { useAsciiDistributionChart } from './useAsciiDistributionChart';
 
 interface AsciiDistributionWidgetProps {
   texts: InputData[];
   base: BaseType;
-  width?: number;
-  height?: number;
   gridW?: number;
-  asciiRange: 'extended' | 'ascii' | 'input';
-  setAsciiRange: (range: 'extended' | 'ascii' | 'input') => void;
+  asciiRange: string;
+  setAsciiRange: (range: string) => void;
 }
 
-export const defaultGridSize = { w: 2, h: 2 };
-
-export default function AsciiDistributionWidget({
-  texts,
-  base,
-  width,
-  height,
-  gridW,
-  asciiRange,
-  setAsciiRange,
-}: AsciiDistributionWidgetProps) {
-  const [error, setError] = useState<string | null>(null);
-
-  const { data, options } = useAsciiDistributionChart(texts, base, asciiRange);
+export default function AsciiDistributionWidget({ texts, base, gridW, asciiRange, setAsciiRange }: AsciiDistributionWidgetProps) {
+  const analysis = useAsciiDistribution(texts, base, asciiRange);
+  const { data, options } = useAsciiDistributionChart(analysis, base);
 
   return (
     <div className="w-full h-full flex flex-col">
-      <h3 className="text-lg font-semibold mb-2">ASCII Distribution</h3>
-      <div className="mb-4">
-        <label className="mr-2">ASCII Range:</label>
-        <select
-          value={asciiRange}
-          onChange={(e) => setAsciiRange(e.target.value as 'extended' | 'ascii' | 'input')}
-          className="p-2 border rounded"
-        >
-          <option value="extended">Extended ASCII (0-255)</option>
-          <option value="ascii">ASCII (0-127)</option>
-          <option value="input">Input Range Only</option>
-        </select>
-      </div>
-      {error ? (
-        <p className="text-red-500">{error}</p>
-      ) : texts.length > 0 ? (
-        <div className="flex-1 w-full h-full relative">
-          <Bar data={data} options={options} className="absolute inset-0 w-full h-full" />
+      <div className="mb-4 flex flex-row items-center justify-between gap-2">
+        <h3 className="text-lg font-semibold mb-0">ASCII Distribution</h3>
+        <div>
+          <label className="mr-2">Range:</label>
+          <select
+            value={asciiRange}
+            onChange={e => setAsciiRange(e.target.value)}
+            className="p-2 border rounded"
+          >
+            <option value="full">Full (0-255)</option>
+            <option value="ascii">ASCII (0-127)</option>
+            <option value="input">Input Range</option>
+          </select>
         </div>
-      ) : (
-        <p>No data to display.</p>
-      )}
+      </div>
+      <div className="flex-1 w-full h-full relative">
+        {data && data.labels.length > 0 ? (
+          <Bar data={data} options={options} className="absolute inset-0 w-full h-full" />
+        ) : (
+          <p>No data to display.</p>
+        )}
+      </div>
     </div>
   );
 }
