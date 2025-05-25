@@ -49,6 +49,23 @@ export type AsciiRange = 'extended' | 'ascii' | 'input';
 
 export const INPUT_COLORS = ['#3b82f6', '#ef4444', '#22c55e', '#eab308', '#a855f7'];
 
+export type FrequencyAnalysisSettings = {
+  ngramSize: number;
+  ngramMode: 'sliding' | 'block';
+};
+
+function compressSettings(obj: any): string {
+  const json = JSON.stringify(obj);
+  const compressed = pako.deflate(json, { level: 9 });
+  return btoa(String.fromCharCode.apply(null, compressed));
+}
+
+function decompressSettings(str: string): any {
+  const compressed = Uint8Array.from(atob(str), c => c.charCodeAt(0));
+  const decompressed = pako.inflate(compressed);
+  return JSON.parse(new TextDecoder().decode(decompressed));
+}
+
 export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets) {
   const [inputs, setInputs] = useState<Ciphertext[]>([{
     id: 1,
@@ -74,8 +91,10 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   const [inputsForUrlSync, setInputsForUrlSync] = useState<Ciphertext[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [layoutLocked, setLayoutLocked] = useState(false);
-  const [ngramSize, setNgramSize] = useState(1);
-  const [ngramMode, setNgramMode] = useState<'sliding' | 'block'>('sliding');
+  const [frequencyAnalysisSettings, setFrequencyAnalysisSettings] = useState<FrequencyAnalysisSettings>({
+    ngramSize: 1,
+    ngramMode: 'sliding',
+  });
 
   const addInput = useCallback(() => {
     if (inputs.length < 5) {
@@ -145,8 +164,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const ignoreCaseParam = query.get('ignoreCasing');
     const asciiRangeParam = query.get('asciiRange');
     const lockParam = query.get('lock');
-    const ngramParam = query.get('ngram');
-    const ngramModeParam = query.get('ngramMode');
+    const freqSettingsParam = query.get('freqSettings');
 
     if (widgetParam) {
       const widgetList = widgetParam
@@ -202,11 +220,13 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     } else {
       setLayoutLocked(false);
     }
-    if (ngramParam && !isNaN(parseInt(ngramParam))) {
-      setNgramSize(Math.max(1, parseInt(ngramParam)));
-    }
-    if (ngramModeParam === 'block' || ngramModeParam === 'sliding') {
-      setNgramMode(ngramModeParam);
+    if (freqSettingsParam) {
+      try {
+        const settings = decompressSettings(freqSettingsParam);
+        setFrequencyAnalysisSettings(settings);
+      } catch (e) {
+        // fallback to defaults
+      }
     }
     finishLoading();
   }, []);
@@ -223,8 +243,9 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       if (entropyMode === 'sliding') params.set('entropyWindow', entropyWindow.toString());
       if (icMode) params.set('icMode', icMode);
       if (layoutLocked) params.set('lock', '1');
-      if (ngramSize && ngramSize !== 1) params.set('ngram', ngramSize.toString());
-      if (ngramMode && ngramMode !== 'sliding') params.set('ngramMode', ngramMode);
+      if (frequencyAnalysisSettings) {
+        params.set('freqSettings', compressSettings(frequencyAnalysisSettings));
+      }
       if (layouts) {
         compressLZMA(JSON.stringify(layouts)).then((lzlayoutRaw) => {
           const lzlayout = lzlayoutRaw as string;
@@ -236,7 +257,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         });
       }
     });
-  }, [inputs, inputsForUrlSync, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, asciiRange, loading, layoutLocked, ngramSize, ngramMode]);
+  }, [inputs, inputsForUrlSync, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, asciiRange, loading, layoutLocked, frequencyAnalysisSettings]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -321,9 +342,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     loading,
     layoutLocked,
     setLayoutLocked,
-    ngramSize,
-    setNgramSize,
-    ngramMode,
-    setNgramMode,
+    frequencyAnalysisSettings,
+    setFrequencyAnalysisSettings,
   };
 }

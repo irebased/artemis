@@ -106,10 +106,8 @@ export default function DashboardPage() {
     setInputsForUrlSync,
     layoutLocked,
     setLayoutLocked,
-    ngramSize,
-    setNgramSize,
-    ngramMode,
-    setNgramMode,
+    frequencyAnalysisSettings,
+    setFrequencyAnalysisSettings,
     loading,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
 
@@ -197,10 +195,8 @@ export default function DashboardPage() {
         entropyWindow={entropyWindow}
         setEntropyWindow={setEntropyWindow}
         layoutLocked={layoutLocked}
-        ngramSize={ngramSize}
-        setNgramSize={setNgramSize}
-        ngramMode={ngramMode}
-        setNgramMode={setNgramMode}
+        frequencyAnalysisSettings={frequencyAnalysisSettings}
+        setFrequencyAnalysisSettings={setFrequencyAnalysisSettings}
       />
     </div>
   );

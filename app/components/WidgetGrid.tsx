@@ -27,10 +27,8 @@ interface WidgetGridProps {
   entropyWindow: number;
   setEntropyWindow: (n: number) => void;
   layoutLocked: boolean;
-  ngramSize: number;
-  setNgramSize: (n: number) => void;
-  ngramMode: 'sliding' | 'block';
-  setNgramMode: (mode: 'sliding' | 'block') => void;
+  frequencyAnalysisSettings: { ngramSize: number; ngramMode: 'sliding' | 'block' };
+  setFrequencyAnalysisSettings: (settings: { ngramSize: number; ngramMode: 'sliding' | 'block' }) => void;
 }
 
 export default function WidgetGrid({
@@ -50,10 +48,8 @@ export default function WidgetGrid({
   entropyWindow,
   setEntropyWindow,
   layoutLocked,
-  ngramSize,
-  setNgramSize,
-  ngramMode,
-  setNgramMode,
+  frequencyAnalysisSettings,
+  setFrequencyAnalysisSettings,
 }: WidgetGridProps) {
   return (
     <ResponsiveGridLayout
@@ -73,7 +69,7 @@ export default function WidgetGrid({
         let WidgetComponent = null;
         const layoutItem = layouts.lg.find((l: any) => l.i === widget) || { w: 1, h: 1 };
         if (widget === 'frequency') {
-          WidgetComponent = <FrequencyAnalysisWidget inputs={adjustedTexts} gridH={layoutItem.h} ngramSize={ngramSize} setNgramSize={setNgramSize} ngramMode={ngramMode} setNgramMode={setNgramMode} />;
+          WidgetComponent = <FrequencyAnalysisWidget inputs={adjustedTexts} gridH={layoutItem.h} frequencyAnalysisSettings={frequencyAnalysisSettings} setFrequencyAnalysisSettings={setFrequencyAnalysisSettings} />;
         } else if (widget === 'ascii') {
           WidgetComponent = (
             <AsciiDistributionWidget

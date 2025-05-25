@@ -19,16 +19,22 @@ interface FrequencyAnalysisWidgetProps {
   width?: number;
   height?: number;
   gridH?: number;
-  ngramSize: number;
-  setNgramSize: (n: number) => void;
-  ngramMode: 'sliding' | 'block';
-  setNgramMode: (mode: 'sliding' | 'block') => void;
+  frequencyAnalysisSettings: { ngramSize: number; ngramMode: 'sliding' | 'block' };
+  setFrequencyAnalysisSettings: (settings: { ngramSize: number; ngramMode: 'sliding' | 'block' }) => void;
 }
 
-export default function FrequencyAnalysisWidget({ inputs, width, height, gridH, ngramSize, setNgramSize, ngramMode, setNgramMode }: FrequencyAnalysisWidgetProps) {
+export default function FrequencyAnalysisWidget({ inputs, width, height, gridH, frequencyAnalysisSettings, setFrequencyAnalysisSettings }: FrequencyAnalysisWidgetProps) {
   const [showSettings, setShowSettings] = useState(false);
+  const { ngramSize, ngramMode } = frequencyAnalysisSettings;
   const analysis = useFrequencyAnalysis(inputs, ngramSize, ngramMode);
   const { data, options } = useFrequencyAnalysisChart(analysis);
+
+  const handleNgramSizeChange = (n: number) => {
+    setFrequencyAnalysisSettings({ ...frequencyAnalysisSettings, ngramSize: n });
+  };
+  const handleNgramModeChange = (mode: 'sliding' | 'block') => {
+    setFrequencyAnalysisSettings({ ...frequencyAnalysisSettings, ngramMode: mode });
+  };
 
   return (
     <div className="w-full h-full flex flex-col">
@@ -53,7 +59,7 @@ export default function FrequencyAnalysisWidget({ inputs, width, height, gridH, 
                   min={1}
                   max={10}
                   value={ngramSize}
-                  onChange={e => setNgramSize(Math.max(1, Math.min(10, Number(e.target.value))))}
+                  onChange={e => handleNgramSizeChange(Math.max(1, Math.min(10, Number(e.target.value))))}
                   className="w-16 p-1 border rounded text-sm"
                 />
               </label>
@@ -61,7 +67,7 @@ export default function FrequencyAnalysisWidget({ inputs, width, height, gridH, 
                 <span>Mode:</span>
                 <select
                   value={ngramMode}
-                  onChange={e => setNgramMode(e.target.value as 'sliding' | 'block')}
+                  onChange={e => handleNgramModeChange(e.target.value as 'sliding' | 'block')}
                   className="p-1 border rounded text-sm"
                 >
                   <option value="sliding">Sliding window</option>
