@@ -1,11 +1,11 @@
 import { Line } from 'react-chartjs-2';
-import { InputData } from '@/app/useDashboardParams';
+import { Ciphertext } from '@/types/ciphertext';
 import { BaseType } from '@/types/bases';
 import { useIndexOfCoincidence, IC_BASELINES } from './useIndexOfCoincidence';
 import { useIndexOfCoincidenceChart } from './useIndexOfCoincidenceChart';
 
 interface IndexOfCoincidenceWidgetProps {
-  texts: InputData[];
+  inputs: Ciphertext[];
   base: BaseType;
   width?: number;
   height?: number;
@@ -14,7 +14,7 @@ interface IndexOfCoincidenceWidgetProps {
 }
 
 export default function IndexOfCoincidenceWidget({
-  texts,
+  inputs,
   base,
   width,
   height,
@@ -22,7 +22,7 @@ export default function IndexOfCoincidenceWidget({
   onViewChange,
 }: IndexOfCoincidenceWidgetProps) {
   const baseline = IC_BASELINES[base];
-  const results = useIndexOfCoincidence(texts, base);
+  const results = useIndexOfCoincidence(inputs);
   const { data: periodLineData, options: lineOptions } = useIndexOfCoincidenceChart(results, view, baseline);
 
   return (
@@ -43,28 +43,25 @@ export default function IndexOfCoincidenceWidget({
       </div>
       {view === 'summary' ? (
         <div className="overflow-x-auto">
-          <div className="flex gap-8 mb-2 text-gray-400">
-            <span>English avg: <span className="font-mono">{baseline.english.toFixed(5)}</span></span>
-            <span>Random avg: <span className="font-mono">{baseline.random.toFixed(5)}</span></span>
-          </div>
           <table className="min-w-full text-sm">
             <thead>
               <tr>
                 <th className="text-left p-2">Text</th>
                 <th className="text-left p-2">IC</th>
-                <th className="text-left p-2">Total chars</th>
-                <th className="text-left p-2">Unique chars</th>
+                <th className="text-left p-2">English baseline</th>
+                <th className="text-left p-2">Random text baseline</th>
               </tr>
             </thead>
             <tbody>
               {results.map((r, i) => (
                 <tr key={i}>
                   <td className="p-2" style={{ color: r.color }}>
-                    {r.text.slice(0, 20)}{r.text.length > 20 ? '...' : ''}
+                    <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: r.color, display: 'inline-block' }} />
+                    {r.text.slice(0, 7)}{r.text.length > 7 ? '...' : ''}
                   </td>
-                  <td className="p-2 font-bold text-2xl" style={{ color: r.color }}>{r.ic.toFixed(5)}</td>
-                  <td className="p-2 text-gray-400">{r.total}</td>
-                  <td className="p-2 text-gray-400">{r.unique}</td>
+                  <td className="p-2 font-bold text-gray-400">{r.ioc.toFixed(4)}</td>
+                  <td className="p-2 text-gray-400">{r.baseline.toFixed(4)}</td>
+                  <td className="p-2 text-gray-400">{r.randomBaseline.toFixed(4)}</td>
                 </tr>
               ))}
             </tbody>

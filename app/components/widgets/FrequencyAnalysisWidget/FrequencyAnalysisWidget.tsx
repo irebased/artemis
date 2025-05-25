@@ -10,19 +10,19 @@ import {
   Legend,
   Title,
 } from 'chart.js';
-import { InputData } from '@/app/useDashboardParams';
+import { Ciphertext } from '@/types/ciphertext';
 import { useFrequencyAnalysis, defaultGridSize } from './useFrequencyAnalysis';
 import { useFrequencyAnalysisChart } from './useFrequencyAnalysisChart';
 
 interface FrequencyAnalysisWidgetProps {
-  texts: InputData[];
+  inputs: Ciphertext[];
   width?: number;
   height?: number;
   gridH?: number;
 }
 
-export default function FrequencyAnalysisWidget({ texts, width, height, gridH }: FrequencyAnalysisWidgetProps) {
-  const analysis = useFrequencyAnalysis(texts);
+export default function FrequencyAnalysisWidget({ inputs, width, height, gridH }: FrequencyAnalysisWidgetProps) {
+  const analysis = useFrequencyAnalysis(inputs);
   const { data, options } = useFrequencyAnalysisChart(analysis);
 
   return (

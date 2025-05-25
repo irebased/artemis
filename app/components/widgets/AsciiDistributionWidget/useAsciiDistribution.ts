@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
-import { BaseType } from '@/types/bases';
-import { InputData } from '@/app/useDashboardParams';
-import { decodeText } from '../../../utils/decoderUtils';
+import { Ciphertext } from '@/types/ciphertext';
+import { decodeText } from '@/utils/decoderUtils';
 
-export function useAsciiDistribution(texts: InputData[], base: BaseType, asciiRange: string) {
+export function useAsciiDistribution(inputs: Ciphertext[], asciiRange: string) {
   return useMemo(() => {
-    const distributions = texts.map(input => {
-      const decodedText = decodeText(input.text, base);
+    const distributions = inputs.map(input => {
+      const decodedText = decodeText(input.text, input.encoding);
       const counts = new Array(256).fill(0);
       for (const char of decodedText) {
         const code = char.charCodeAt(0);
@@ -17,6 +16,7 @@ export function useAsciiDistribution(texts: InputData[], base: BaseType, asciiRa
       return {
         text: input.text,
         color: input.color,
+        encoding: input.encoding,
         counts
       };
     });
@@ -38,5 +38,5 @@ export function useAsciiDistribution(texts: InputData[], base: BaseType, asciiRa
       }
     }
     return { distributions, start, end };
-  }, [texts, base, asciiRange]);
+  }, [inputs, asciiRange]);
 }

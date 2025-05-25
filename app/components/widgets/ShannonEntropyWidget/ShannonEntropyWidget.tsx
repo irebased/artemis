@@ -1,10 +1,10 @@
 import { Line } from 'react-chartjs-2';
-import { InputData } from '@/app/useDashboardParams';
+import { Ciphertext } from '@/types/ciphertext';
 import { useShannonEntropy, ENTROPY_BASELINES, BaseType } from './useShannonEntropy';
 import { useShannonEntropyChart, defaultGridSize } from './useShannonEntropyChart';
 
 interface ShannonEntropyWidgetProps {
-  texts: InputData[];
+  inputs: Ciphertext[];
   base: BaseType;
   width?: number;
   height?: number;
@@ -15,7 +15,7 @@ interface ShannonEntropyWidgetProps {
 }
 
 export default function ShannonEntropyWidget({
-  texts,
+  inputs,
   base,
   width,
   height,
@@ -24,7 +24,7 @@ export default function ShannonEntropyWidget({
   onModeChange,
   onWindowSizeChange,
 }: ShannonEntropyWidgetProps) {
-  const results = useShannonEntropy(texts, windowSize);
+  const results = useShannonEntropy(inputs, windowSize);
   const { data: slidingLineData, options: slidingLineOptions } = useShannonEntropyChart(results, windowSize);
 
   return (
@@ -63,19 +63,20 @@ export default function ShannonEntropyWidget({
               <tr>
                 <th className="text-left p-2">Text</th>
                 <th className="text-left p-2">Entropy</th>
-                <th className="text-left p-2">Total chars</th>
-                <th className="text-left p-2">Unique chars</th>
+                <th className="text-left p-2">English baseline</th>
+                <th className="text-left p-2">Random text baseline</th>
               </tr>
             </thead>
             <tbody>
               {results.map((r, i) => (
                 <tr key={i}>
                   <td className="p-2" style={{ color: r.color }}>
-                    {r.text.slice(0, 20)}{r.text.length > 20 ? '...' : ''}
+                  <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: r.color, display: 'inline-block' }} />
+                    {r.text.slice(0, 7)}{r.text.length > 7 ? '...' : ''}
                   </td>
-                  <td className="p-2 font-bold text-2xl" style={{ color: r.color }}>{r.entropy.toFixed(5)}</td>
-                  <td className="p-2 text-gray-400">{r.total}</td>
-                  <td className="p-2 text-gray-400">{r.unique}</td>
+                  <td className="p-2 font-bold">{r.entropy.toFixed(4)}</td>
+                  <td className="p-2 text-gray-400">{r.baseline.toFixed(4)}</td>
+                  <td className="p-2 text-gray-400">{r.randomBaseline.toFixed(4)}</td>
                 </tr>
               ))}
             </tbody>

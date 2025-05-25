@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { InputData } from '@/app/useDashboardParams';
+import { Ciphertext } from '@/types/ciphertext';
 
 export const ENTROPY_BASELINES = {
   ascii: { english: 4.321011139059028, random: 5.696167170226023 },
@@ -20,64 +20,71 @@ export type EntropyResult = {
   unique: number;
 };
 
-export function useShannonEntropy(texts: InputData[], windowSize: number): EntropyResult[] {
+export function useShannonEntropy(inputs: Ciphertext[], windowSize: number = 1) {
   return useMemo(() => {
-    return texts.map(input => {
-      const text = input.text;
-      if (text.length === 0) {
-        return {
-          text,
-          color: input.color,
-          entropy: 0,
-          sliding: [],
-          total: 0,
-          unique: 0
-        };
-      }
-
-      // Calculate character frequencies
-      const freq: Record<string, number> = {};
-      for (const char of text) {
-        freq[char] = (freq[char] || 0) + 1;
-      }
-
-      const total = text.length;
-      const unique = Object.keys(freq).length;
-
-      // Calculate overall entropy
-      const entropy = -Object.values(freq).reduce((sum, count) => {
-        const p = count / total;
-        return sum + p * Math.log2(p);
-      }, 0);
-
-      // Calculate sliding window entropy
-      const sliding: number[] = [];
-      for (let i = 0; i <= text.length - windowSize; i++) {
-        const window = text.slice(i, i + windowSize);
-        const windowFreq: Record<string, number> = {};
-
-        // Calculate frequencies for this window
-        for (const char of window) {
-          windowFreq[char] = (windowFreq[char] || 0) + 1;
+    return inputs.map(input => {
+      try {
+        const text = input.text;
+        if (!text) {
+          return {
+            text: input.text,
+            color: input.color,
+            entropy: 0,
+            windowEntropy: []
+          };
         }
 
-        // Calculate entropy for this window
-        const windowEntropy = -Object.values(windowFreq).reduce((sum, count) => {
-          const p = count / windowSize;
-          return sum + p * Math.log2(p);
-        }, 0);
+        // Calculate overall entropy
+        const freq: Record<string, number> = {};
+        for (const char of text) {
+          freq[char] = (freq[char] || 0) + 1;
+        }
+        const unique = Object.keys(freq).length;
+        const total = text.length;
+        let entropy = 0;
+        for (const count of Object.values(freq)) {
+          const p = count / total;
+          entropy -= p * Math.log2(p);
+        }
 
-        sliding.push(windowEntropy);
+        // Calculate sliding window entropy
+        const windowEntropy = [];
+        for (let i = 0; i <= text.length - windowSize; i++) {
+          const window = text.slice(i, i + windowSize);
+          const windowFreq: Record<string, number> = {};
+          for (const char of window) {
+            windowFreq[char] = (windowFreq[char] || 0) + 1;
+          }
+          let windowEnt = 0;
+          for (const count of Object.values(windowFreq)) {
+            const p = count / windowSize;
+            windowEnt -= p * Math.log2(p);
+          }
+          windowEntropy.push({
+            position: i,
+            entropy: windowEnt
+          });
+        }
+
+        return {
+          text: input.text,
+          color: input.color,
+          entropy,
+          unique,
+          baseline: ENTROPY_BASELINES[input.encoding]['english'],
+          randomBaseline: ENTROPY_BASELINES[input.encoding]['random'],
+          windowEntropy
+        };
+      } catch (error) {
+        console.error('Error processing text:', error);
+        return {
+          text: input.text,
+          color: input.color,
+          unique: 0,
+          entropy: 0,
+          windowEntropy: []
+        };
       }
-
-      return {
-        text,
-        color: input.color,
-        entropy,
-        sliding,
-        total,
-        unique,
-      };
     });
-  }, [texts, windowSize]);
+  }, [inputs, windowSize]);
 }

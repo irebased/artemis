@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { InputData } from '@/app/useDashboardParams';
+import { Ciphertext } from '@/types/ciphertext';
 import { BaseType } from '@/types/bases';
 
 export const IC_BASELINES = {
@@ -10,48 +10,58 @@ export const IC_BASELINES = {
   octal: { english: 0.20402, random: 0.12121 },
 } as const;
 
-export function useIndexOfCoincidence(texts: InputData[], base: BaseType) {
+export function useIndexOfCoincidence(inputs: Ciphertext[]) {
   return useMemo(() => {
-    return texts.map(input => {
-      const text = input.text;
-      const n = text.length;
+    return inputs.map(input => {
+      try {
+        const text = input.text;
 
-      if (n < 2) return { text, color: input.color, ic: 0, periodics: [], total: n, unique: 0 };
-
-      const freq: Record<string, number> = {};
-      for (const char of text) {
-        freq[char] = (freq[char] || 0) + 1;
-      }
-      const sum = Object.values(freq).reduce((acc, count) => acc + count * (count - 1), 0);
-      const ic = sum / (n * (n - 1));
-
-      const periodics = [];
-      for (let period = 2; period <= Math.min(20, Math.floor(n / 2)); period++) {
-        const groups: string[][] = Array.from({ length: period }, () => []);
-        for (let i = 0; i < n; i++) {
-          groups[i % period].push(text[i]);
+        const freq: Record<string, number> = {};
+        for (const char of text) {
+          freq[char] = (freq[char] || 0) + 1;
         }
-        const groupICs = groups.map(group => {
-          const groupFreq: Record<string, number> = {};
-          for (const char of group) {
-            groupFreq[char] = (groupFreq[char] || 0) + 1;
+        const n = text.length;
+        const uniqueChars = Object.keys(freq).length;
+        const sum = Object.values(freq).reduce((acc, count) => acc + count * (count - 1), 0);
+        const ioc = n > 1 ? sum / (n * (n - 1)) : 0;
+
+        const periodicity = [];
+        for (let period = 1; period <= Math.min(20, Math.floor(n / 2)); period++) {
+          let matches = 0;
+          let comparisons = 0;
+          for (let i = 0; i < n - period; i++) {
+            if (text[i] === text[i + period]) {
+              matches++;
+            }
+            comparisons++;
           }
-          const groupN = group.length;
-          if (groupN < 2) return 0;
-          const groupSum = Object.values(groupFreq).reduce((acc, count) => acc + count * (count - 1), 0);
-          return groupSum / (groupN * (groupN - 1));
-        });
-        const avgIC = groupICs.reduce((a, b) => a + b, 0) / groupICs.length;
-        periodics.push({ period, ic: avgIC });
+          periodicity.push({
+            period,
+            ioc: comparisons > 0 ? matches / comparisons : 0
+          });
+        }
+
+        return {
+          text: input.text,
+          color: input.color,
+          ioc,
+          uniqueChars,
+          baseline: IC_BASELINES[input.encoding]['english'],
+          randomBaseline: IC_BASELINES[input.encoding]['random'],
+          periodicity
+        };
+      } catch (error) {
+        console.error('Error processing text:', error);
+        return {
+          text: input.text,
+          color: input.color,
+          ioc: 0,
+          uniqueChars: 0,
+          baseline: IC_BASELINES[input.encoding]['english'],
+          randomBaseline: IC_BASELINES[input.encoding]['random'],
+          periodicity: []
+        };
       }
-      return {
-        text,
-        color: input.color,
-        ic,
-        periodics,
-        total: n,
-        unique: Object.keys(freq).length,
-      };
     });
-  }, [texts, base]);
+  }, [inputs]);
 }

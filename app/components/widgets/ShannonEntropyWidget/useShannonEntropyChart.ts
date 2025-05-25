@@ -25,11 +25,11 @@ export const defaultGridSize = { w: 2, h: 2 };
 
 export function useShannonEntropyChart(results, windowSize) {
   const data = useMemo(() => {
-    if (!results.length || !results[0].sliding.length) return null;
-    const labels = Array.from({ length: results[0].sliding.length }, (_, i) => i.toString());
+    if (!results.length || !results[0].windowEntropy.length) return null;
+    const labels = results[0].windowEntropy.map(e => e.position.toString());
     const datasets = results.map(r => ({
       label: `Text ${r.text.slice(0, 20)}${r.text.length > 20 ? '...' : ''}`,
-      data: r.sliding,
+      data: r.windowEntropy.map(e => e.entropy),
       borderColor: r.color,
       backgroundColor: r.color,
       fill: false,

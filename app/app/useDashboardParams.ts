@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import pako from 'pako';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import { BASE_OPTIONS, BaseType } from '@/types/bases';
+import { Ciphertext } from '@/types/ciphertext';
 
 // Helper: make base64 URL safe
 function makeBase64UrlSafe(base64: string): string {
@@ -44,16 +45,20 @@ function decompressLZMA(base64url) {
   });
 }
 
-export type InputData = {
-  id: number;
-  text: string;
-  color: string;
-};
+export type AsciiRange = 'extended' | 'ascii' | 'input';
 
 export const INPUT_COLORS = ['#3b82f6', '#ef4444', '#22c55e', '#eab308', '#a855f7'];
 
 export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets) {
-  const [inputs, setInputs] = useState<InputData[]>([{ id: 1, text: '', color: INPUT_COLORS[0] }]);
+  const [inputs, setInputs] = useState<Ciphertext[]>([{
+    id: 1,
+    text: '',
+    encoding: 'ascii',
+    ignorePunctuation: false,
+    ignoreWhitespace: false,
+    ignoreCasing: false,
+    color: INPUT_COLORS[0],
+  }]);
   const [widgets, setWidgets] = useState<string[]>([]);
   const [asciiBase, setAsciiBase] = useState<BaseType>('ascii');
   const [entropyMode, setEntropyMode] = useState<'raw' | 'sliding'>('raw');
@@ -64,18 +69,20 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     md: generateLayout(widgets, COLS.md),
     sm: generateLayout(widgets, COLS.sm),
   }));
-  const [ignorePunctuation, setIgnorePunctuation] = useState(false);
-  const [ignoreWhitespace, setIgnoreWhitespace] = useState(false);
-  const [ignoreCasing, setIgnoreCasing] = useState(false);
   const [asciiRange, setAsciiRange] = useState<'extended' | 'ascii' | 'input'>('extended');
 
-  const [inputsForUrlSync, setInputsForUrlSync] = useState<InputData[] | null>(null);
+  const [inputsForUrlSync, setInputsForUrlSync] = useState<Ciphertext[] | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const addInput = useCallback(() => {
     if (inputs.length < 5) {
       setInputs(prev => [...prev, {
         id: prev.length + 1,
         text: '',
+        encoding: 'ascii',
+        ignorePunctuation: false,
+        ignoreWhitespace: false,
+        ignoreCasing: false,
         color: INPUT_COLORS[prev.length]
       }]);
     }
@@ -93,7 +100,37 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
-
+    const lzdataParam = query.get('lzdata');
+    let asyncLoads = 0;
+    let asyncDone = 0;
+    let loadedInputs = false;
+    let loadedLayouts = false;
+    async function finishLoading() {
+      if ((lzdataParam ? loadedInputs : true) && loadedLayouts) {
+        setLoading(false);
+      }
+    }
+    if (lzdataParam) {
+      asyncLoads++;
+      decompressLZMA(lzdataParam)
+        .then((json) => {
+          try {
+            const decoded = JSON.parse(json as string);
+            if (Array.isArray(decoded)) {
+              setInputs(decoded);
+              loadedInputs = true;
+              finishLoading();
+              return;
+            }
+          } catch (e) {
+            loadedInputs = true;
+            finishLoading();
+          }
+        })
+        .catch(() => { loadedInputs = true; finishLoading(); });
+    } else {
+      loadedInputs = true;
+    }
     const widgetParam = query.get('widgets');
     const baseParam = query.get('base');
     const modeParam = query.get('entropyMode');
@@ -104,44 +141,6 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const ignoreWSParam = query.get('ignoreWhitespace');
     const ignoreCaseParam = query.get('ignoreCasing');
     const asciiRangeParam = query.get('asciiRange');
-
-    // Async load inputs
-    const decompressPromises: Promise<InputData | null>[] = [];
-    for (let i = 1; i <= 5; i++) {
-      const lzdataParam = query.get(`lzdata${i}`);
-      if (lzdataParam) {
-        decompressPromises.push(
-          decompressLZMA(lzdataParam)
-            .then((json) => {
-              try {
-                const decoded = JSON.parse(json as string);
-                if (decoded.data) {
-                  return {
-                    id: i,
-                    text: decoded.data,
-                    color: INPUT_COLORS[i - 1]
-                  };
-                }
-              } catch (e) {
-                console.error(`Failed to parse decompressed data for input ${i}:`, e);
-              }
-              return null;
-            })
-            .catch((e) => {
-              console.error(`Failed to decompress data for input ${i}:`, e);
-              return null;
-            })
-        );
-      }
-    }
-    if (decompressPromises.length > 0) {
-      Promise.all(decompressPromises).then((results) => {
-        const loadedInputs = results.filter(Boolean) as InputData[];
-        if (loadedInputs.length > 0) {
-          setInputs(loadedInputs);
-        }
-      });
-    }
 
     if (widgetParam) {
       const widgetList = widgetParam
@@ -165,39 +164,41 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       try {
         const decoded = JSON.parse(decompressFromEncodedURIComponent(layoutParam));
         setLayouts(decoded);
+        loadedLayouts = true;
+        finishLoading();
       } catch (e) {}
     }
     const lzlayoutParam = query.get('lzdata_layout');
     if (lzlayoutParam) {
+      asyncLoads++;
       decompressLZMA(lzlayoutParam)
         .then((json) => {
           try {
             const decoded = JSON.parse(json as string);
             setLayouts(decoded);
+            loadedLayouts = true;
+            finishLoading();
           } catch (e) {
-            console.error('Failed to parse decompressed layout:', e);
+            loadedLayouts = true;
+            finishLoading();
           }
         })
-        .catch((e) => {
-          console.error('Failed to decompress layout:', e);
-        });
+        .catch(() => { loadedLayouts = true; finishLoading(); });
+    } else {
+      loadedLayouts = true;
     }
-    if (ignorePunctParam !== null) setIgnorePunctuation(ignorePunctParam === 'true');
-    if (ignoreWSParam !== null) setIgnoreWhitespace(ignoreWSParam === 'true');
-    if (ignoreCaseParam !== null) setIgnoreCasing(ignoreCaseParam === 'true');
+    if (ignorePunctParam !== null) setInputs(prev => prev.map(input => ({ ...input, ignorePunctuation: ignorePunctParam === 'true' })));
+    if (ignoreWSParam !== null) setInputs(prev => prev.map(input => ({ ...input, ignoreWhitespace: ignoreWSParam === 'true' })));
+    if (ignoreCaseParam !== null) setInputs(prev => prev.map(input => ({ ...input, ignoreCasing: ignoreCaseParam === 'true' })));
     if (asciiRangeParam === 'extended' || asciiRangeParam === 'ascii' || asciiRangeParam === 'input') setAsciiRange(asciiRangeParam);
   }, []);
 
   useEffect(() => {
+    if (loading) return;
     // Use override if provided, else use internal state
     const urlInputs = inputsForUrlSync || inputs;
-    const compressPromises = urlInputs.map(input =>
-      compressLZMA(JSON.stringify({ data: input.text }))
-    );
-
-    Promise.all(compressPromises).then(compressedData => {
+    compressLZMA(JSON.stringify(urlInputs)).then(compressed => {
       const params = new URLSearchParams();
-
       if (widgets.length > 0) params.set('widgets', widgets.join(','));
       if (asciiBase) params.set('base', asciiBase);
       if (entropyMode) params.set('entropyMode', entropyMode);
@@ -207,21 +208,14 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         compressLZMA(JSON.stringify(layouts)).then((lzlayoutRaw) => {
           const lzlayout = lzlayoutRaw as string;
           params.set('lzdata_layout', lzlayout);
-          params.set('ignorePunctuation', String(ignorePunctuation));
-          params.set('ignoreWhitespace', String(ignoreWhitespace));
-          params.set('ignoreCasing', String(ignoreCasing));
           params.set('asciiRange', asciiRange);
-
-          compressedData.forEach((data, index) => {
-            params.set(`lzdata${index + 1}`, data as string);
-          });
-
+          params.set('lzdata', compressed as string);
           const newUrl = `${window.location.pathname}?${params.toString()}`;
           window.history.replaceState(null, '', newUrl);
         });
       }
     });
-  }, [inputs, inputsForUrlSync, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, ignorePunctuation, ignoreWhitespace, ignoreCasing, asciiRange]);
+  }, [inputs, inputsForUrlSync, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, asciiRange, loading]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -233,9 +227,9 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       entropyWindow,
       icMode,
       layout: allLayouts,
-      ignorePunctuation,
-      ignoreWhitespace,
-      ignoreCasing,
+      ignorePunctuation: inputs.every(input => input.ignorePunctuation),
+      ignoreWhitespace: inputs.every(input => input.ignoreWhitespace),
+      ignoreCasing: inputs.every(input => input.ignoreCasing),
       asciiRange,
     };
     compressLZMA(JSON.stringify(paramsObj)).then((lzdataRaw) => {
@@ -251,9 +245,9 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         compressLZMA(JSON.stringify(allLayouts)).then((lzlayoutRaw) => {
           const lzlayout = lzlayoutRaw as string;
           legacyParams.set('lzdata_layout', lzlayout);
-          legacyParams.set('ignorePunctuation', String(ignorePunctuation));
-          legacyParams.set('ignoreWhitespace', String(ignoreWhitespace));
-          legacyParams.set('ignoreCasing', String(ignoreCasing));
+          legacyParams.set('ignorePunctuation', String(inputs.every(input => input.ignorePunctuation)));
+          legacyParams.set('ignoreWhitespace', String(inputs.every(input => input.ignoreWhitespace)));
+          legacyParams.set('ignoreCasing', String(inputs.every(input => input.ignoreCasing)));
           legacyParams.set('asciiRange', asciiRange);
           const legacyQuery = legacyParams.toString();
           let newUrl;
@@ -265,9 +259,9 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
           window.history.replaceState(null, '', newUrl);
         });
       } else {
-        legacyParams.set('ignorePunctuation', String(ignorePunctuation));
-        legacyParams.set('ignoreWhitespace', String(ignoreWhitespace));
-        legacyParams.set('ignoreCasing', String(ignoreCasing));
+        legacyParams.set('ignorePunctuation', String(inputs.every(input => input.ignorePunctuation)));
+        legacyParams.set('ignoreWhitespace', String(inputs.every(input => input.ignoreWhitespace)));
+        legacyParams.set('ignoreCasing', String(inputs.every(input => input.ignoreCasing)));
         legacyParams.set('asciiRange', asciiRange);
         const legacyQuery = legacyParams.toString();
         let newUrl;
@@ -279,7 +273,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         window.history.replaceState(null, '', newUrl);
       }
     });
-  }, [widgets, inputs, asciiBase, entropyMode, entropyWindow, icMode, ignorePunctuation, ignoreWhitespace, ignoreCasing, asciiRange]);
+  }, [widgets, inputs, asciiBase, entropyMode, entropyWindow, icMode, asciiRange]);
 
   return {
     inputs,
@@ -301,13 +295,8 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     layouts,
     setLayouts,
     handleLayoutChange,
-    ignorePunctuation,
-    setIgnorePunctuation,
-    ignoreWhitespace,
-    setIgnoreWhitespace,
-    ignoreCasing,
-    setIgnoreCasing,
     asciiRange,
     setAsciiRange,
+    loading,
   };
 }

@@ -17,24 +17,26 @@ import { BaseType } from '@/types/bases';
 import { InputData } from '@/app/useDashboardParams';
 import { useAsciiDistribution, defaultGridSize } from './useAsciiDistribution';
 import { useAsciiDistributionChart } from './useAsciiDistributionChart';
+import { AsciiRange } from '@/app/useDashboardParams';
+import { Ciphertext } from '@/types/ciphertext';
 
 interface AsciiDistributionWidgetProps {
-  texts: InputData[];
-  base: BaseType;
+  inputs: Ciphertext[];
   gridW?: number;
   asciiRange: string;
   setAsciiRange: (range: string) => void;
 }
 
-export default function AsciiDistributionWidget({ texts, base, gridW, asciiRange, setAsciiRange }: AsciiDistributionWidgetProps) {
-  const analysis = useAsciiDistribution(texts, base, asciiRange);
-  const { data, options } = useAsciiDistributionChart(analysis, base);
+export default function AsciiDistributionWidget({ inputs, gridW = 1, asciiRange, setAsciiRange }: AsciiDistributionWidgetProps) {
+  const analysis = useAsciiDistribution(inputs, asciiRange);
+  const { data, options } = useAsciiDistributionChart(analysis);
+  const isNarrow = gridW < 2;
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="mb-4 flex flex-row items-center justify-between gap-2">
+      <div className={`mb-4 flex ${isNarrow ? 'flex-col' : 'flex-row'} items-start ${isNarrow ? '' : 'items-center'} justify-between gap-2`}>
         <h3 className="text-lg font-semibold mb-0">ASCII Distribution</h3>
-        <div>
+        <div className={`${isNarrow ? 'mt-2' : ''}`}>
           <label className="mr-2">Range:</label>
           <select
             value={asciiRange}

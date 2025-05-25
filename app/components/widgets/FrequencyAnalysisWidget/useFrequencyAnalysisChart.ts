@@ -16,7 +16,7 @@ export const defaultGridSize = { w: 2, h: 2 };
 export function useFrequencyAnalysisChart({ frequencies, sortedChars }) {
   const data = useMemo(() => {
     const datasets = frequencies.map(freq => ({
-      label: `Text ${freq.text.slice(0, 20)}${freq.text.length > 20 ? '...' : ''}`,
+      label: `${freq.text.slice(0, 7)}${freq.text.length > 7 ? '...' : ''}`,
       data: sortedChars.map(char => freq.frequencies[char] || 0),
       backgroundColor: freq.color,
       borderColor: freq.color,

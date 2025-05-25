@@ -1,30 +1,36 @@
 import { BaseType } from '@/types/bases';
 import { customBase64Decode } from './base64';
 
-export function decodeText(text: string, base: BaseType): string {
+export function decodeText(
+  text: string,
+  base: BaseType,
+): string {
+  let decoded = text;
   try {
     switch (base) {
       case 'base64':
-        return customBase64Decode(text);
+        decoded = customBase64Decode(text);
+        break;
       case 'hex':
         if (/^[0-9A-Fa-f\s]*$/.test(text)) {
-          return text.match(/.{1,2}/g)?.map(byte => String.fromCharCode(parseInt(byte, 16))).join('') || '';
+          decoded = text.match(/.{1,2}/g)?.map(byte => String.fromCharCode(parseInt(byte, 16))).join('') || '';
         }
-        return text;
+        break;
       case 'decimal':
         if (/^[0-9\s]*$/.test(text)) {
-          return text.split(/\s+/).map(num => String.fromCharCode(parseInt(num, 10))).join('');
+          decoded = text.split(/\s+/).map(num => String.fromCharCode(parseInt(num, 10))).join('');
         }
-        return text;
+        break;
       case 'octal':
         if (/^[0-7\s]*$/.test(text)) {
-          return text.split(/\s+/).map(num => String.fromCharCode(parseInt(num, 8))).join('');
+          decoded = text.split(/\s+/).map(num => String.fromCharCode(parseInt(num, 8))).join('');
         }
-        return text;
+        break;
       case 'ascii':
       default:
-        return text;
+        decoded = text;
     }
+    return decoded;
   } catch (e) {
     console.error('Error decoding text:', e);
     return text;

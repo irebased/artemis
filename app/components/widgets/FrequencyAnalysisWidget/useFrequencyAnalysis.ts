@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
-import { InputData } from '@/app/useDashboardParams';
+import { Ciphertext } from '@/types/ciphertext';
 
-export function useFrequencyAnalysis(texts: InputData[]) {
+export function useFrequencyAnalysis(inputs: Ciphertext[]) {
   return useMemo(() => {
-    const frequencies = texts.map(input => {
+    const frequencies = inputs.map(input => {
+      const text = input.text;
       const freq: Record<string, number> = {};
-      const total = input.text.length;
-      for (const char of input.text) {
+      const total = text.length;
+      for (const char of text) {
         freq[char] = (freq[char] || 0) + 1;
       }
       const percentages: Record<string, number> = {};
@@ -25,5 +26,5 @@ export function useFrequencyAnalysis(texts: InputData[]) {
     });
     const sortedChars = Array.from(allChars).sort();
     return { frequencies, sortedChars };
-  }, [texts]);
+  }, [inputs]);
 }
