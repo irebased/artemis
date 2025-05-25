@@ -5,7 +5,6 @@ import AsciiDistributionWidget from '../components/widgets/AsciiDistributionWidg
 import FrequencyStdDevWidget from '../components/widgets/FrequencyStdDevWidget/FrequencyStdDev';
 import IndexOfCoincidenceWidget from '../components/widgets/IndexOfCoincidenceWidget/IndexOfCoincidenceWidget';
 import ShannonEntropyWidget from '../components/widgets/ShannonEntropyWidget/ShannonEntropyWidget';
-import { AsciiRange } from '@/app/useDashboardParams';
 import { BaseType } from '@/types/bases';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -18,8 +17,6 @@ interface WidgetGridProps {
   BREAKPOINTS: Record<string, number>;
   adjustedTexts: any;
   asciiBase: BaseType;
-  icMode: any;
-  setIcMode: (mode: any) => void;
   entropyMode: any;
   setEntropyMode: (mode: any) => void;
   entropyWindow: number;
@@ -33,6 +30,8 @@ interface WidgetGridProps {
   setAnyModalOpen: (open: boolean) => void;
   asciiDistributionSettings: { range: 'extended' | 'ascii' | 'input' };
   setAsciiDistributionSettings: (settings: { range: 'extended' | 'ascii' | 'input' }) => void;
+  indexOfCoincidenceSettings: { mode: 'summary' | 'period' };
+  setIndexOfCoincidenceSettings: (settings: { mode: 'summary' | 'period' }) => void;
 }
 
 export default function WidgetGrid({
@@ -43,8 +42,6 @@ export default function WidgetGrid({
   BREAKPOINTS,
   adjustedTexts,
   asciiBase,
-  icMode,
-  setIcMode,
   entropyMode,
   setEntropyMode,
   entropyWindow,
@@ -58,6 +55,8 @@ export default function WidgetGrid({
   setAnyModalOpen,
   asciiDistributionSettings,
   setAsciiDistributionSettings,
+  indexOfCoincidenceSettings,
+  setIndexOfCoincidenceSettings,
 }: WidgetGridProps) {
   return (
     <ResponsiveGridLayout
@@ -94,10 +93,11 @@ export default function WidgetGrid({
         } else if (widget === 'coincidence') {
           WidgetComponent = (
             <IndexOfCoincidenceWidget
-            inputs={adjustedTexts}
+              inputs={adjustedTexts}
               base={asciiBase}
-              view={icMode}
-              onViewChange={setIcMode}
+              indexOfCoincidenceSettings={indexOfCoincidenceSettings}
+              setIndexOfCoincidenceSettings={setIndexOfCoincidenceSettings}
+              setAnyModalOpen={setAnyModalOpen}
             />
           );
         } else if (widget === 'entropy') {

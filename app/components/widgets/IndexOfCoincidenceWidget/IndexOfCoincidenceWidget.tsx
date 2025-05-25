@@ -1,47 +1,43 @@
 import { Line } from 'react-chartjs-2';
 import { Ciphertext } from '@/types/ciphertext';
-import { BaseType } from '@/types/bases';
 import { useIndexOfCoincidence, IC_BASELINES } from './useIndexOfCoincidence';
 import { useIndexOfCoincidenceChart } from './useIndexOfCoincidenceChart';
+import WidgetWithSettings from '../FrequencyAnalysisWidget/WidgetWithSettings';
+import IndexOfCoincidenceSettingsForm, { IndexOfCoincidenceSettings } from './IndexOfCoincidenceSettingsForm';
+import { BaseType } from '@/types/bases';
 
 interface IndexOfCoincidenceWidgetProps {
   inputs: Ciphertext[];
   base: BaseType;
-  width?: number;
-  height?: number;
-  view: 'summary' | 'period';
-  onViewChange: (view: 'summary' | 'period') => void;
+  indexOfCoincidenceSettings: IndexOfCoincidenceSettings;
+  setIndexOfCoincidenceSettings: (settings: IndexOfCoincidenceSettings) => void;
+  setAnyModalOpen?: (open: boolean) => void;
 }
 
 export default function IndexOfCoincidenceWidget({
   inputs,
   base,
-  width,
-  height,
-  view,
-  onViewChange,
+  indexOfCoincidenceSettings,
+  setIndexOfCoincidenceSettings,
+  setAnyModalOpen,
 }: IndexOfCoincidenceWidgetProps) {
-  const baseline = IC_BASELINES[base];
+  const { mode } = indexOfCoincidenceSettings;
   const results = useIndexOfCoincidence(inputs);
-  const { data: periodLineData, options: lineOptions } = useIndexOfCoincidenceChart(results, view, baseline);
+  const baseline = IC_BASELINES[base];
+  const { data: periodLineData, options: lineOptions } = useIndexOfCoincidenceChart(results, mode, baseline);
 
   return (
-    <div className="w-full h-full flex flex-col">
-      <div className="mb-4 flex flex-row items-center justify-between gap-2">
-        <h3 className="text-lg font-semibold mb-0">Index of Coincidence</h3>
-        <div>
-          <label className="mr-2">View:</label>
-          <select
-            value={view}
-            onChange={(e) => onViewChange(e.target.value as 'summary' | 'period')}
-            className="p-2 border rounded"
-          >
-            <option value="summary">Summary</option>
-            <option value="period">Periodic Analysis</option>
-          </select>
-        </div>
-      </div>
-      {view === 'summary' ? (
+    <WidgetWithSettings
+      title="Index of Coincidence"
+      settingsComponent={
+        <IndexOfCoincidenceSettingsForm
+          settings={indexOfCoincidenceSettings}
+          setSettings={setIndexOfCoincidenceSettings}
+        />
+      }
+      setAnyModalOpen={setAnyModalOpen}
+    >
+      {mode === 'summary' ? (
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
@@ -76,6 +72,6 @@ export default function IndexOfCoincidenceWidget({
           )}
         </div>
       )}
-    </div>
+    </WidgetWithSettings>
   );
 }

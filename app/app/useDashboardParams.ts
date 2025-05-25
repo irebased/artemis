@@ -63,6 +63,10 @@ export type AsciiDistributionSettings = {
   range: 'extended' | 'ascii' | 'input';
 };
 
+export type IndexOfCoincidenceSettings = {
+  mode: 'summary' | 'period';
+};
+
 function compressSettings(obj: any): string {
   const json = JSON.stringify(obj);
   const compressed = pako.deflate(json, { level: 9 });
@@ -110,6 +114,9 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   });
   const [asciiDistributionSettings, setAsciiDistributionSettings] = useState<AsciiDistributionSettings>({
     range: 'extended',
+  });
+  const [indexOfCoincidenceSettings, setIndexOfCoincidenceSettings] = useState<IndexOfCoincidenceSettings>({
+    mode: 'summary',
   });
 
   const addInput = useCallback(() => {
@@ -183,6 +190,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const freqSettingsParam = query.get('freqSettings');
     const entropySettingsParam = query.get('entropySettings');
     const asciiSettingsParam = query.get('asciiSettings');
+    const icSettingsParam = query.get('icSettings');
 
     if (widgetParam) {
       const widgetList = widgetParam
@@ -262,6 +270,14 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         // fallback to defaults
       }
     }
+    if (icSettingsParam) {
+      try {
+        const settings = decompressSettings(icSettingsParam);
+        setIndexOfCoincidenceSettings(settings);
+      } catch (e) {
+        // fallback to defaults
+      }
+    }
     finishLoading();
   }, []);
 
@@ -284,6 +300,9 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       if (asciiDistributionSettings) {
         params.set('asciiSettings', compressSettings(asciiDistributionSettings));
       }
+      if (indexOfCoincidenceSettings) {
+        params.set('icSettings', compressSettings(indexOfCoincidenceSettings));
+      }
       if (layouts) {
         compressLZMA(JSON.stringify(layouts)).then((lzlayoutRaw) => {
           const lzlayout = lzlayoutRaw as string;
@@ -294,7 +313,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         });
       }
     });
-  }, [inputs, inputsForUrlSync, widgets, asciiBase, icMode, layouts, asciiDistributionSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings]);
+  }, [inputs, inputsForUrlSync, widgets, asciiBase, icMode, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -385,5 +404,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     setShannonEntropySettings,
     asciiDistributionSettings,
     setAsciiDistributionSettings,
+    indexOfCoincidenceSettings,
+    setIndexOfCoincidenceSettings,
   };
 }

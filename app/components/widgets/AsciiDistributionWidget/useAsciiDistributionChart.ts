@@ -18,7 +18,7 @@ export const defaultGridSize = { w: 2, h: 2 };
 export function useAsciiDistributionChart({ distributions, start, end, encoding }) {
   const data = useMemo(() => {
     const datasets = distributions.map(dist => ({
-      label: `Text ${dist.text.slice(0, 20)}${dist.text.length > 20 ? '...' : ''}`,
+      label: `Text ${dist.text.slice(0, 7)}${dist.text.length > 7 ? '...' : ''}`,
       data: dist.counts.slice(start, end),
       backgroundColor: dist.color,
       borderColor: dist.color,

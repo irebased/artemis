@@ -113,6 +113,8 @@ export default function DashboardPage() {
     loading,
     asciiDistributionSettings,
     setAsciiDistributionSettings,
+    indexOfCoincidenceSettings,
+    setIndexOfCoincidenceSettings,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
 
   const { theme } = useTheme();
@@ -192,8 +194,6 @@ export default function DashboardPage() {
         BREAKPOINTS={BREAKPOINTS}
         adjustedTexts={adjustedTexts}
         asciiBase={asciiBase}
-        icMode={icMode}
-        setIcMode={setIcMode}
         entropyMode={entropyMode}
         setEntropyMode={setEntropyMode}
         entropyWindow={entropyWindow}
@@ -207,6 +207,8 @@ export default function DashboardPage() {
         setAnyModalOpen={setAnyModalOpen}
         asciiDistributionSettings={asciiDistributionSettings}
         setAsciiDistributionSettings={setAsciiDistributionSettings}
+        indexOfCoincidenceSettings={indexOfCoincidenceSettings}
+        setIndexOfCoincidenceSettings={setIndexOfCoincidenceSettings}
       />
     </div>
   );
