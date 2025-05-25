@@ -154,7 +154,7 @@ export default function TextInputCard({
       </div>
       <Card className="mb-6 rounded-t-none">
         <CardHeader>
-          <h2 className="text-xl font-semibold">Input Texts</h2>
+          <h2 className="text-xl font-semibold">Input Text</h2>
         </CardHeader>
         <CardBody>
           {/* Active input editor */}
