@@ -2,7 +2,7 @@ import { Line } from 'react-chartjs-2';
 import { Ciphertext } from '@/types/ciphertext';
 import { useShannonEntropy, ENTROPY_BASELINES, BaseType } from './useShannonEntropy';
 import { useShannonEntropyChart, defaultGridSize } from './useShannonEntropyChart';
-import WidgetWithSettings from '../FrequencyAnalysisWidget/WidgetWithSettings';
+import WidgetWithSettings from '../WidgetWithSettings';
 import ShannonEntropySettingsForm from './ShannonEntropySettingsForm';
 
 interface ShannonEntropyWidgetProps {

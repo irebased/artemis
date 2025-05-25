@@ -17,7 +17,7 @@ import { BaseType } from '@/types/bases';
 import { InputData } from '@/app/useDashboardParams';
 import { useAsciiDistribution, defaultGridSize } from './useAsciiDistribution';
 import { useAsciiDistributionChart } from './useAsciiDistributionChart';
-import WidgetWithSettings from '../FrequencyAnalysisWidget/WidgetWithSettings';
+import WidgetWithSettings from '../WidgetWithSettings';
 import AsciiDistributionSettingsForm, { AsciiDistributionSettings } from './AsciiDistributionSettingsForm';
 import { Ciphertext } from '@/types/ciphertext';
 

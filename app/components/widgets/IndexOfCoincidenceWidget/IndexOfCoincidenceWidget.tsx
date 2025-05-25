@@ -2,7 +2,7 @@ import { Line } from 'react-chartjs-2';
 import { Ciphertext } from '@/types/ciphertext';
 import { useIndexOfCoincidence, IC_BASELINES } from './useIndexOfCoincidence';
 import { useIndexOfCoincidenceChart } from './useIndexOfCoincidenceChart';
-import WidgetWithSettings from '../FrequencyAnalysisWidget/WidgetWithSettings';
+import WidgetWithSettings from '../WidgetWithSettings';
 import IndexOfCoincidenceSettingsForm, { IndexOfCoincidenceSettings } from './IndexOfCoincidenceSettingsForm';
 import { BaseType } from '@/types/bases';
 

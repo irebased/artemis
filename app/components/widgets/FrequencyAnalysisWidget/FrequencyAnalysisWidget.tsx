@@ -13,8 +13,9 @@ import {
 import { Ciphertext } from '@/types/ciphertext';
 import { useFrequencyAnalysis } from './useFrequencyAnalysis';
 import { useFrequencyAnalysisChart } from './useFrequencyAnalysisChart';
-import WidgetWithSettings from './WidgetWithSettings';
+import WidgetWithSettings from '../WidgetWithSettings';
 import FrequencyAnalysisSettingsForm from './FrequencyAnalysisSettingsForm';
+import FrequencyAnalysisInformation from './FrequencyAnalysisInformation';
 
 interface FrequencyAnalysisWidgetProps {
   inputs: Ciphertext[];
@@ -38,6 +39,9 @@ export default function FrequencyAnalysisWidget({
   return (
     <WidgetWithSettings
       title="Frequency Analysis"
+      infoContent={
+        <FrequencyAnalysisInformation />
+      }
       settingsComponent={
         <FrequencyAnalysisSettingsForm
           settings={frequencyAnalysisSettings}
