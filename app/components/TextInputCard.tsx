@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardHeader, CardBody } from '@heroui/react';
 import { BaseType } from '@/types/bases';
 import { Ciphertext } from '@/types/ciphertext';
+import { useTheme } from 'next-themes';
 
 interface TextInputCardProps {
   inputs: Ciphertext[];
@@ -19,6 +20,7 @@ export default function TextInputCard({
   const [activeTab, setActiveTab] = useState(0);
   const mounted = useRef(false);
   const prevInputsLen = useRef(inputs.length);
+  const { theme } = useTheme();
 
   // Ensure we always have at least one input
   useEffect(() => {
@@ -86,15 +88,25 @@ export default function TextInputCard({
 
   const activeInput = inputs[activeTab];
 
+  const lightModeTabActiveStyle = 'bg-gray-100 text-black';
+  const darkModeTabActiveStyle = 'bg-gray-800 text-white';
+  const lightModeTabStyle = 'bg-blue-200 text-gray-800 hover:bg-gray-100 hover:text-black';
+  const darkModeTabStyle = 'bg-gray-900 text-gray-400 hover:bg-gray-800 hover:text-white';
+
+  const lightModeHeaderStyle = 'border-gray-100 bg-blue-100';
+  const darkModeHeaderStyle = 'border-b border-gray-800 bg-gray-900';
+
   return (
     <div>
       {/* Tabs Bar - now above the card, styled for dark theme */}
-      <div className="flex items-center gap-2 mb-0 border-b border-gray-800 bg-gray-900 rounded-t-lg px-4 pt-2 pb-1">
+      <div className={`flex items-center gap-2 mb-0 ${theme === 'dark' ? darkModeHeaderStyle : lightModeHeaderStyle} rounded-t-lg px-4 pt-2 pb-1`}>
         {inputs.map((input, idx) => (
           <div
             key={input.id}
             className={`flex items-center px-3 py-1 cursor-pointer rounded-t transition-colors duration-100
-              ${activeTab === idx ? 'bg-gray-800 text-white' : 'bg-gray-900 text-gray-400 hover:bg-gray-800 hover:text-white'}`}
+              ${activeTab === idx
+                ? theme === 'dark' ? darkModeTabActiveStyle : lightModeTabActiveStyle
+                : theme === 'dark' ? darkModeTabStyle : lightModeTabStyle}`}
             style={{ borderBottom: activeTab === idx ? '2px solid #3b82f6' : '2px solid transparent' }}
             onClick={() => handleTabChange(idx)}
           >

@@ -1,13 +1,6 @@
 'use client';
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
-import { Card, CardHeader, CardBody } from '@heroui/react';
-import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
-import FrequencyAnalysisWidget from '../components/widgets/FrequencyAnalysisWidget/FrequencyAnalysisWidget';
-import AsciiDistributionWidget from '../components/widgets/AsciiDistributionWidget/AsciiDistributionWidget';
-import FrequencyStdDevWidget from '../components/widgets/FrequencyStdDevWidget/FrequencyStdDev';
-import IndexOfCoincidenceWidget from '@/components/widgets/IndexOfCoincidenceWidget/IndexOfCoincidenceWidget';
-import ShannonEntropyWidget from '@/components/widgets/ShannonEntropyWidget/ShannonEntropyWidget';
 import { defaultGridSize as entropyDefault } from '@/components/widgets/ShannonEntropyWidget/useShannonEntropyChart';
 import { defaultGridSize as icDefault } from '@/components/widgets/IndexOfCoincidenceWidget/useIndexOfCoincidenceChart';
 import { defaultGridSize as stddevDefault } from '@/components/widgets/FrequencyStdDevWidget/useFrequencyStdDevChart';
@@ -17,12 +10,11 @@ import { BASE_OPTIONS, BaseType } from '@/types/bases';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
-import WidgetContainer from '../components/widgets/WidgetContainer';
 import { useDashboardParams, INPUT_COLORS, AsciiRange } from './useDashboardParams';
 import TextInputCard from '../components/TextInputCard';
 import WidgetSelectorCard from '../components/WidgetSelectorCard';
 import WidgetGrid from '../components/WidgetGrid';
-import { Ciphertext } from '@/types/ciphertext';
+import { useTheme } from 'next-themes';
 
 const AVAILABLE_WIDGETS = {
   frequency: 'Frequency Analysis',
@@ -117,6 +109,8 @@ export default function DashboardPage() {
     loading,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
 
+  const { theme } = useTheme();
+
   useEffect(() => {
     setInputsForUrlSync(inputs.filter(input => input.text.trim() !== ''));
   }, [inputs, setInputsForUrlSync]);
@@ -138,12 +132,21 @@ export default function DashboardPage() {
     return <div className="max-w-[1600px] mx-auto py-8 px-4 text-center text-lg">Loading dashboard...</div>;
   }
 
+  const darkModeLockedButtonStyle ='bg-gray-800 text-blue-400 border-blue-400';
+  const darkModeUnlockedButtonStyle = 'bg-gray-900 text-gray-400 border-gray-700 hover:text-blue-400';
+  const lightModeLockedButtonStyle = 'bg-gray-100 text-blue-800 border-blue-800';
+  const lightModeUnlockedButtonStyle = 'bg-gray-200 text-gray-400 border-gray-300 hover:text-blue-400';
+
+  const lightModeButtonStyle = theme === 'light' ? lightModeLockedButtonStyle : lightModeUnlockedButtonStyle;
+
+  const darkModeButtonStyle = theme === 'dark' ? darkModeLockedButtonStyle : darkModeUnlockedButtonStyle;
+
   return (
     <div className="max-w-[1600px] mx-auto py-8 px-4">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Text Analysis Dashboard</h1>
         <button
-          className={`flex items-center px-3 py-1 rounded border ${layoutLocked ? 'bg-gray-800 text-blue-400 border-blue-400' : 'bg-gray-900 text-gray-400 border-gray-700 hover:text-blue-400'}`}
+          className={`flex items-center px-3 py-1 rounded border ${theme == 'dark' ? darkModeButtonStyle : lightModeButtonStyle}`}
           onClick={() => setLayoutLocked(!layoutLocked)}
           title={layoutLocked ? 'Unlock layout (enable drag, resize, add/remove)' : 'Lock layout (disable drag, resize, add/remove)'}
         >

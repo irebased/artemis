@@ -1,4 +1,5 @@
 import { Card, CardHeader, CardBody } from '@heroui/react';
+import { useTheme } from 'next-themes';
 
 interface WidgetSelectorCardProps {
   widgets: string[];
@@ -8,6 +9,11 @@ interface WidgetSelectorCardProps {
 }
 
 export default function WidgetSelectorCard({ widgets, setWidgets, AVAILABLE_WIDGETS, layoutLocked }: WidgetSelectorCardProps) {
+  const { theme } = useTheme();
+
+  const lightModeButtonStyle = 'bg-gray-100 hover:bg-gray-200 text-gray-800'
+  const darkModeButtonStyle = 'bg-gray-700 hover:bg-gray-800';
+
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -24,7 +30,7 @@ export default function WidgetSelectorCard({ widgets, setWidgets, AVAILABLE_WIDG
               className={`px-3 py-1 rounded ${
                 widgets.includes(key)
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-700 hover:bg-gray-800'
+                  : theme === 'light' ? lightModeButtonStyle : darkModeButtonStyle
               }`}
               disabled={layoutLocked}
               title={layoutLocked ? 'Unlock layout to add/remove widgets' : ''}
