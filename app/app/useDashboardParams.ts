@@ -177,10 +177,8 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       loadedInputs = true;
     }
     const widgetParam = query.get('widgets');
-    const baseParam = query.get('base');
     const modeParam = query.get('entropyMode');
     const windowParam = query.get('entropyWindow');
-    const icModeParam = query.get('icMode');
     const layoutParam = query.get('layout');
     const ignorePunctParam = query.get('ignorePunctuation');
     const ignoreWSParam = query.get('ignoreWhitespace');
@@ -198,17 +196,11 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         .filter((w) => w in WIDGET_DEFAULTS) as string[];
       setWidgets(widgetList);
     }
-    if (baseParam && BASE_OPTIONS.includes(baseParam as BaseType)) {
-      setAsciiBase(baseParam as BaseType);
-    }
     if (modeParam === 'sliding' || modeParam === 'raw') {
       setEntropyMode(modeParam);
     }
     if (windowParam && !isNaN(parseInt(windowParam))) {
       setEntropyWindow(parseInt(windowParam));
-    }
-    if (icModeParam === 'summary' || icModeParam === 'period') {
-      setIcMode(icModeParam);
     }
     if (layoutParam) {
       try {
@@ -288,8 +280,6 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     compressLZMA(JSON.stringify(urlInputs)).then(compressed => {
       const params = new URLSearchParams();
       if (widgets.length > 0) params.set('widgets', widgets.join(','));
-      if (asciiBase) params.set('base', asciiBase);
-      if (icMode) params.set('icMode', icMode);
       if (layoutLocked) params.set('lock', '1');
       if (frequencyAnalysisSettings) {
         params.set('freqSettings', compressSettings(frequencyAnalysisSettings));
@@ -313,7 +303,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         });
       }
     });
-  }, [inputs, inputsForUrlSync, widgets, asciiBase, icMode, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings]);
+  }, [inputs, inputsForUrlSync, widgets, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
