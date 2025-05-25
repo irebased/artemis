@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
 
 export const IC_BASELINES = {
-  ascii: { english: 0.0704, random: 0.01805 },
+  ascii: { english: 0.0616, random: 0.01805 },
   base64: { english: 0.0282, random: 0.01387 },
   hex: { english: 0.1399, random: 0.05714 },
   decimal: { english: 0.2085, random: 0.09769 },
