@@ -54,6 +54,11 @@ export type FrequencyAnalysisSettings = {
   ngramMode: 'sliding' | 'block';
 };
 
+export type ShannonEntropySettings = {
+  mode: 'raw' | 'sliding';
+  windowSize: 16 | 32 | 64 | 128 | 256;
+};
+
 function compressSettings(obj: any): string {
   const json = JSON.stringify(obj);
   const compressed = pako.deflate(json, { level: 9 });
@@ -94,6 +99,10 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   const [frequencyAnalysisSettings, setFrequencyAnalysisSettings] = useState<FrequencyAnalysisSettings>({
     ngramSize: 1,
     ngramMode: 'sliding',
+  });
+  const [shannonEntropySettings, setShannonEntropySettings] = useState<ShannonEntropySettings>({
+    mode: 'raw',
+    windowSize: 64,
   });
 
   const addInput = useCallback(() => {
@@ -165,6 +174,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const asciiRangeParam = query.get('asciiRange');
     const lockParam = query.get('lock');
     const freqSettingsParam = query.get('freqSettings');
+    const entropySettingsParam = query.get('entropySettings');
 
     if (widgetParam) {
       const widgetList = widgetParam
@@ -228,6 +238,14 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         // fallback to defaults
       }
     }
+    if (entropySettingsParam) {
+      try {
+        const settings = decompressSettings(entropySettingsParam);
+        setShannonEntropySettings(settings);
+      } catch (e) {
+        // fallback to defaults
+      }
+    }
     finishLoading();
   }, []);
 
@@ -239,12 +257,13 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       const params = new URLSearchParams();
       if (widgets.length > 0) params.set('widgets', widgets.join(','));
       if (asciiBase) params.set('base', asciiBase);
-      if (entropyMode) params.set('entropyMode', entropyMode);
-      if (entropyMode === 'sliding') params.set('entropyWindow', entropyWindow.toString());
       if (icMode) params.set('icMode', icMode);
       if (layoutLocked) params.set('lock', '1');
       if (frequencyAnalysisSettings) {
         params.set('freqSettings', compressSettings(frequencyAnalysisSettings));
+      }
+      if (shannonEntropySettings) {
+        params.set('entropySettings', compressSettings(shannonEntropySettings));
       }
       if (layouts) {
         compressLZMA(JSON.stringify(layouts)).then((lzlayoutRaw) => {
@@ -257,7 +276,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         });
       }
     });
-  }, [inputs, inputsForUrlSync, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, asciiRange, loading, layoutLocked, frequencyAnalysisSettings]);
+  }, [inputs, inputsForUrlSync, widgets, asciiBase, icMode, layouts, asciiRange, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -344,5 +363,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     setLayoutLocked,
     frequencyAnalysisSettings,
     setFrequencyAnalysisSettings,
+    shannonEntropySettings,
+    setShannonEntropySettings,
   };
 }

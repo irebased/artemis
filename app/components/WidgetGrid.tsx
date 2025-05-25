@@ -29,6 +29,8 @@ interface WidgetGridProps {
   layoutLocked: boolean;
   frequencyAnalysisSettings: { ngramSize: number; ngramMode: 'sliding' | 'block' };
   setFrequencyAnalysisSettings: (settings: { ngramSize: number; ngramMode: 'sliding' | 'block' }) => void;
+  shannonEntropySettings: { mode: 'raw' | 'sliding'; windowSize: 16 | 32 | 64 | 128 | 256 };
+  setShannonEntropySettings: (settings: { mode: 'raw' | 'sliding'; windowSize: 16 | 32 | 64 | 128 | 256 }) => void;
 }
 
 export default function WidgetGrid({
@@ -50,6 +52,8 @@ export default function WidgetGrid({
   layoutLocked,
   frequencyAnalysisSettings,
   setFrequencyAnalysisSettings,
+  shannonEntropySettings,
+  setShannonEntropySettings,
 }: WidgetGridProps) {
   return (
     <ResponsiveGridLayout
@@ -95,10 +99,8 @@ export default function WidgetGrid({
             <ShannonEntropyWidget
               inputs={adjustedTexts}
               base={asciiBase}
-              mode={entropyMode}
-              windowSize={entropyWindow}
-              onModeChange={setEntropyMode}
-              onWindowSizeChange={setEntropyWindow}
+              shannonEntropySettings={shannonEntropySettings}
+              setShannonEntropySettings={setShannonEntropySettings}
             />
           );
         }

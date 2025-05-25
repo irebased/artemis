@@ -108,6 +108,8 @@ export default function DashboardPage() {
     setLayoutLocked,
     frequencyAnalysisSettings,
     setFrequencyAnalysisSettings,
+    shannonEntropySettings,
+    setShannonEntropySettings,
     loading,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
 
@@ -197,6 +199,8 @@ export default function DashboardPage() {
         layoutLocked={layoutLocked}
         frequencyAnalysisSettings={frequencyAnalysisSettings}
         setFrequencyAnalysisSettings={setFrequencyAnalysisSettings}
+        shannonEntropySettings={shannonEntropySettings}
+        setShannonEntropySettings={setShannonEntropySettings}
       />
     </div>
   );
