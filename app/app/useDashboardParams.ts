@@ -65,6 +65,8 @@ export type AsciiDistributionSettings = {
 
 export type IndexOfCoincidenceSettings = {
   mode: 'summary' | 'period';
+  ngramSize?: number;
+  ngramMode?: 'sliding' | 'block';
 };
 
 function compressSettings(obj: any): string {
@@ -117,6 +119,8 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   });
   const [indexOfCoincidenceSettings, setIndexOfCoincidenceSettings] = useState<IndexOfCoincidenceSettings>({
     mode: 'summary',
+    ngramSize: 1,
+    ngramMode: 'sliding',
   });
 
   const addInput = useCallback(() => {

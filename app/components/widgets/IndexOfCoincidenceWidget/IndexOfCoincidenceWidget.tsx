@@ -21,8 +21,8 @@ export default function IndexOfCoincidenceWidget({
   setIndexOfCoincidenceSettings,
   setAnyModalOpen,
 }: IndexOfCoincidenceWidgetProps) {
-  const { mode } = indexOfCoincidenceSettings;
-  const results = useIndexOfCoincidence(inputs);
+  const { mode, ngramSize = 1, ngramMode = 'sliding' } = indexOfCoincidenceSettings;
+  const results = useIndexOfCoincidence(inputs, ngramSize, ngramMode);
   const baseline = IC_BASELINES[base];
   const { data: periodLineData, options: lineOptions } = useIndexOfCoincidenceChart(results, mode, baseline);
 
@@ -44,8 +44,12 @@ export default function IndexOfCoincidenceWidget({
               <tr>
                 <th className="text-left p-2">Text</th>
                 <th className="text-left p-2">IC</th>
-                <th className="text-left p-2">English baseline</th>
-                <th className="text-left p-2">Random text baseline</th>
+                { ngramSize == 1 &&
+                  <>
+                    <th className="text-left p-2">English baseline</th>
+                    <th className="text-left p-2">Random text baseline</th>
+                  </>
+                }
               </tr>
             </thead>
             <tbody>
@@ -56,8 +60,12 @@ export default function IndexOfCoincidenceWidget({
                     {r.text.slice(0, 7)}{r.text.length > 7 ? '...' : ''}
                   </td>
                   <td className="p-2 font-bold text-gray-400">{r.ioc.toFixed(4)}</td>
-                  <td className="p-2 text-gray-400">{r.baseline.toFixed(4)}</td>
-                  <td className="p-2 text-gray-400">{r.randomBaseline.toFixed(4)}</td>
+                  { ngramSize == 1 &&
+                    <>
+                      <td className="p-2 text-gray-400">{r.baseline.toFixed(4)}</td>
+                      <td className="p-2 text-gray-400">{r.randomBaseline.toFixed(4)}</td>
+                    </>
+                  }
                 </tr>
               ))}
             </tbody>
