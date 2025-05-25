@@ -7,6 +7,8 @@ import { Providers } from "./providers";
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
+import { Analytics } from "@vercel/analytics/next"
+
 
 export const metadata: Metadata = {
   title: {
@@ -40,6 +42,7 @@ export default function RootLayout({
           fontSans.variable,
         )}
       >
+        <Analytics />
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
             <Navbar />
