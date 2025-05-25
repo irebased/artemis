@@ -106,7 +106,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     let asyncDone = 0;
     let loadedInputs = false;
     let loadedLayouts = false;
-    async function finishLoading() {
+    function finishLoading() {
       if ((lzdataParam ? loadedInputs : true) && loadedLayouts) {
         setLoading(false);
       }
@@ -198,6 +198,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     } else {
       setLayoutLocked(false);
     }
+    finishLoading();
   }, []);
 
   useEffect(() => {
