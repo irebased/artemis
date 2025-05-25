@@ -20,6 +20,7 @@ import { useAsciiDistributionChart } from './useAsciiDistributionChart';
 import WidgetWithSettings from '../WidgetWithSettings';
 import AsciiDistributionSettingsForm, { AsciiDistributionSettings } from './AsciiDistributionSettingsForm';
 import { Ciphertext } from '@/types/ciphertext';
+import AsciiDistributionInformation from './AsciiDistributionInformation';
 
 interface AsciiDistributionWidgetProps {
   inputs: Ciphertext[];
@@ -50,6 +51,7 @@ export default function AsciiDistributionWidget({
         />
       }
       setAnyModalOpen={setAnyModalOpen}
+      infoContent={<AsciiDistributionInformation />}
     >
       <div className="flex-1 w-full h-full relative">
         {data && data.labels.length > 0 ? (
