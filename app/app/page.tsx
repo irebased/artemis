@@ -127,7 +127,7 @@ export default function DashboardPage() {
 
   const adjustedTexts = useMemo(() =>
     inputs
-      .filter(input => input.text.trim() !== '')
+      .filter(input => input.text.trim() !== '' && !input.hidden)
       .map(input => ({
         ...input,
         text: processText(input.text, {

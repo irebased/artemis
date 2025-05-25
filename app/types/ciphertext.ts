@@ -8,4 +8,5 @@ export type Ciphertext = {
   ignoreWhitespace: boolean;
   ignoreCasing: boolean;
   color: string;
+  hidden?: boolean;
 };

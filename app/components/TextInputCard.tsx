@@ -112,6 +112,25 @@ export default function TextInputCard({
           >
             <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: input.color, display: 'inline-block' }} />
             <span className="font-mono text-xs">{input.text.slice(0, 5) + (input.text.length > 5 ? '…' : '')}</span>
+            <button
+              className={`ml-2 text-gray-400 hover:text-blue-400 focus:outline-none ${input.hidden ? 'opacity-60' : ''}`}
+              onClick={e => { e.stopPropagation(); setInputs(inputs.map((inp, i) => i === idx ? { ...inp, hidden: !inp.hidden } : inp)); }}
+              aria-label={input.hidden ? 'Show input' : 'Hide input'}
+              title={input.hidden ? 'Show input in widgets' : 'Hide input from widgets'}
+            >
+              {input.hidden ? (
+                // Eye-off icon
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.403-3.22 1.125-4.575M6.22 6.22A7.963 7.963 0 004 9c0 4.418 3.582 8 8 8 1.657 0 3.22-.403 4.575-1.125M17.78 17.78A7.963 7.963 0 0020 15c0-4.418-3.582-8-8-8-1.657 0-3.22.403-4.575 1.125M3 3l18 18" />
+                </svg>
+              ) : (
+                // Eye icon
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              )}
+            </button>
             {inputs.length > 1 && (
               <button
                 className="ml-2 text-gray-400 hover:text-red-500 focus:outline-none"
