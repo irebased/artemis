@@ -115,6 +115,8 @@ export default function DashboardPage() {
 
   const { theme } = useTheme();
 
+  const [anyModalOpen, setAnyModalOpen] = useState(false);
+
   useEffect(() => {
     setInputsForUrlSync(inputs.filter(input => input.text.trim() !== ''));
   }, [inputs, setInputsForUrlSync]);
@@ -201,6 +203,8 @@ export default function DashboardPage() {
         setFrequencyAnalysisSettings={setFrequencyAnalysisSettings}
         shannonEntropySettings={shannonEntropySettings}
         setShannonEntropySettings={setShannonEntropySettings}
+        anyModalOpen={anyModalOpen}
+        setAnyModalOpen={setAnyModalOpen}
       />
     </div>
   );

@@ -31,6 +31,8 @@ interface WidgetGridProps {
   setFrequencyAnalysisSettings: (settings: { ngramSize: number; ngramMode: 'sliding' | 'block' }) => void;
   shannonEntropySettings: { mode: 'raw' | 'sliding'; windowSize: 16 | 32 | 64 | 128 | 256 };
   setShannonEntropySettings: (settings: { mode: 'raw' | 'sliding'; windowSize: 16 | 32 | 64 | 128 | 256 }) => void;
+  anyModalOpen: boolean;
+  setAnyModalOpen: (open: boolean) => void;
 }
 
 export default function WidgetGrid({
@@ -54,6 +56,8 @@ export default function WidgetGrid({
   setFrequencyAnalysisSettings,
   shannonEntropySettings,
   setShannonEntropySettings,
+  anyModalOpen,
+  setAnyModalOpen,
 }: WidgetGridProps) {
   return (
     <ResponsiveGridLayout
@@ -62,18 +66,19 @@ export default function WidgetGrid({
       breakpoints={BREAKPOINTS}
       cols={COLS}
       rowHeight={200}
-      isResizable={!layoutLocked}
-      isDraggable={!layoutLocked}
+      isResizable={!layoutLocked && !anyModalOpen}
+      isDraggable={!layoutLocked && !anyModalOpen}
       onLayoutChange={handleLayoutChange}
       measureBeforeMount={false}
       useCSSTransforms={true}
       compactType="vertical"
+      draggableCancel=".widget-settings-btn"
     >
       {widgets.map((widget) => {
         let WidgetComponent = null;
         const layoutItem = layouts.lg.find((l: any) => l.i === widget) || { w: 1, h: 1 };
         if (widget === 'frequency') {
-          WidgetComponent = <FrequencyAnalysisWidget inputs={adjustedTexts} gridH={layoutItem.h} frequencyAnalysisSettings={frequencyAnalysisSettings} setFrequencyAnalysisSettings={setFrequencyAnalysisSettings} />;
+          WidgetComponent = <FrequencyAnalysisWidget inputs={adjustedTexts} gridH={layoutItem.h} frequencyAnalysisSettings={frequencyAnalysisSettings} setFrequencyAnalysisSettings={setFrequencyAnalysisSettings} setAnyModalOpen={setAnyModalOpen} />;
         } else if (widget === 'ascii') {
           WidgetComponent = (
             <AsciiDistributionWidget
@@ -101,6 +106,7 @@ export default function WidgetGrid({
               base={asciiBase}
               shannonEntropySettings={shannonEntropySettings}
               setShannonEntropySettings={setShannonEntropySettings}
+              setAnyModalOpen={setAnyModalOpen}
             />
           );
         }
