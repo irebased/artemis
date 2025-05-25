@@ -111,6 +111,8 @@ export default function DashboardPage() {
     shannonEntropySettings,
     setShannonEntropySettings,
     loading,
+    asciiDistributionSettings,
+    setAsciiDistributionSettings,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
 
   const { theme } = useTheme();
@@ -190,8 +192,6 @@ export default function DashboardPage() {
         BREAKPOINTS={BREAKPOINTS}
         adjustedTexts={adjustedTexts}
         asciiBase={asciiBase}
-        asciiRange={asciiRange}
-        setAsciiRange={val => setAsciiRange(val as AsciiRange)}
         icMode={icMode}
         setIcMode={setIcMode}
         entropyMode={entropyMode}
@@ -205,6 +205,8 @@ export default function DashboardPage() {
         setShannonEntropySettings={setShannonEntropySettings}
         anyModalOpen={anyModalOpen}
         setAnyModalOpen={setAnyModalOpen}
+        asciiDistributionSettings={asciiDistributionSettings}
+        setAsciiDistributionSettings={setAsciiDistributionSettings}
       />
     </div>
   );

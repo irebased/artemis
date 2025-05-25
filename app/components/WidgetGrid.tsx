@@ -18,8 +18,6 @@ interface WidgetGridProps {
   BREAKPOINTS: Record<string, number>;
   adjustedTexts: any;
   asciiBase: BaseType;
-  asciiRange: AsciiRange;
-  setAsciiRange: (range: AsciiRange) => void;
   icMode: any;
   setIcMode: (mode: any) => void;
   entropyMode: any;
@@ -33,6 +31,8 @@ interface WidgetGridProps {
   setShannonEntropySettings: (settings: { mode: 'raw' | 'sliding'; windowSize: 16 | 32 | 64 | 128 | 256 }) => void;
   anyModalOpen: boolean;
   setAnyModalOpen: (open: boolean) => void;
+  asciiDistributionSettings: { range: 'extended' | 'ascii' | 'input' };
+  setAsciiDistributionSettings: (settings: { range: 'extended' | 'ascii' | 'input' }) => void;
 }
 
 export default function WidgetGrid({
@@ -43,8 +43,6 @@ export default function WidgetGrid({
   BREAKPOINTS,
   adjustedTexts,
   asciiBase,
-  asciiRange,
-  setAsciiRange,
   icMode,
   setIcMode,
   entropyMode,
@@ -58,6 +56,8 @@ export default function WidgetGrid({
   setShannonEntropySettings,
   anyModalOpen,
   setAnyModalOpen,
+  asciiDistributionSettings,
+  setAsciiDistributionSettings,
 }: WidgetGridProps) {
   return (
     <ResponsiveGridLayout
@@ -84,8 +84,9 @@ export default function WidgetGrid({
             <AsciiDistributionWidget
               inputs={adjustedTexts}
               gridW={layoutItem.w}
-              asciiRange={asciiRange}
-              setAsciiRange={setAsciiRange}
+              asciiDistributionSettings={asciiDistributionSettings}
+              setAsciiDistributionSettings={setAsciiDistributionSettings}
+              setAnyModalOpen={setAnyModalOpen}
             />
           );
         } else if (widget === 'freqstddev') {

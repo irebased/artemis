@@ -59,6 +59,10 @@ export type ShannonEntropySettings = {
   windowSize: 16 | 32 | 64 | 128 | 256;
 };
 
+export type AsciiDistributionSettings = {
+  range: 'extended' | 'ascii' | 'input';
+};
+
 function compressSettings(obj: any): string {
   const json = JSON.stringify(obj);
   const compressed = pako.deflate(json, { level: 9 });
@@ -103,6 +107,9 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   const [shannonEntropySettings, setShannonEntropySettings] = useState<ShannonEntropySettings>({
     mode: 'raw',
     windowSize: 64,
+  });
+  const [asciiDistributionSettings, setAsciiDistributionSettings] = useState<AsciiDistributionSettings>({
+    range: 'extended',
   });
 
   const addInput = useCallback(() => {
@@ -175,6 +182,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const lockParam = query.get('lock');
     const freqSettingsParam = query.get('freqSettings');
     const entropySettingsParam = query.get('entropySettings');
+    const asciiSettingsParam = query.get('asciiSettings');
 
     if (widgetParam) {
       const widgetList = widgetParam
@@ -246,6 +254,14 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         // fallback to defaults
       }
     }
+    if (asciiSettingsParam) {
+      try {
+        const settings = decompressSettings(asciiSettingsParam);
+        setAsciiDistributionSettings(settings);
+      } catch (e) {
+        // fallback to defaults
+      }
+    }
     finishLoading();
   }, []);
 
@@ -265,18 +281,20 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       if (shannonEntropySettings) {
         params.set('entropySettings', compressSettings(shannonEntropySettings));
       }
+      if (asciiDistributionSettings) {
+        params.set('asciiSettings', compressSettings(asciiDistributionSettings));
+      }
       if (layouts) {
         compressLZMA(JSON.stringify(layouts)).then((lzlayoutRaw) => {
           const lzlayout = lzlayoutRaw as string;
           params.set('lzdata_layout', lzlayout);
-          params.set('asciiRange', asciiRange);
           params.set('lzdata', compressed as string);
           const newUrl = `${window.location.pathname}?${params.toString()}`;
           window.history.replaceState(null, '', newUrl);
         });
       }
     });
-  }, [inputs, inputsForUrlSync, widgets, asciiBase, icMode, layouts, asciiRange, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings]);
+  }, [inputs, inputsForUrlSync, widgets, asciiBase, icMode, layouts, asciiDistributionSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -365,5 +383,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     setFrequencyAnalysisSettings,
     shannonEntropySettings,
     setShannonEntropySettings,
+    asciiDistributionSettings,
+    setAsciiDistributionSettings,
   };
 }
