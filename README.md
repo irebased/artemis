@@ -13,12 +13,13 @@ testing how strong a cipher of your creation is.
 - Dashboard locking: lock your dashboard for a viewing experience that does not experience any interference from the resizing and reordering system.
 - Dark mode and light mode supported
 - The ciphertexts, their configuration (encoding, ignore options, etc.), the locked/unlocked status of the dashboard, as well as the layout, sizing, and configuration of each widget, are all preserved in the URL via query parameters, so you can save your link and come back later. You can also share it with your peers so they can view it too. Precaution: for larger dashboards that compare large amounts of data, links will become too long to send over platforms like Discord. I recommend using a site like [tinyurl](https://tinyurl.com/) to create a shortened link before sharing.
+- Show/hide your inputs from the dashboard without deleting them for better analysis while preserving the data you are working with.
 
 ### Widgets
 
 The following widgets are available for evaluating ciphertext:
 
-- **Frequency Analysis**: Performs frequency analysis on your string without decoding it.
+- **Frequency Analysis**: Performs frequency analysis on your string without decoding it. Supports n-gram analysis between 1-10-gram size. Evaluates based on either sliding window or blocks.
 - **ASCII Distribution**: Decodes your string based on the configured encoding, then plots the data on an ASCII number line.
 - **Frequency Standard Deviation**: Calculates the standard deviation of character frequency for your encoded string.
 - **Index of Coincidence**: Calculates the IC of your text without decoding it. Based on your encoding, an English text baseline IC and a random text baseline IC will also be displayed in the table for reference. These are English and random texts that are encoded in your text's encodings for accurate comparison. Also supports period-based calculations to view the IC over specific chunks of the text.
