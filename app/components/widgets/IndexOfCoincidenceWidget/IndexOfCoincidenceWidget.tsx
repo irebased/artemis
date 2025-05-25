@@ -91,24 +91,21 @@ export default function IndexOfCoincidenceWidget({
   view,
   onViewChange,
 }: IndexOfCoincidenceWidgetProps) {
-  // Baseline values
+
   const baseline = IC_BASELINES[base];
 
-  // Calculate results for each input
   const results = useMemo(() => {
     return texts.map(input => {
       const text = input.text;
       const n = text.length;
       if (n < 2) return { text, color: input.color, ic: 0, periodics: [], total: n, unique: 0 };
-      // Calculate character frequencies
       const freq: Record<string, number> = {};
       for (const char of text) {
         freq[char] = (freq[char] || 0) + 1;
       }
-      // Calculate IC
       const sum = Object.values(freq).reduce((acc, count) => acc + count * (count - 1), 0);
       const ic = sum / (n * (n - 1));
-      // Calculate periodic ICs (up to period 20)
+
       const periodics = [];
       for (let period = 2; period <= Math.min(20, Math.floor(n / 2)); period++) {
         const groups: string[][] = Array.from({ length: period }, () => []);
@@ -139,7 +136,6 @@ export default function IndexOfCoincidenceWidget({
     });
   }, [texts, base]);
 
-  // Use chart hook for chart data and options
   const { data: periodLineData, options: lineOptions } = useIndexOfCoincidenceChart(results, view, baseline);
 
   return (
