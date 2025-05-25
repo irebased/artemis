@@ -18,7 +18,6 @@ export default function FrequencyStdDevWidget({ inputs, width, height, gridH }: 
 
   return (
     <div className="w-full h-full flex flex-col">
-      <h3 className="text-lg font-semibold mb-2">Frequency Standard Deviation</h3>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead>

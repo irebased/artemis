@@ -7,6 +7,7 @@ import IndexOfCoincidenceWidget from '../components/widgets/IndexOfCoincidenceWi
 import ShannonEntropyWidget from '../components/widgets/ShannonEntropyWidget/ShannonEntropyWidget';
 import KolmogorovSmirnovWidget from '../components/widgets/KolmogrovSmirnovWidget/KolmogorovSmirnovWidget';
 import { BaseType } from '@/types/bases';
+import FrequencyStdDevInformation from './widgets/FrequencyStdDevWidget/FrequencyStdDevInformation';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -80,6 +81,8 @@ export default function WidgetGrid({
     >
       {widgets.map((widget) => {
         let WidgetComponent = null;
+        let WidgetInfo = null;
+        let WidgetTitle = null;
         const layoutItem = layouts.lg.find((l: any) => l.i === widget) || { w: 1, h: 1 };
         if (widget === 'frequency') {
           WidgetComponent = <FrequencyAnalysisWidget inputs={adjustedTexts} gridH={layoutItem.h} frequencyAnalysisSettings={frequencyAnalysisSettings} setFrequencyAnalysisSettings={setFrequencyAnalysisSettings} setAnyModalOpen={setAnyModalOpen} />;
@@ -95,6 +98,8 @@ export default function WidgetGrid({
           );
         } else if (widget === 'freqstddev') {
           WidgetComponent = <FrequencyStdDevWidget inputs={adjustedTexts} gridH={layoutItem.h} />;
+          WidgetInfo = <FrequencyStdDevInformation />;
+          WidgetTitle = 'Frequency Standard Deviation';
         } else if (widget === 'coincidence') {
           WidgetComponent = (
             <IndexOfCoincidenceWidget
@@ -126,7 +131,7 @@ export default function WidgetGrid({
         }
         return (
           <div key={widget} data-grid={layouts.lg.find((l: any) => l.i === widget)}>
-            <WidgetContainer>
+            <WidgetContainer infoContent={WidgetInfo} title={WidgetTitle}>
               {WidgetComponent}
             </WidgetContainer>
           </div>

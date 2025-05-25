@@ -11,7 +11,7 @@ interface InformationModalProps {
 export default function InformationModal({ isOpen, onClose, title = 'Information', children }: InformationModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
-      <div className="prose dark:prose-invert max-w-none">
+      <div className="prose dark:prose-invert max-w-500">
         {children}
       </div>
     </Modal>

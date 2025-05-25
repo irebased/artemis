@@ -35,7 +35,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-xl min-w-[400px] max-w-[90vw] max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-900 p-8 rounded-lg shadow-xl min-w-[400px] max-w-[60vw] max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h4 className="text-xl font-semibold">{title}</h4>
           <button

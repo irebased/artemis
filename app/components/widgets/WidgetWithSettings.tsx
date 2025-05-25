@@ -44,12 +44,12 @@ export default function WidgetWithSettings({
           <h3 className="text-lg font-semibold mb-0">{title}</h3>
           {infoContent && (
             <button
-              className="widget-settings-btn widget-info-btn draggableCancel flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none w-8 h-8 min-w-[32px] min-h-[32px] rounded-full border-2 border-gray-500 dark:border-gray-400 bg-transparent text-base font-bold"
+              className="widget-settings-btn widget-info-btn draggableCancel flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none w-8 h-8 min-w-[18px] min-h-[18px] rounded-full border-2 border-gray-500 dark:border-gray-400 bg-transparent text-base font-bold"
               aria-label="Info"
               onClick={handleInfoOpen}
               type="button"
               tabIndex={0}
-              style={{ padding: 0, margin: 0, lineHeight: 1 }}
+              style={{ padding: 0, margin: 0, lineHeight: 1, fontSize: '10px', height: '18px', width: '18px', fontWeight: 'bold' }}
             >
               i
             </button>
