@@ -4,9 +4,10 @@ interface WidgetSelectorCardProps {
   widgets: string[];
   setWidgets: (updater: (prev: string[]) => string[]) => void;
   AVAILABLE_WIDGETS: Record<string, string>;
+  layoutLocked: boolean;
 }
 
-export default function WidgetSelectorCard({ widgets, setWidgets, AVAILABLE_WIDGETS }: WidgetSelectorCardProps) {
+export default function WidgetSelectorCard({ widgets, setWidgets, AVAILABLE_WIDGETS, layoutLocked }: WidgetSelectorCardProps) {
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -25,6 +26,8 @@ export default function WidgetSelectorCard({ widgets, setWidgets, AVAILABLE_WIDG
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-700 hover:bg-gray-800'
               }`}
+              disabled={layoutLocked}
+              title={layoutLocked ? 'Unlock layout to add/remove widgets' : ''}
             >
               {name}
             </button>

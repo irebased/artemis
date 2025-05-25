@@ -26,6 +26,7 @@ interface WidgetGridProps {
   setEntropyMode: (mode: any) => void;
   entropyWindow: number;
   setEntropyWindow: (n: number) => void;
+  layoutLocked: boolean;
 }
 
 export default function WidgetGrid({
@@ -44,6 +45,7 @@ export default function WidgetGrid({
   setEntropyMode,
   entropyWindow,
   setEntropyWindow,
+  layoutLocked,
 }: WidgetGridProps) {
   return (
     <ResponsiveGridLayout
@@ -52,7 +54,8 @@ export default function WidgetGrid({
       breakpoints={BREAKPOINTS}
       cols={COLS}
       rowHeight={200}
-      isResizable={true}
+      isResizable={!layoutLocked}
+      isDraggable={!layoutLocked}
       onLayoutChange={handleLayoutChange}
       measureBeforeMount={false}
       useCSSTransforms={true}

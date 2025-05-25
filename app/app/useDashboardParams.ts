@@ -73,6 +73,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
 
   const [inputsForUrlSync, setInputsForUrlSync] = useState<Ciphertext[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [layoutLocked, setLayoutLocked] = useState(false);
 
   const addInput = useCallback(() => {
     if (inputs.length < 5) {
@@ -141,6 +142,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const ignoreWSParam = query.get('ignoreWhitespace');
     const ignoreCaseParam = query.get('ignoreCasing');
     const asciiRangeParam = query.get('asciiRange');
+    const lockParam = query.get('lock');
 
     if (widgetParam) {
       const widgetList = widgetParam
@@ -191,6 +193,11 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     if (ignoreWSParam !== null) setInputs(prev => prev.map(input => ({ ...input, ignoreWhitespace: ignoreWSParam === 'true' })));
     if (ignoreCaseParam !== null) setInputs(prev => prev.map(input => ({ ...input, ignoreCasing: ignoreCaseParam === 'true' })));
     if (asciiRangeParam === 'extended' || asciiRangeParam === 'ascii' || asciiRangeParam === 'input') setAsciiRange(asciiRangeParam);
+    if (lockParam === '1' || lockParam === 'true') {
+      setLayoutLocked(true);
+    } else {
+      setLayoutLocked(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -204,6 +211,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       if (entropyMode) params.set('entropyMode', entropyMode);
       if (entropyMode === 'sliding') params.set('entropyWindow', entropyWindow.toString());
       if (icMode) params.set('icMode', icMode);
+      if (layoutLocked) params.set('lock', '1');
       if (layouts) {
         compressLZMA(JSON.stringify(layouts)).then((lzlayoutRaw) => {
           const lzlayout = lzlayoutRaw as string;
@@ -215,7 +223,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         });
       }
     });
-  }, [inputs, inputsForUrlSync, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, asciiRange, loading]);
+  }, [inputs, inputsForUrlSync, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, asciiRange, loading, layoutLocked]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -298,5 +306,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     asciiRange,
     setAsciiRange,
     loading,
+    layoutLocked,
+    setLayoutLocked,
   };
 }

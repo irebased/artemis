@@ -112,6 +112,8 @@ export default function DashboardPage() {
     asciiRange,
     setAsciiRange,
     setInputsForUrlSync,
+    layoutLocked,
+    setLayoutLocked,
     loading,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
 
@@ -138,6 +140,27 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-[1600px] mx-auto py-8 px-4">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">Text Analysis Dashboard</h1>
+        <button
+          className={`flex items-center px-3 py-1 rounded border ${layoutLocked ? 'bg-gray-800 text-blue-400 border-blue-400' : 'bg-gray-900 text-gray-400 border-gray-700 hover:text-blue-400'}`}
+          onClick={() => setLayoutLocked(!layoutLocked)}
+          title={layoutLocked ? 'Unlock layout (enable drag, resize, add/remove)' : 'Lock layout (disable drag, resize, add/remove)'}
+        >
+          {layoutLocked ? (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11V7a3 3 0 10-6 0v4" />
+              <rect width="12" height="8" x="6" y="11" rx="2" stroke="currentColor" strokeWidth={2} fill="none"/>
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 018 0" />
+              <rect width="12" height="8" x="6" y="11" rx="2" stroke="currentColor" strokeWidth={2} fill="none"/>
+            </svg>
+          )}
+          {layoutLocked ? 'Locked' : 'Unlocked'}
+        </button>
+      </div>
       <TextInputCard
         inputs={inputs}
         setInputs={setInputs}
@@ -148,6 +171,7 @@ export default function DashboardPage() {
         widgets={widgets}
         setWidgets={setWidgets}
         AVAILABLE_WIDGETS={AVAILABLE_WIDGETS}
+        layoutLocked={layoutLocked}
       />
       <WidgetGrid
         widgets={widgets}
@@ -165,6 +189,7 @@ export default function DashboardPage() {
         setEntropyMode={setEntropyMode}
         entropyWindow={entropyWindow}
         setEntropyWindow={setEntropyWindow}
+        layoutLocked={layoutLocked}
       />
     </div>
   );
