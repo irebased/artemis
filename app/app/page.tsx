@@ -22,6 +22,7 @@ const AVAILABLE_WIDGETS = {
   freqstddev: 'Frequency Std Dev',
   coincidence: 'Index of Coincidence',
   entropy: 'Shannon Entropy',
+  ks: 'Kolmogorov-Smirnov Test',
 };
 
 type WidgetKey = keyof typeof AVAILABLE_WIDGETS;
@@ -34,6 +35,7 @@ const WIDGET_DEFAULTS: Record<string, { w: number; h: number }> = {
   freqstddev: stddevDefault,
   coincidence: icDefault,
   entropy: entropyDefault,
+  ks: { w: 1, h: 2 },
 };
 
 const BREAKPOINTS = { lg: 1024, md: 768, sm: 0 };
@@ -115,6 +117,8 @@ export default function DashboardPage() {
     setAsciiDistributionSettings,
     indexOfCoincidenceSettings,
     setIndexOfCoincidenceSettings,
+    kolmogorovSmirnovSettings,
+    setKolmogorovSmirnovSettings,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
 
   const { theme } = useTheme();
@@ -209,6 +213,8 @@ export default function DashboardPage() {
         setAsciiDistributionSettings={setAsciiDistributionSettings}
         indexOfCoincidenceSettings={indexOfCoincidenceSettings}
         setIndexOfCoincidenceSettings={setIndexOfCoincidenceSettings}
+        kolmogorovSmirnovSettings={kolmogorovSmirnovSettings}
+        setKolmogorovSmirnovSettings={setKolmogorovSmirnovSettings}
       />
     </div>
   );

@@ -5,6 +5,7 @@ import AsciiDistributionWidget from '../components/widgets/AsciiDistributionWidg
 import FrequencyStdDevWidget from '../components/widgets/FrequencyStdDevWidget/FrequencyStdDev';
 import IndexOfCoincidenceWidget from '../components/widgets/IndexOfCoincidenceWidget/IndexOfCoincidenceWidget';
 import ShannonEntropyWidget from '../components/widgets/ShannonEntropyWidget/ShannonEntropyWidget';
+import KolmogorovSmirnovWidget from '../components/widgets/KolmogrovSmirnovWidget/KolmogorovSmirnovWidget';
 import { BaseType } from '@/types/bases';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -32,6 +33,8 @@ interface WidgetGridProps {
   setAsciiDistributionSettings: (settings: { range: 'extended' | 'ascii' | 'input' }) => void;
   indexOfCoincidenceSettings: { mode: 'summary' | 'period' };
   setIndexOfCoincidenceSettings: (settings: { mode: 'summary' | 'period' }) => void;
+  kolmogorovSmirnovSettings: { ngramSize: number; ngramMode: 'sliding' | 'block' };
+  setKolmogorovSmirnovSettings: (settings: { ngramSize: number; ngramMode: 'sliding' | 'block' }) => void;
 }
 
 export default function WidgetGrid({
@@ -57,6 +60,8 @@ export default function WidgetGrid({
   setAsciiDistributionSettings,
   indexOfCoincidenceSettings,
   setIndexOfCoincidenceSettings,
+  kolmogorovSmirnovSettings,
+  setKolmogorovSmirnovSettings,
 }: WidgetGridProps) {
   return (
     <ResponsiveGridLayout
@@ -108,6 +113,14 @@ export default function WidgetGrid({
               shannonEntropySettings={shannonEntropySettings}
               setShannonEntropySettings={setShannonEntropySettings}
               setAnyModalOpen={setAnyModalOpen}
+            />
+          );
+        } else if (widget === 'ks') {
+          WidgetComponent = (
+            <KolmogorovSmirnovWidget
+              inputs={adjustedTexts}
+              kolmogorovSmirnovSettings={kolmogorovSmirnovSettings}
+              setKolmogorovSmirnovSettings={setKolmogorovSmirnovSettings}
             />
           );
         }

@@ -69,6 +69,11 @@ export type IndexOfCoincidenceSettings = {
   ngramMode?: 'sliding' | 'block';
 };
 
+export type KolmogorovSmirnovSettings = {
+  ngramSize: number;
+  ngramMode: 'sliding' | 'block';
+};
+
 function compressSettings(obj: any): string {
   const json = JSON.stringify(obj);
   const compressed = pako.deflate(json, { level: 9 });
@@ -119,6 +124,10 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   });
   const [indexOfCoincidenceSettings, setIndexOfCoincidenceSettings] = useState<IndexOfCoincidenceSettings>({
     mode: 'summary',
+    ngramSize: 1,
+    ngramMode: 'sliding',
+  });
+  const [kolmogorovSmirnovSettings, setKolmogorovSmirnovSettings] = useState<KolmogorovSmirnovSettings>({
     ngramSize: 1,
     ngramMode: 'sliding',
   });
@@ -193,6 +202,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const entropySettingsParam = query.get('entropySettings');
     const asciiSettingsParam = query.get('asciiSettings');
     const icSettingsParam = query.get('icSettings');
+    const ksSettingsParam = query.get('ksSettings');
 
     if (widgetParam) {
       const widgetList = widgetParam
@@ -274,6 +284,14 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         // fallback to defaults
       }
     }
+    if (ksSettingsParam) {
+      try {
+        const settings = decompressSettings(ksSettingsParam);
+        setKolmogorovSmirnovSettings(settings);
+      } catch (e) {
+        // fallback to defaults
+      }
+    }
     finishLoading();
   }, []);
 
@@ -297,6 +315,9 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       if (indexOfCoincidenceSettings) {
         params.set('icSettings', compressSettings(indexOfCoincidenceSettings));
       }
+      if (kolmogorovSmirnovSettings) {
+        params.set('ksSettings', compressSettings(kolmogorovSmirnovSettings));
+      }
       if (layouts) {
         compressLZMA(JSON.stringify(layouts)).then((lzlayoutRaw) => {
           const lzlayout = lzlayoutRaw as string;
@@ -307,7 +328,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         });
       }
     });
-  }, [inputs, inputsForUrlSync, widgets, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings]);
+  }, [inputs, inputsForUrlSync, widgets, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings, kolmogorovSmirnovSettings]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -400,5 +421,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     setAsciiDistributionSettings,
     indexOfCoincidenceSettings,
     setIndexOfCoincidenceSettings,
+    kolmogorovSmirnovSettings,
+    setKolmogorovSmirnovSettings,
   };
 }

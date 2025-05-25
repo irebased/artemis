@@ -35,6 +35,7 @@
     "framer-motion": "11.13.1",
     "heroui-cli": "^1.2.3",
     "intl-messageformat": "10.7.16",
+    "jstat": "^1.9.6",
     "lz-string": "^1.5.0",
     "lzma-js": "^1.0.1",
     "lzma-purejs": "^0.9.3",
