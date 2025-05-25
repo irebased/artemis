@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
-import { BaseType } from '@/types/bases';
 
 export const IC_BASELINES = {
   ascii: { english: 0.065, random: 0.01805 },
@@ -26,18 +25,28 @@ export function useIndexOfCoincidence(inputs: Ciphertext[]) {
         const ioc = n > 1 ? sum / (n * (n - 1)) : 0;
 
         const periodicity = [];
-        for (let period = 1; period <= Math.min(20, Math.floor(n / 2)); period++) {
-          let matches = 0;
-          let comparisons = 0;
-          for (let i = 0; i < n - period; i++) {
-            if (text[i] === text[i + period]) {
-              matches++;
-            }
-            comparisons++;
+        for (let period = 2; period <= Math.min(20, Math.floor(n / 2)); period++) {
+          // Split text into groups by index mod period
+          const groups = Array.from({ length: period }, () => []);
+          for (let i = 0; i < n; i++) {
+            groups[i % period].push(text[i]);
           }
+          // Compute IC for each group
+          const groupICs: number[] = groups.map(group => {
+            const groupFreq: Record<string, number> = {};
+            for (const char of group) {
+              groupFreq[char] = (groupFreq[char] || 0) + 1;
+            }
+            const groupN = group.length;
+            if (groupN < 2) return 0;
+            const groupSum = Object.values(groupFreq).reduce((acc: number, count: number) => acc + count * (count - 1), 0);
+            return groupSum / (groupN * (groupN - 1));
+          });
+          // Average IC for this period
+          const avgIC = groupICs.reduce((a: number, b: number) => a + b, 0) / groupICs.length;
           periodicity.push({
             period,
-            ioc: comparisons > 0 ? matches / comparisons : 0
+            ic: avgIC
           });
         }
 
