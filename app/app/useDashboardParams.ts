@@ -74,6 +74,8 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   const [inputsForUrlSync, setInputsForUrlSync] = useState<Ciphertext[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [layoutLocked, setLayoutLocked] = useState(false);
+  const [ngramSize, setNgramSize] = useState(1);
+  const [ngramMode, setNgramMode] = useState<'sliding' | 'block'>('sliding');
 
   const addInput = useCallback(() => {
     if (inputs.length < 5) {
@@ -143,6 +145,8 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const ignoreCaseParam = query.get('ignoreCasing');
     const asciiRangeParam = query.get('asciiRange');
     const lockParam = query.get('lock');
+    const ngramParam = query.get('ngram');
+    const ngramModeParam = query.get('ngramMode');
 
     if (widgetParam) {
       const widgetList = widgetParam
@@ -198,6 +202,12 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     } else {
       setLayoutLocked(false);
     }
+    if (ngramParam && !isNaN(parseInt(ngramParam))) {
+      setNgramSize(Math.max(1, parseInt(ngramParam)));
+    }
+    if (ngramModeParam === 'block' || ngramModeParam === 'sliding') {
+      setNgramMode(ngramModeParam);
+    }
     finishLoading();
   }, []);
 
@@ -213,6 +223,8 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       if (entropyMode === 'sliding') params.set('entropyWindow', entropyWindow.toString());
       if (icMode) params.set('icMode', icMode);
       if (layoutLocked) params.set('lock', '1');
+      if (ngramSize && ngramSize !== 1) params.set('ngram', ngramSize.toString());
+      if (ngramMode && ngramMode !== 'sliding') params.set('ngramMode', ngramMode);
       if (layouts) {
         compressLZMA(JSON.stringify(layouts)).then((lzlayoutRaw) => {
           const lzlayout = lzlayoutRaw as string;
@@ -224,7 +236,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         });
       }
     });
-  }, [inputs, inputsForUrlSync, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, asciiRange, loading, layoutLocked]);
+  }, [inputs, inputsForUrlSync, widgets, asciiBase, entropyMode, entropyWindow, icMode, layouts, asciiRange, loading, layoutLocked, ngramSize, ngramMode]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -309,5 +321,9 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     loading,
     layoutLocked,
     setLayoutLocked,
+    ngramSize,
+    setNgramSize,
+    ngramMode,
+    setNgramMode,
   };
 }

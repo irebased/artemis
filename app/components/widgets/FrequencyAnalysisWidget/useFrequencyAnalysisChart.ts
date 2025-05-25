@@ -15,6 +15,7 @@ export const defaultGridSize = { w: 2, h: 2 };
 
 export function useFrequencyAnalysisChart({ frequencies, sortedChars }) {
   const data = useMemo(() => {
+    const visibleLabels = sortedChars.map(label => label.replace(/ /g, '\u2027'));
     const datasets = frequencies.map(freq => ({
       label: `${freq.text.slice(0, 7)}${freq.text.length > 7 ? '...' : ''}`,
       data: sortedChars.map(char => freq.frequencies[char] || 0),
@@ -23,7 +24,7 @@ export function useFrequencyAnalysisChart({ frequencies, sortedChars }) {
       borderWidth: 1,
     }));
     return {
-      labels: sortedChars,
+      labels: visibleLabels,
       datasets,
     };
   }, [frequencies, sortedChars]);
@@ -59,6 +60,12 @@ export function useFrequencyAnalysisChart({ frequencies, sortedChars }) {
         title: {
           display: true,
           text: 'Character'
+        },
+        ticks: {
+          font: {
+            family: 'monospace',
+            size: 12,
+          }
         }
       },
       x: {

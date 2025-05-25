@@ -27,6 +27,10 @@ interface WidgetGridProps {
   entropyWindow: number;
   setEntropyWindow: (n: number) => void;
   layoutLocked: boolean;
+  ngramSize: number;
+  setNgramSize: (n: number) => void;
+  ngramMode: 'sliding' | 'block';
+  setNgramMode: (mode: 'sliding' | 'block') => void;
 }
 
 export default function WidgetGrid({
@@ -46,6 +50,10 @@ export default function WidgetGrid({
   entropyWindow,
   setEntropyWindow,
   layoutLocked,
+  ngramSize,
+  setNgramSize,
+  ngramMode,
+  setNgramMode,
 }: WidgetGridProps) {
   return (
     <ResponsiveGridLayout
@@ -65,7 +73,7 @@ export default function WidgetGrid({
         let WidgetComponent = null;
         const layoutItem = layouts.lg.find((l: any) => l.i === widget) || { w: 1, h: 1 };
         if (widget === 'frequency') {
-          WidgetComponent = <FrequencyAnalysisWidget inputs={adjustedTexts} gridH={layoutItem.h} />;
+          WidgetComponent = <FrequencyAnalysisWidget inputs={adjustedTexts} gridH={layoutItem.h} ngramSize={ngramSize} setNgramSize={setNgramSize} ngramMode={ngramMode} setNgramMode={setNgramMode} />;
         } else if (widget === 'ascii') {
           WidgetComponent = (
             <AsciiDistributionWidget
