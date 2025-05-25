@@ -46,11 +46,11 @@ export function useIndexOfCoincidenceChart(results, view, baseline) {
         }]
       };
     } else {
-      const maxPeriod = Math.max(...results.map(r => r.periodics.length));
+      const maxPeriod = Math.max(...results.map(r => r.periodicity.length));
       const labels = Array.from({ length: maxPeriod }, (_, i) => (i + 2).toString());
       const datasets = results.map(r => ({
         label: r.text.slice(0, 20) + (r.text.length > 20 ? '...' : ''),
-        data: r.periodics.map(p => p.ic),
+        data: r.periodicity.map(p => p.ic),
         borderColor: r.color,
         backgroundColor: r.color,
         fill: false,
