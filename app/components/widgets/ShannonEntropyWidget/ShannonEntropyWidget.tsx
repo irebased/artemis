@@ -1,53 +1,7 @@
-import { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-  Title,
-} from 'chart.js';
 import { InputData } from '@/app/useDashboardParams';
-import BaseType from '@/app/page';
-import { useShannonEntropyChart } from './useShannonEntropyChart';
-
-ChartJS.register(
-  LineElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
-  Title,
-);
-
-const ENTROPY_BASELINES = {
-  ascii: { english: 4.321011139059028, random: 5.696167170226023 },
-  base64: { english: 5.397278374532011, random: 6.0 },
-  hex: { english: 3.1145264801712846, random: 4.0 },
-  decimal: { english: 2.729561401738525, random: 3.3005590923909547 },
-  octal: { english: 2.723477924808014, random: 3.0 },
-} as const;
-
-type BaseType = keyof typeof ENTROPY_BASELINES;
-
-function computeEntropy(text: string): number {
-  const freq: Record<string, number> = {};
-  for (const char of text) {
-    freq[char] = (freq[char] || 0) + 1;
-  }
-
-  const total = text.length;
-  let entropy = 0;
-  for (const count of Object.values(freq)) {
-    const p = count / total;
-    entropy -= p * Math.log2(p);
-  }
-  return entropy;
-}
+import { useShannonEntropy, ENTROPY_BASELINES, BaseType } from './useShannonEntropy';
+import { useShannonEntropyChart, defaultGridSize } from './useShannonEntropyChart';
 
 interface ShannonEntropyWidgetProps {
   texts: InputData[];
@@ -60,8 +14,6 @@ interface ShannonEntropyWidgetProps {
   onWindowSizeChange: (size: number) => void;
 }
 
-export const defaultGridSize = { w: 2, h: 2 };
-
 export default function ShannonEntropyWidget({
   texts,
   base,
@@ -72,46 +24,7 @@ export default function ShannonEntropyWidget({
   onModeChange,
   onWindowSizeChange,
 }: ShannonEntropyWidgetProps) {
-
-  const results = useMemo(() => {
-    return texts.map(input => {
-      const text = input.text;
-      if (text.length === 0) return { text, color: input.color, entropy: 0, sliding: [], total: 0, unique: 0 };
-      const freq: Record<string, number> = {};
-      for (const char of text) {
-        freq[char] = (freq[char] || 0) + 1;
-      }
-      const total = text.length;
-      const unique = Object.keys(freq).length;
-      const entropy = -Object.values(freq).reduce((sum, count) => {
-        const p = count / total;
-        return sum + p * Math.log2(p);
-      }, 0);
-
-      const sliding: number[] = [];
-      for (let i = 0; i <= text.length - windowSize; i++) {
-        const window = text.slice(i, i + windowSize);
-        const freq: Record<string, number> = {};
-        for (const char of window) {
-          freq[char] = (freq[char] || 0) + 1;
-        }
-        const entropy = -Object.values(freq).reduce((sum, count) => {
-          const p = count / windowSize;
-          return sum + p * Math.log2(p);
-        }, 0);
-        sliding.push(entropy);
-      }
-      return {
-        text,
-        color: input.color,
-        entropy,
-        sliding,
-        total,
-        unique,
-      };
-    });
-  }, [texts, windowSize]);
-
+  const results = useShannonEntropy(texts, windowSize);
   const { data: slidingLineData, options: slidingLineOptions } = useShannonEntropyChart(results, windowSize);
 
   return (

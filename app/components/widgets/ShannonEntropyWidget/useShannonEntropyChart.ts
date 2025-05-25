@@ -1,4 +1,27 @@
 import { useMemo } from 'react';
+import {
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  Title,
+} from 'chart.js';
+
+// Register ChartJS components
+ChartJS.register(
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  Title,
+);
+
+export const defaultGridSize = { w: 2, h: 2 };
 
 export function useShannonEntropyChart(results, windowSize) {
   const data = useMemo(() => {

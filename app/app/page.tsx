@@ -7,7 +7,8 @@ import FrequencyAnalysisWidget, { defaultGridSize as freqDefault } from '../comp
 import AsciiDistributionWidget, { defaultGridSize as asciiDefault } from '../components/widgets/AsciiDistributionWidget/AsciiDistributionWidget';
 import FrequencyStdDevWidget, { defaultGridSize as stddevDefault } from '../components/widgets/FrequencyStdDevWidget/FrequencyStdDev';
 import IndexOfCoincidenceWidget, { defaultGridSize as icDefault } from '@/components/widgets/IndexOfCoincidenceWidget/IndexOfCoincidenceWidget';
-import ShannonEntropyWidget, { defaultGridSize as entropyDefault } from '@/components/widgets/ShannonEntropyWidget/ShannonEntropyWidget';
+import ShannonEntropyWidget from '@/components/widgets/ShannonEntropyWidget/ShannonEntropyWidget';
+import { defaultGridSize as entropyDefault } from '@/components/widgets/ShannonEntropyWidget/useShannonEntropyChart';
 import { BASE_OPTIONS, BaseType } from '@/types/bases';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
