@@ -35,7 +35,9 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning lang="en">
-      <head />
+      <head>
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7230406387622460" crossOrigin="anonymous" />
+      </head>
       <body
         className={clsx(
           "min-h-screen bg-background font-sans antialiased",
