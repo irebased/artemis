@@ -119,15 +119,44 @@ export default function DashboardPage() {
     setIndexOfCoincidenceSettings,
     kolmogorovSmirnovSettings,
     setKolmogorovSmirnovSettings,
+    dashboardName,
+    setDashboardName,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
 
   const { theme } = useTheme();
 
   const [anyModalOpen, setAnyModalOpen] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState(dashboardName);
 
   useEffect(() => {
     setInputsForUrlSync(inputs.filter(input => input.text.trim() !== ''));
   }, [inputs, setInputsForUrlSync]);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    if (newName.length <= 40) {
+      setTempName(newName);
+    }
+  };
+
+  const handleNameSubmit = () => {
+    if (tempName.trim()) {
+      setDashboardName(tempName.trim());
+    } else {
+      setTempName(dashboardName);
+    }
+    setIsEditingName(false);
+  };
+
+  const handleNameKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleNameSubmit();
+    } else if (e.key === 'Escape') {
+      setTempName(dashboardName);
+      setIsEditingName(false);
+    }
+  };
 
   const adjustedTexts = useMemo(() =>
     inputs
@@ -158,7 +187,26 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Artemis Dashboard</h1>
+        {isEditingName ? (
+          <input
+            type="text"
+            value={tempName}
+            onChange={handleNameChange}
+            onBlur={handleNameSubmit}
+            onKeyDown={handleNameKeyDown}
+            className="text-2xl font-bold bg-transparent border-b border-gray-300 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400 outline-none px-1"
+            autoFocus
+            maxLength={40}
+          />
+        ) : (
+          <h1
+            className="text-2xl font-bold cursor-pointer hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+            onClick={() => setIsEditingName(true)}
+            title="Click to edit dashboard name"
+          >
+            {dashboardName}
+          </h1>
+        )}
         <button
           className={`flex items-center px-3 py-1 rounded border ${theme == 'dark' ? darkModeButtonStyle : lightModeButtonStyle}`}
           onClick={() => setLayoutLocked(!layoutLocked)}

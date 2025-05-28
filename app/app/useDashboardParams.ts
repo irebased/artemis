@@ -96,6 +96,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     ignoreCasing: false,
     color: INPUT_COLORS[0],
   }]);
+  const [dashboardName, setDashboardName] = useState<string>('Artemis Dashboard');
   const [widgets, setWidgets] = useState<string[]>([]);
   const [asciiBase, setAsciiBase] = useState<BaseType>('ascii');
   const [entropyMode, setEntropyMode] = useState<'raw' | 'sliding'>('raw');
@@ -203,7 +204,11 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const asciiSettingsParam = query.get('asciiSettings');
     const icSettingsParam = query.get('icSettings');
     const ksSettingsParam = query.get('ksSettings');
+    const nameParam = query.get('name');
 
+    if (nameParam) {
+      setDashboardName(decodeURIComponent(nameParam));
+    }
     if (widgetParam) {
       const widgetList = widgetParam
         .split(',')
@@ -318,6 +323,9 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       if (kolmogorovSmirnovSettings) {
         params.set('ksSettings', compressSettings(kolmogorovSmirnovSettings));
       }
+      if (dashboardName !== 'Artemis Dashboard') {
+        params.set('name', encodeURIComponent(dashboardName));
+      }
       if (layouts) {
         compressLZMA(JSON.stringify(layouts)).then((lzlayoutRaw) => {
           const lzlayout = lzlayoutRaw as string;
@@ -328,7 +336,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         });
       }
     });
-  }, [inputs, inputsForUrlSync, widgets, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings, kolmogorovSmirnovSettings]);
+  }, [inputs, inputsForUrlSync, widgets, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings, kolmogorovSmirnovSettings, dashboardName]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -423,5 +431,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     setIndexOfCoincidenceSettings,
     kolmogorovSmirnovSettings,
     setKolmogorovSmirnovSettings,
+    dashboardName,
+    setDashboardName,
   };
 }
