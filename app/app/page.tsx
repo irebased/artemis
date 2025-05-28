@@ -39,7 +39,7 @@ const WIDGET_DEFAULTS: Record<string, { w: number; h: number }> = {
 };
 
 const BREAKPOINTS = { lg: 1024, md: 768, sm: 0 };
-const COLS = { lg: 4, md: 2, sm: 1 };
+const COLS = { lg: 16, md: 8, sm: 1 };
 
 function generateLayout(widgets, cols) {
   return widgets.map((widget, i) => ({
@@ -156,7 +156,7 @@ export default function DashboardPage() {
   const darkModeButtonStyle = theme === 'dark' ? darkModeLockedButtonStyle : darkModeUnlockedButtonStyle;
 
   return (
-    <div className="max-w-[1600px] mx-auto py-8 px-4">
+    <div className="mx-auto">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Text Analysis Dashboard</h1>
         <button

@@ -71,7 +71,7 @@ export default function WidgetGrid({
       layouts={layouts}
       breakpoints={BREAKPOINTS}
       cols={COLS}
-      rowHeight={200}
+      rowHeight={100}
       isResizable={!layoutLocked && !anyModalOpen}
       isDraggable={!layoutLocked && !anyModalOpen}
       onLayoutChange={handleLayoutChange}
