@@ -158,7 +158,7 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Text Analysis Dashboard</h1>
+        <h1 className="text-2xl font-bold">Artemis Dashboard</h1>
         <button
           className={`flex items-center px-3 py-1 rounded border ${theme == 'dark' ? darkModeButtonStyle : lightModeButtonStyle}`}
           onClick={() => setLayoutLocked(!layoutLocked)}

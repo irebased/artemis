@@ -8,6 +8,7 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
 import { Analytics } from "@vercel/analytics/next"
+import { GithubIcon } from "@/components/icons";
 
 
 export const metadata: Metadata = {
@@ -48,11 +49,25 @@ export default function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
             <Navbar />
-            <main className="margin-auto px-16 flex-grow w-100">
+            <main className="margin-auto px-16 pt-8 flex-grow w-100">
               {children}
             </main>
-            <footer className="w-full flex items-center justify-center py-3">
-                <span className="text-default-600">{`Made by rebase <3`}</span>
+            <footer className="w-full border-t border-divider">
+              <div className="max-w-7xl mx-auto px-4 py-4">
+                <div className="text-center text-default-600">
+                  <p>
+                    Made with <span className="text-red-500">♥</span> by{" "}
+                    <a
+                      href="https://github.com/irebased"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 dark:hover:text-blue-400 underline-offset-2 underline"
+                    >
+                      rebase
+                    </a>
+                  </p>
+                </div>
+              </div>
             </footer>
           </div>
         </Providers>

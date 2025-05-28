@@ -188,7 +188,7 @@ export default function TextInputCard({
           </button>
         )}
       </div>
-      <Card className="mb-6 rounded-t-none">
+      <Card className="mb-6 rounded-t-none bg-gray-50 dark:bg-gray-900/10">
         <CardHeader>
           <h2 className="text-xl font-semibold">Input Text</h2>
         </CardHeader>

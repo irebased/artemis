@@ -8,7 +8,7 @@ export default function BarChartSkeleton({ bars = 12 }) {
   });
 
   return (
-    <div className="flex items-end justify-between w-full h-full gap-1 p-4 bg-gray-50 dark:bg-gray-900 rounded">
+    <div className="flex items-end justify-between w-full h-full gap-1 p-4 bg-none dark:bg-none rounded">
       {barHeights.map((height, idx) => (
         <Skeleton
           key={idx}

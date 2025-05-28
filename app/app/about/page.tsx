@@ -1,23 +1,38 @@
 'use client'
 import { subtitle, title } from "@/components/primitives";
+import { Image } from "@heroui/image";
 
 export default function AboutPage() {
   return (
     <div>
+      <div className="flex justify-center items-center pb-16">
+        <Image src="/images/artemis.PNG" alt="Artemis" width={360} height={360} />
+      </div>
       <h1 className={title()}>About Artemis</h1>
       <p className="my-4">
-        Artemis is a simple tool I created which allows you to share a dashboard of visualizations using a link. This should
-        help with cryptanalysis. We built this tool while trying to solve some ciphers made by a guy named Jason Blundell.
+        Artemis is the only tool for cryptographers to create visualization dashboards of their ciphers, and share them with the world.
+        This tool brings cryptanalysis to a new level, allowing you to see the patterns in your ciphers in a way that is not possible with
+        traditional tools which require you to hop between tools.
       </p>
       <p className="my-4">
-        As of May 6, 2025, we have not solved them.
+        This tool was created as part of an effort to solve some decade-old ciphers constructed by Jason Blundell, a well-known
+        executive producer in the video game industry that has a knack for creating ciphers.
       </p>
       <p className="my-4">
-        But there is still hope that one day we will. Who knows. I sure don't. In the meantime, hit me up on discord <strong className="text-blue-800">@rebase</strong> if
-        you have any feature requests.
+        More widgets, tools, and features will continue to be added to Artemis as we continue to make it awesome.
+      </p>
+      <p className="my-4">
+        For any questions, comments, or feature requests, please file an issue on the <a href="https://github.com/irebased/artemis/issues" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline-offset-2 underline">GitHub repository</a>.
       </p>
       <h3 className={subtitle()}>FAQ</h3>
-      <h4 style={{paddingBottom: 8}}><strong>How do you calculate the IC and entropy of different bases for English text?</strong></h4>
+      <h4 className="pb-8 pt-8">
+        <strong>Is Artemis free?</strong>
+      </h4>
+      <p>
+        Yes, Artemis is free to use. As it scales, it's likely that I will need to add a backend to handle the larger dashboard links for
+        minification of URLs. The site <strong>will</strong> eventually have a monetization model via non-intrusive ads.
+      </p>
+      <h4 className="pb-8 pt-8"><strong>How do you calculate the IC and entropy of different bases for English text?</strong></h4>
       <p>
         I take a 500-word English text, convert it to the expected base, and calculate the entropy, IC, or other
         calculation. So you can test the functionality independently, here is the sample text that I use:

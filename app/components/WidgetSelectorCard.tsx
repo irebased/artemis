@@ -15,7 +15,7 @@ export default function WidgetSelectorCard({ widgets, setWidgets, AVAILABLE_WIDG
   const darkModeButtonStyle = 'bg-gray-700 hover:bg-gray-800';
 
   return (
-    <Card className="mb-6">
+    <Card className="mb-6 bg-gray-50 dark:bg-gray-900/10">
       <CardHeader>
         <h2 className="text-xl font-semibold">Available Widgets</h2>
       </CardHeader>

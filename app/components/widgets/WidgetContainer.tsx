@@ -44,7 +44,7 @@ export default function WidgetContainer({ children, infoContent, title }: { chil
   const handleInfoClose = () => setShowInfo(false);
 
   return (
-    <Card ref={ref} className="h-full min-h-0 relative p-4">
+    <Card ref={ref} className="h-full min-h-0 relative p-4 bg-gray-50 dark:bg-gray-900/10">
       {(title || infoContent) && (
         <div className="mb-4 flex flex-row items-center gap-2">
           {title && <h3 className="text-lg font-semibold mb-0">{title}</h3>}
