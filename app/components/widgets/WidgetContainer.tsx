@@ -1,11 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import useResizeObserver from 'use-resize-observer';
 import { Card } from '@heroui/react';
 import InformationModal from '@/components/InformationModal';
 
+function useDebouncedResize(delay: number = 100) {
+  const [size, setSize] = useState<{ width?: number; height?: number }>({});
+  const [debouncedSize, setDebouncedSize] = useState<{ width?: number; height?: number }>({});
+  const timeoutRef = React.useRef<NodeJS.Timeout>();
+
+  const handleResize = useCallback((width?: number, height?: number) => {
+    setSize({ width, height });
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      setDebouncedSize({ width, height });
+    }, delay);
+  }, [delay]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  return { size, debouncedSize, handleResize };
+}
+
 export default function WidgetContainer({ children, infoContent, title }: { children: React.ReactNode | ((size: { width?: number; height?: number }) => React.ReactNode), infoContent?: React.ReactNode, title?: React.ReactNode }) {
   const { ref, width, height } = useResizeObserver();
   const [showInfo, setShowInfo] = useState(false);
+  const { debouncedSize, handleResize } = useDebouncedResize(100);
+
+  useEffect(() => {
+    handleResize(width, height);
+  }, [width, height, handleResize]);
 
   const handleInfoOpen = () => setShowInfo(true);
   const handleInfoClose = () => setShowInfo(false);
@@ -29,7 +62,7 @@ export default function WidgetContainer({ children, infoContent, title }: { chil
           )}
         </div>
       )}
-      {typeof children === 'function' ? children({ width, height }) : children}
+      {typeof children === 'function' ? children(debouncedSize) : children}
       {infoContent && (
         <InformationModal
           isOpen={showInfo}

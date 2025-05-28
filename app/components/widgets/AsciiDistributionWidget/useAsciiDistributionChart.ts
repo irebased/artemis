@@ -72,6 +72,9 @@ export function useAsciiDistributionChart({ distributions, start, end, encoding 
           text: 'ASCII Code'
         }
       }
+    },
+    animation: {
+      duration: 0
     }
   }), [distributions, start, end]);
 

@@ -3,6 +3,7 @@ import { Card, CardHeader, CardBody } from '@heroui/react';
 import { BaseType } from '@/types/bases';
 import { Ciphertext } from '@/types/ciphertext';
 import { useTheme } from 'next-themes';
+import useDebounce from '@/hooks/useDebounce';
 
 interface TextInputCardProps {
   inputs: Ciphertext[];
@@ -18,11 +19,36 @@ export default function TextInputCard({
   BASE_OPTIONS,
 }: TextInputCardProps) {
   const [activeTab, setActiveTab] = useState(0);
+  const [localTexts, setLocalTexts] = useState<Map<number, string>>(new Map());
   const mounted = useRef(false);
   const prevInputsLen = useRef(inputs.length);
   const { theme } = useTheme();
 
-  // Ensure we always have at least one input
+  useEffect(() => {
+    const newLocalTexts = new Map();
+    inputs.forEach((input, idx) => {
+      if (!localTexts.has(idx)) {
+        newLocalTexts.set(idx, input.text);
+      } else {
+        newLocalTexts.set(idx, localTexts.get(idx)!);
+      }
+    });
+    setLocalTexts(newLocalTexts);
+  }, [inputs.length]);
+
+  const currentLocalText = localTexts.get(activeTab) ?? '';
+  const debouncedText = useDebounce(currentLocalText, 300);
+
+  useEffect(() => {
+    if (debouncedText !== inputs[activeTab]?.text) {
+      const updatedInputs = inputs.map((input, idx) =>
+        idx === activeTab ? { ...input, text: debouncedText } : input
+      );
+      setInputs(updatedInputs);
+    }
+  }, [debouncedText]);
+
+
   useEffect(() => {
     if (inputs.length === 0) {
       setInputs([{
@@ -37,7 +63,6 @@ export default function TextInputCard({
     }
   }, [inputs.length, setInputs, INPUT_COLORS]);
 
-  // Sync activeTab if inputs change length
   useEffect(() => {
     if (!mounted.current || prevInputsLen.current !== inputs.length) {
       if (activeTab >= inputs.length) setActiveTab(Math.max(0, inputs.length - 1));
@@ -46,17 +71,24 @@ export default function TextInputCard({
     }
   }, [inputs.length, activeTab]);
 
-  // Handlers
-  const handleTabChange = (idx: number) => setActiveTab(idx);
+  const handleTabChange = useCallback((idx: number) => {
+    setActiveTab(idx);
+  }, []);
 
-  const handleInputChange = (field: keyof Ciphertext, value: any) => {
-    const updatedInputs = inputs.map((input, idx) =>
-      idx === activeTab ? { ...input, [field]: value } : input
-    );
-    setInputs(updatedInputs);
-  };
+  const handleInputChange = useCallback((field: keyof Ciphertext, value: any) => {
+    if (field === 'text') {
+      const newLocalTexts = new Map(localTexts);
+      newLocalTexts.set(activeTab, value);
+      setLocalTexts(newLocalTexts);
+    } else {
+      const updatedInputs = inputs.map((input, idx) =>
+        idx === activeTab ? { ...input, [field]: value } : input
+      );
+      setInputs(updatedInputs);
+    }
+  }, [activeTab, inputs, localTexts, setInputs]);
 
-  const handleAddInput = () => {
+  const handleAddInput = useCallback(() => {
     if (inputs.length >= 5) return;
     const nextColor = INPUT_COLORS[inputs.length % INPUT_COLORS.length];
     setInputs([
@@ -71,17 +103,20 @@ export default function TextInputCard({
         color: nextColor,
       },
     ]);
-    setActiveTab(inputs.length); // focus new tab
-  };
+    setActiveTab(inputs.length);
+  }, [inputs, INPUT_COLORS, setInputs]);
 
-  const handleRemoveInput = (idx: number) => {
+  const handleRemoveInput = useCallback((idx: number) => {
     if (inputs.length === 1) return;
     const newInputs = inputs.filter((_, i) => i !== idx).map((input, i) => ({ ...input, color: INPUT_COLORS[i] }));
     setInputs(newInputs);
     setActiveTab(idx === 0 ? 0 : idx - 1);
-  };
 
-  // Safety check for activeInput
+    const newLocalTexts = new Map(localTexts);
+    newLocalTexts.delete(idx);
+    setLocalTexts(newLocalTexts);
+  }, [inputs, INPUT_COLORS, localTexts, setInputs]);
+
   if (inputs.length === 0 || activeTab >= inputs.length) {
     return null;
   }
@@ -98,7 +133,6 @@ export default function TextInputCard({
 
   return (
     <div>
-      {/* Tabs Bar - now above the card, styled for dark theme */}
       <div className={`flex items-center gap-2 mb-0 ${theme === 'dark' ? darkModeHeaderStyle : lightModeHeaderStyle} rounded-t-lg px-4 pt-2 pb-1`}>
         <div className="flex items-center gap-2 flex-wrap">
           {inputs.map((input, idx) => (
@@ -159,14 +193,12 @@ export default function TextInputCard({
           <h2 className="text-xl font-semibold">Input Text</h2>
         </CardHeader>
         <CardBody>
-          {/* Active input editor */}
           <textarea
             className="w-full h-40 p-2 border rounded"
-            value={activeInput.text}
+            value={currentLocalText}
             onChange={e => handleInputChange('text', e.target.value)}
             placeholder={`Enter text here...`}
           />
-          {/* Per-input options for the active input */}
           <div className="mt-4 flex flex-wrap gap-4 items-center">
             <label className="font-medium mr-2">Encoding:</label>
             <select

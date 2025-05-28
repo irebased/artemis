@@ -5,6 +5,8 @@ import { useShannonEntropyChart, defaultGridSize } from './useShannonEntropyChar
 import WidgetWithSettings from '../WidgetWithSettings';
 import ShannonEntropySettingsForm from './ShannonEntropySettingsForm';
 import ShannonEntropyInformation from './ShannonEntropyInformation';
+import { useChartResize } from '@/hooks/useChartResize';
+import BarChartSkeleton from '@/components/BarChartSkeleton';
 
 interface ShannonEntropyWidgetProps {
   inputs: Ciphertext[];
@@ -28,6 +30,7 @@ export default function ShannonEntropyWidget({
   const { mode, windowSize } = shannonEntropySettings;
   const results = useShannonEntropy(inputs, windowSize);
   const { data: slidingLineData, options: slidingLineOptions } = useShannonEntropyChart(results, windowSize);
+  const { chartRef, containerRef, isResizing } = useChartResize<'line'>();
 
   return (
     <WidgetWithSettings
@@ -68,9 +71,16 @@ export default function ShannonEntropyWidget({
           </table>
         </div>
       ) : (
-        <div className="flex-1 w-full h-full relative">
-          {slidingLineData ? (
-            <Line data={slidingLineData} options={slidingLineOptions} className="absolute inset-0 w-full h-full" />
+        <div ref={containerRef} className="flex-1 w-full h-full relative">
+          {isResizing ? (
+            <BarChartSkeleton />
+          ) : slidingLineData ? (
+            <Line
+              ref={chartRef}
+              data={slidingLineData}
+              options={slidingLineOptions}
+              className="absolute inset-0 w-full h-full"
+            />
           ) : (
             <p>No data to display.</p>
           )}

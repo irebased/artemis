@@ -6,6 +6,8 @@ import WidgetWithSettings from '../WidgetWithSettings';
 import IndexOfCoincidenceSettingsForm, { IndexOfCoincidenceSettings } from './IndexOfCoincidenceSettingsForm';
 import { BaseType } from '@/types/bases';
 import IndexOfCoincidenceInformation from './IndexOfCoincidenceInformation';
+import { useChartResize } from '@/hooks/useChartResize';
+import BarChartSkeleton from '@/components/BarChartSkeleton';
 
 interface IndexOfCoincidenceWidgetProps {
   inputs: Ciphertext[];
@@ -26,6 +28,7 @@ export default function IndexOfCoincidenceWidget({
   const results = useIndexOfCoincidence(inputs, ngramSize, ngramMode);
   const baseline = IC_BASELINES[base];
   const { data: periodLineData, options: lineOptions } = useIndexOfCoincidenceChart(results, mode, baseline);
+  const { chartRef, containerRef, isResizing } = useChartResize<'line'>();
 
   return (
     <WidgetWithSettings
@@ -74,9 +77,16 @@ export default function IndexOfCoincidenceWidget({
           </table>
         </div>
       ) : (
-        <div className="flex-1 w-full h-full relative">
-          {periodLineData ? (
-            <Line data={periodLineData} options={lineOptions} className="absolute inset-0 w-full h-full" />
+        <div ref={containerRef} className="flex-1 w-full h-full relative">
+          {isResizing ? (
+            <BarChartSkeleton />
+          ) : periodLineData ? (
+            <Line
+              ref={chartRef}
+              data={periodLineData}
+              options={lineOptions}
+              className="absolute inset-0 w-full h-full"
+            />
           ) : (
             <p>No data to display.</p>
           )}

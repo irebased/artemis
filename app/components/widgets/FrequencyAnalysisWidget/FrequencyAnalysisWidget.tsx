@@ -16,6 +16,8 @@ import { useFrequencyAnalysisChart } from './useFrequencyAnalysisChart';
 import WidgetWithSettings from '../WidgetWithSettings';
 import FrequencyAnalysisSettingsForm from './FrequencyAnalysisSettingsForm';
 import FrequencyAnalysisInformation from './FrequencyAnalysisInformation';
+import { useChartResize } from '@/hooks/useChartResize';
+import BarChartSkeleton from '@/components/BarChartSkeleton';
 
 interface FrequencyAnalysisWidgetProps {
   inputs: Ciphertext[];
@@ -35,6 +37,7 @@ export default function FrequencyAnalysisWidget({
   const { ngramSize, ngramMode } = frequencyAnalysisSettings;
   const results = useFrequencyAnalysis(inputs, ngramSize, ngramMode);
   const { data: barData, options: barOptions } = useFrequencyAnalysisChart(results, ngramSize);
+  const { chartRef, containerRef, isResizing } = useChartResize();
 
   return (
     <WidgetWithSettings
@@ -50,13 +53,20 @@ export default function FrequencyAnalysisWidget({
       }
       setAnyModalOpen={setAnyModalOpen}
     >
-      {barData ? (
-        <div className="flex-1 w-full h-full relative">
-          <Bar data={barData} options={barOptions} className="absolute inset-0 w-full h-full" />
-        </div>
-      ) : (
-        <p>No data to display.</p>
-      )}
+      <div ref={containerRef} className="flex-1 w-full h-full relative">
+        {isResizing ? (
+          <BarChartSkeleton />
+        ) : barData ? (
+          <Bar
+            ref={chartRef}
+            data={barData}
+            options={barOptions}
+            className="absolute inset-0 w-full h-full"
+          />
+        ) : (
+          <p>No data to display.</p>
+        )}
+      </div>
     </WidgetWithSettings>
   );
 }
