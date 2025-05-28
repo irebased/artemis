@@ -12,7 +12,6 @@ export default function KolmogorovSmirnovWidget({ inputs, kolmogorovSmirnovSetti
 
   return (
     <div className="w-full h-full flex flex-col">
-      <h3 className="text-lg font-semibold mb-4">Kolmogorov-Smirnov Test (vs. English, per encoding)</h3>
       <div className="overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead>

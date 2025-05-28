@@ -5,6 +5,7 @@ import { useIndexOfCoincidenceChart } from './useIndexOfCoincidenceChart';
 import WidgetWithSettings from '../WidgetWithSettings';
 import IndexOfCoincidenceSettingsForm, { IndexOfCoincidenceSettings } from './IndexOfCoincidenceSettingsForm';
 import { BaseType } from '@/types/bases';
+import IndexOfCoincidenceInformation from './IndexOfCoincidenceInformation';
 
 interface IndexOfCoincidenceWidgetProps {
   inputs: Ciphertext[];
@@ -36,6 +37,7 @@ export default function IndexOfCoincidenceWidget({
         />
       }
       setAnyModalOpen={setAnyModalOpen}
+      infoContent={<IndexOfCoincidenceInformation />}
     >
       {mode === 'summary' ? (
         <div className="overflow-x-auto">

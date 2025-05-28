@@ -4,6 +4,7 @@ import { useShannonEntropy, ENTROPY_BASELINES, BaseType } from './useShannonEntr
 import { useShannonEntropyChart, defaultGridSize } from './useShannonEntropyChart';
 import WidgetWithSettings from '../WidgetWithSettings';
 import ShannonEntropySettingsForm from './ShannonEntropySettingsForm';
+import ShannonEntropyInformation from './ShannonEntropyInformation';
 
 interface ShannonEntropyWidgetProps {
   inputs: Ciphertext[];
@@ -38,6 +39,7 @@ export default function ShannonEntropyWidget({
         />
       }
       setAnyModalOpen={setAnyModalOpen}
+      infoContent={<ShannonEntropyInformation />}
     >
       {mode === 'raw' ? (
         <div className="overflow-x-auto">

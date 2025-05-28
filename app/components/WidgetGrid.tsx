@@ -8,6 +8,7 @@ import ShannonEntropyWidget from '../components/widgets/ShannonEntropyWidget/Sha
 import KolmogorovSmirnovWidget from '../components/widgets/KolmogrovSmirnovWidget/KolmogorovSmirnovWidget';
 import { BaseType } from '@/types/bases';
 import FrequencyStdDevInformation from './widgets/FrequencyStdDevWidget/FrequencyStdDevInformation';
+import KolmogrovSmirnovInformation from './widgets/KolmogrovSmirnovWidget/KolmogrovSmirnovInformation';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -121,6 +122,8 @@ export default function WidgetGrid({
             />
           );
         } else if (widget === 'ks') {
+          WidgetInfo = <KolmogrovSmirnovInformation />;
+          WidgetTitle = 'Kolmogorov-Smirnov Test';
           WidgetComponent = (
             <KolmogorovSmirnovWidget
               inputs={adjustedTexts}
