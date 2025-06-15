@@ -6,6 +6,7 @@ import { defaultGridSize as icDefault } from '@/components/widgets/IndexOfCoinci
 import { defaultGridSize as stddevDefault } from '@/components/widgets/FrequencyStdDevWidget/useFrequencyStdDevChart';
 import { defaultGridSize as freqDefault } from '@/components/widgets/FrequencyAnalysisWidget/useFrequencyAnalysisChart';
 import { defaultGridSize as asciiDefault } from '@/components/widgets/AsciiDistributionWidget/useAsciiDistributionChart';
+import { defaultGridSize as ksDefault } from '@/components/widgets/KolmogrovSmirnovWidget/useKolmogorovSmirnov';
 import { BASE_OPTIONS, BaseType } from '@/types/bases';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
@@ -35,19 +36,23 @@ const WIDGET_DEFAULTS: Record<string, { w: number; h: number }> = {
   freqstddev: stddevDefault,
   coincidence: icDefault,
   entropy: entropyDefault,
-  ks: { w: 1, h: 2 },
+  ks: ksDefault,
 };
 
 const BREAKPOINTS = { lg: 1024, md: 768, sm: 0 };
 const COLS = { lg: 16, md: 8, sm: 1 };
 
 function generateLayout(widgets, cols) {
-  return widgets.map((widget, i) => ({
-    i: widget,
-    x: i % cols,
-    y: Math.floor(i / cols),
-    ...WIDGET_DEFAULTS[widget] || { w: 1, h: 2 },
-  }));
+  return widgets.map((widget, i) => {
+    const defaultSize = WIDGET_DEFAULTS[widget] || { w: 1, h: 2 };
+    return {
+      i: widget,
+      x: i % cols,
+      y: Math.floor(i / cols),
+      w: defaultSize.w,
+      h: defaultSize.h,
+    };
+  });
 }
 
 function mergeLayoutsWithWidgets(layouts, widgets, cols) {
@@ -56,20 +61,24 @@ function mergeLayoutsWithWidgets(layouts, widgets, cols) {
     const existing = layouts[bp] || [];
     const existingMap = Object.fromEntries(existing.map(l => [l.i, l]));
     let nextX = 0, nextY = 0;
+
     newLayouts[bp] = widgets.map((widget, i) => {
       if (existingMap[widget]) {
         return existingMap[widget];
       } else {
-
-        const def = WIDGET_DEFAULTS[widget] || { w: 1, h: 2 };
+        const defaultSize = WIDGET_DEFAULTS[widget] || { w: 1, h: 2 };
         const layoutItem = {
           i: widget,
           x: nextX,
           y: nextY,
-          ...def,
+          w: defaultSize.w,
+          h: defaultSize.h,
+          minW: 1,
+          minH: 1,
+          static: false,
         };
 
-        nextX = (nextX + def.w) % cols[bp];
+        nextX = (nextX + defaultSize.w) % cols[bp];
         if (nextX === 0) nextY++;
         return layoutItem;
       }

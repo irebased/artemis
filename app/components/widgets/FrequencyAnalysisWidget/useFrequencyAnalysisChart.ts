@@ -11,7 +11,7 @@ import { useMemo } from 'react';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, Title);
 
-export const defaultGridSize = { w: 2, h: 2 };
+export const defaultGridSize = { w: 4, h: 4 };
 
 export function useFrequencyAnalysisChart({ frequencies, sortedChars }) {
   const data = useMemo(() => {

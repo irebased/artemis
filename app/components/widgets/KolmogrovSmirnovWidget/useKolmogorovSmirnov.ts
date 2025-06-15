@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
 import { getReferenceDistribution } from './englishReferenceDistributions';
 
+export const defaultGridSize = { w: 6, h: 2 }
+
 // Kolmogorov-Smirnov D statistic
 function ksStatistic(emp1: Record<string, number>, emp2: Record<string, number>): number {
   const allKeys = Array.from(new Set([...Object.keys(emp1), ...Object.keys(emp2)])).sort();

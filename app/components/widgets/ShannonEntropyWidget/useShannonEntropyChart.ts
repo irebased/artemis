@@ -21,7 +21,7 @@ ChartJS.register(
   Title,
 );
 
-export const defaultGridSize = { w: 2, h: 2 };
+export const defaultGridSize = { w: 6, h: 2 };
 
 export function useShannonEntropyChart(results, windowSize) {
   const data = useMemo(() => {

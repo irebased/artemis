@@ -9,6 +9,21 @@ import KolmogorovSmirnovWidget from '../components/widgets/KolmogrovSmirnovWidge
 import { BaseType } from '@/types/bases';
 import FrequencyStdDevInformation from './widgets/FrequencyStdDevWidget/FrequencyStdDevInformation';
 import KolmogrovSmirnovInformation from './widgets/KolmogrovSmirnovWidget/KolmogrovSmirnovInformation';
+import { defaultGridSize as freqDefault } from '@/components/widgets/FrequencyAnalysisWidget/useFrequencyAnalysisChart';
+import { defaultGridSize as asciiDefault } from '@/components/widgets/AsciiDistributionWidget/useAsciiDistributionChart';
+import { defaultGridSize as stddevDefault } from '@/components/widgets/FrequencyStdDevWidget/useFrequencyStdDevChart';
+import { defaultGridSize as icDefault } from '@/components/widgets/IndexOfCoincidenceWidget/useIndexOfCoincidenceChart';
+import { defaultGridSize as entropyDefault } from '@/components/widgets/ShannonEntropyWidget/useShannonEntropyChart';
+import { defaultGridSize as ksDefault } from '@/components/widgets/KolmogrovSmirnovWidget/useKolmogorovSmirnov';
+
+const WIDGET_DEFAULTS = {
+  frequency: freqDefault,
+  ascii: asciiDefault,
+  freqstddev: stddevDefault,
+  coincidence: icDefault,
+  entropy: entropyDefault,
+  ks: ksDefault,
+};
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -84,7 +99,17 @@ export default function WidgetGrid({
         let WidgetComponent = null;
         let WidgetInfo = null;
         let WidgetTitle = null;
-        const layoutItem = layouts.lg.find((l: any) => l.i === widget) || { w: 1, h: 1 };
+        const layoutItem = layouts.lg.find((l: any) => l.i === widget) || {
+          i: widget,
+          x: 0,
+          y: 0,
+          w: WIDGET_DEFAULTS[widget]?.w || 1,
+          h: WIDGET_DEFAULTS[widget]?.h || 2,
+          minW: 1,
+          minH: 1,
+          static: false,
+        };
+
         if (widget === 'frequency') {
           WidgetComponent = <FrequencyAnalysisWidget inputs={adjustedTexts} gridH={layoutItem.h} frequencyAnalysisSettings={frequencyAnalysisSettings} setFrequencyAnalysisSettings={setFrequencyAnalysisSettings} setAnyModalOpen={setAnyModalOpen} />;
         } else if (widget === 'ascii') {
@@ -133,7 +158,7 @@ export default function WidgetGrid({
           );
         }
         return (
-          <div key={widget} data-grid={layouts.lg.find((l: any) => l.i === widget)}>
+          <div key={widget} data-grid={layoutItem}>
             <WidgetContainer infoContent={WidgetInfo} title={WidgetTitle}>
               {WidgetComponent}
             </WidgetContainer>
