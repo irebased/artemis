@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --fix"
+    "lint": "eslint --fix",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -56,6 +58,7 @@
     "@next/eslint-plugin-next": "15.3.1",
     "@react-types/shared": "3.29.0",
     "@tauri-apps/cli": "^2.6.2",
+    "@types/jest": "^30.0.0",
     "@types/node": "22.15.3",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
@@ -73,10 +76,12 @@
     "eslint-plugin-react-hooks": "5.2.0",
     "eslint-plugin-unused-imports": "4.1.4",
     "globals": "16.0.0",
+    "jest": "^30.0.4",
     "postcss": "8.5.3",
     "prettier": "3.5.3",
     "tailwind-variants": "0.3.0",
     "tailwindcss": "3.4.16",
+    "ts-jest": "^29.4.0",
     "typescript": "5.6.3"
   }
 }
