@@ -74,6 +74,11 @@ export type KolmogorovSmirnovSettings = {
   ngramMode: 'sliding' | 'block';
 };
 
+export type ChiSquaredSettings = {
+  selectedTextIndex: number;
+  baseDataIndex: number | 'sample';
+};
+
 function compressSettings(obj: any): string {
   const json = JSON.stringify(obj);
   const compressed = pako.deflate(json, { level: 9 });
@@ -131,6 +136,10 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   const [kolmogorovSmirnovSettings, setKolmogorovSmirnovSettings] = useState<KolmogorovSmirnovSettings>({
     ngramSize: 1,
     ngramMode: 'sliding',
+  });
+  const [chiSquaredSettings, setChiSquaredSettings] = useState<ChiSquaredSettings>({
+    selectedTextIndex: 0,
+    baseDataIndex: 'sample',
   });
 
   const addInput = useCallback(() => {
@@ -204,6 +213,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     const asciiSettingsParam = query.get('asciiSettings');
     const icSettingsParam = query.get('icSettings');
     const ksSettingsParam = query.get('ksSettings');
+    const chiSquaredSettingsParam = query.get('chiSquaredSettings');
     const nameParam = query.get('name');
 
     if (nameParam) {
@@ -297,6 +307,14 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         // fallback to defaults
       }
     }
+    if (chiSquaredSettingsParam) {
+      try {
+        const settings = decompressSettings(chiSquaredSettingsParam);
+        setChiSquaredSettings(settings);
+      } catch (e) {
+        // fallback to defaults
+      }
+    }
     finishLoading();
   }, []);
 
@@ -320,9 +338,12 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       if (indexOfCoincidenceSettings) {
         params.set('icSettings', compressSettings(indexOfCoincidenceSettings));
       }
-      if (kolmogorovSmirnovSettings) {
-        params.set('ksSettings', compressSettings(kolmogorovSmirnovSettings));
-      }
+          if (kolmogorovSmirnovSettings) {
+      params.set('ksSettings', compressSettings(kolmogorovSmirnovSettings));
+    }
+    if (chiSquaredSettings) {
+      params.set('chiSquaredSettings', compressSettings(chiSquaredSettings));
+    }
       if (dashboardName !== 'Artemis Dashboard') {
         params.set('name', encodeURIComponent(dashboardName));
       }
@@ -336,7 +357,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         });
       }
     });
-  }, [inputs, inputsForUrlSync, widgets, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings, kolmogorovSmirnovSettings, dashboardName]);
+  }, [inputs, inputsForUrlSync, widgets, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings, kolmogorovSmirnovSettings, chiSquaredSettings, dashboardName]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -431,6 +452,8 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     setIndexOfCoincidenceSettings,
     kolmogorovSmirnovSettings,
     setKolmogorovSmirnovSettings,
+    chiSquaredSettings,
+    setChiSquaredSettings,
     dashboardName,
     setDashboardName,
   };

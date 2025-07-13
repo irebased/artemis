@@ -7,6 +7,7 @@ import { defaultGridSize as stddevDefault } from '@/components/widgets/Frequency
 import { defaultGridSize as freqDefault } from '@/components/widgets/FrequencyAnalysisWidget/useFrequencyAnalysisChart';
 import { defaultGridSize as asciiDefault } from '@/components/widgets/AsciiDistributionWidget/useAsciiDistributionChart';
 import { defaultGridSize as ksDefault } from '@/components/widgets/KolmogrovSmirnovWidget/useKolmogorovSmirnov';
+import { defaultGridSize as chiSquaredDefault } from '@/components/widgets/ChiSquaredWidget/useChiSquaredChart';
 import { BASE_OPTIONS, BaseType } from '@/types/bases';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
@@ -24,6 +25,7 @@ const AVAILABLE_WIDGETS = {
   coincidence: 'Index of Coincidence',
   entropy: 'Shannon Entropy',
   ks: 'Kolmogorov-Smirnov Test',
+  chisquared: 'Chi-Squared Test',
 };
 
 type WidgetKey = keyof typeof AVAILABLE_WIDGETS;
@@ -37,6 +39,7 @@ const WIDGET_DEFAULTS: Record<string, { w: number; h: number }> = {
   coincidence: icDefault,
   entropy: entropyDefault,
   ks: ksDefault,
+  chisquared: chiSquaredDefault,
 };
 
 const BREAKPOINTS = { lg: 1024, md: 768, sm: 0 };
@@ -66,15 +69,15 @@ function mergeLayoutsWithWidgets(layouts, widgets, cols) {
       if (existingMap[widget]) {
         return existingMap[widget];
       } else {
-        const defaultSize = WIDGET_DEFAULTS[widget] || { w: 1, h: 2 };
+        const defaultSize = WIDGET_DEFAULTS[widget] || { w: 1, h: 2, minW: 1, minH: 1 };
         const layoutItem = {
           i: widget,
           x: nextX,
           y: nextY,
           w: defaultSize.w,
           h: defaultSize.h,
-          minW: 1,
-          minH: 1,
+          minW: (defaultSize as any).minW || 1,
+          minH: (defaultSize as any).minH || 1,
           static: false,
         };
 
@@ -128,6 +131,8 @@ export default function DashboardPage() {
     setIndexOfCoincidenceSettings,
     kolmogorovSmirnovSettings,
     setKolmogorovSmirnovSettings,
+    chiSquaredSettings,
+    setChiSquaredSettings,
     dashboardName,
     setDashboardName,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
@@ -272,6 +277,8 @@ export default function DashboardPage() {
         setIndexOfCoincidenceSettings={setIndexOfCoincidenceSettings}
         kolmogorovSmirnovSettings={kolmogorovSmirnovSettings}
         setKolmogorovSmirnovSettings={setKolmogorovSmirnovSettings}
+        chiSquaredSettings={chiSquaredSettings}
+        setChiSquaredSettings={setChiSquaredSettings}
       />
     </div>
   );

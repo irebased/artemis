@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
 import { getReferenceDistribution } from './englishReferenceDistributions';
 
-export const defaultGridSize = { w: 6, h: 2 }
+export const defaultGridSize = { w: 6, h: 2, minW: 4, minH: 2 }
 
 // Kolmogorov-Smirnov D statistic
 function ksStatistic(emp1: Record<string, number>, emp2: Record<string, number>): number {

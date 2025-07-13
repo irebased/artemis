@@ -13,7 +13,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, ChartDataLabels, Title);
 
-export const defaultGridSize = { w: 6, h: 2 };
+export const defaultGridSize = { w: 6, h: 2, minW: 4, minH: 2 };
 
 export function useAsciiDistributionChart({ distributions, start, end, encoding }) {
   const data = useMemo(() => {

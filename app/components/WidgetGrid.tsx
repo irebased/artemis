@@ -6,6 +6,7 @@ import FrequencyStdDevWidget from '../components/widgets/FrequencyStdDevWidget/F
 import IndexOfCoincidenceWidget from '../components/widgets/IndexOfCoincidenceWidget/IndexOfCoincidenceWidget';
 import ShannonEntropyWidget from '../components/widgets/ShannonEntropyWidget/ShannonEntropyWidget';
 import KolmogorovSmirnovWidget from '../components/widgets/KolmogrovSmirnovWidget/KolmogorovSmirnovWidget';
+import ChiSquaredWidget from '../components/widgets/ChiSquaredWidget/ChiSquaredWidget';
 import { BaseType } from '@/types/bases';
 import FrequencyStdDevInformation from './widgets/FrequencyStdDevWidget/FrequencyStdDevInformation';
 import KolmogrovSmirnovInformation from './widgets/KolmogrovSmirnovWidget/KolmogrovSmirnovInformation';
@@ -15,6 +16,7 @@ import { defaultGridSize as stddevDefault } from '@/components/widgets/Frequency
 import { defaultGridSize as icDefault } from '@/components/widgets/IndexOfCoincidenceWidget/useIndexOfCoincidenceChart';
 import { defaultGridSize as entropyDefault } from '@/components/widgets/ShannonEntropyWidget/useShannonEntropyChart';
 import { defaultGridSize as ksDefault } from '@/components/widgets/KolmogrovSmirnovWidget/useKolmogorovSmirnov';
+import { defaultGridSize as chiSquaredDefault } from '@/components/widgets/ChiSquaredWidget/useChiSquaredChart';
 
 const WIDGET_DEFAULTS = {
   frequency: freqDefault,
@@ -23,6 +25,7 @@ const WIDGET_DEFAULTS = {
   coincidence: icDefault,
   entropy: entropyDefault,
   ks: ksDefault,
+  chisquared: chiSquaredDefault,
 };
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -52,6 +55,8 @@ interface WidgetGridProps {
   setIndexOfCoincidenceSettings: (settings: { mode: 'summary' | 'period' }) => void;
   kolmogorovSmirnovSettings: { ngramSize: number; ngramMode: 'sliding' | 'block' };
   setKolmogorovSmirnovSettings: (settings: { ngramSize: number; ngramMode: 'sliding' | 'block' }) => void;
+  chiSquaredSettings: { selectedTextIndex: number; baseDataIndex: number | 'sample' };
+  setChiSquaredSettings: (settings: { selectedTextIndex: number; baseDataIndex: number | 'sample' }) => void;
 }
 
 export default function WidgetGrid({
@@ -79,6 +84,8 @@ export default function WidgetGrid({
   setIndexOfCoincidenceSettings,
   kolmogorovSmirnovSettings,
   setKolmogorovSmirnovSettings,
+  chiSquaredSettings,
+  setChiSquaredSettings,
 }: WidgetGridProps) {
   return (
     <ResponsiveGridLayout
@@ -99,14 +106,15 @@ export default function WidgetGrid({
         let WidgetComponent = null;
         let WidgetInfo = null;
         let WidgetTitle = null;
+        const defaultSize = WIDGET_DEFAULTS[widget] || { w: 1, h: 2, minW: 1, minH: 1 };
         const layoutItem = layouts.lg.find((l: any) => l.i === widget) || {
           i: widget,
           x: 0,
           y: 0,
-          w: WIDGET_DEFAULTS[widget]?.w || 1,
-          h: WIDGET_DEFAULTS[widget]?.h || 2,
-          minW: 1,
-          minH: 1,
+          w: defaultSize.w,
+          h: defaultSize.h,
+          minW: defaultSize.minW || 1,
+          minH: defaultSize.minH || 1,
           static: false,
         };
 
@@ -156,9 +164,18 @@ export default function WidgetGrid({
               setKolmogorovSmirnovSettings={setKolmogorovSmirnovSettings}
             />
           );
+        } else if (widget === 'chisquared') {
+          WidgetComponent = (
+            <ChiSquaredWidget
+              inputs={adjustedTexts}
+              chiSquaredSettings={chiSquaredSettings}
+              setChiSquaredSettings={setChiSquaredSettings}
+              setAnyModalOpen={setAnyModalOpen}
+            />
+          );
         }
         return (
-          <div key={widget} data-grid={layoutItem}>
+          <div key={widget}>
             <WidgetContainer infoContent={WidgetInfo} title={WidgetTitle}>
               {WidgetComponent}
             </WidgetContainer>

@@ -1,6 +1,6 @@
 import { ChartData, ChartOptions } from 'chart.js';
 
-export const defaultGridSize = { w: 6, h: 2 };
+export const defaultGridSize = { w: 6, h: 2, minW: 4, minH: 2 };
 
 export function useFrequencyStdDevChart(labels: string[], deviations: number[], gridH?: number) {
   const data: ChartData<'bar'> = {

@@ -28,7 +28,7 @@ ChartJS.register(
   Title
 );
 
-export const defaultGridSize = { w: 6, h: 2 };
+export const defaultGridSize = { w: 6, h: 2, minW: 4, minH: 2 };
 
 export function useIndexOfCoincidenceChart(results, view, baseline) {
   const data = useMemo(() => {
