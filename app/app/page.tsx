@@ -8,7 +8,7 @@ import { defaultGridSize as freqDefault } from '@/components/widgets/FrequencyAn
 import { defaultGridSize as asciiDefault } from '@/components/widgets/AsciiDistributionWidget/useAsciiDistributionChart';
 import { defaultGridSize as ksDefault } from '@/components/widgets/KolmogrovSmirnovWidget/useKolmogorovSmirnov';
 import { defaultGridSize as chiSquaredDefault } from '@/components/widgets/ChiSquaredWidget/useChiSquaredChart';
-import { BASE_OPTIONS, BaseType } from '@/types/bases';
+import { BASE_OPTIONS } from '@/types/bases';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
