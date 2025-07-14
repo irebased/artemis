@@ -18,15 +18,15 @@ module.exports = {
   ],
   collectCoverageFrom: [
     'app/tools/**/*.{ts,tsx}',
-    'app/utils/**/*.{ts,tsx}',
-    'app/types/**/*.{ts,tsx}',
-    '!app/**/*.d.ts',
-    '!app/**/*.test.{ts,tsx}',
-    '!app/**/*.spec.{ts,tsx}',
-    '!app/**/*.jsx',
-    '!app/**/*.tsx',
-    '!app/src-tauri/**',
-    '!app/node_modules/**'
+    'utils/**/*.{ts,tsx}',
+    'types/**/*.{ts,tsx}',
+    '!**/*.d.ts',
+    '!**/*.test.{ts,tsx}',
+    '!**/*.spec.{ts,tsx}',
+    '!**/*.jsx',
+    '!**/*.tsx',
+    '!src-tauri/**',
+    '!node_modules/**'
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
@@ -40,6 +40,8 @@ module.exports = {
   },
   testMatch: [
     '<rootDir>/app/**/__tests__/**/*.{ts,tsx}',
-    '<rootDir>/app/**/*.{test,spec}.{ts,tsx}'
+    '<rootDir>/app/**/*.{test,spec}.{ts,tsx}',
+    '<rootDir>/utils/**/*.{test,spec}.{ts,tsx}',
+    '<rootDir>/types/**/*.{test,spec}.{ts,tsx}'
   ]
 };
