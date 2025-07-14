@@ -20,6 +20,7 @@ module.exports = {
     'app/tools/**/*.{ts,tsx}',
     'utils/**/*.{ts,tsx}',
     'types/**/*.{ts,tsx}',
+    'components/**/*.{ts,tsx}',
     '!**/*.d.ts',
     '!**/*.test.{ts,tsx}',
     '!**/*.spec.{ts,tsx}',
@@ -42,6 +43,7 @@ module.exports = {
     '<rootDir>/app/**/__tests__/**/*.{ts,tsx}',
     '<rootDir>/app/**/*.{test,spec}.{ts,tsx}',
     '<rootDir>/utils/**/*.{test,spec}.{ts,tsx}',
-    '<rootDir>/types/**/*.{test,spec}.{ts,tsx}'
+    '<rootDir>/types/**/*.{test,spec}.{ts,tsx}',
+    '<rootDir>/components/**/*.{test,spec}.{ts,tsx}'
   ]
 };

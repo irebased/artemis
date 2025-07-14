@@ -27,6 +27,7 @@ import {
 import { parseAllUrlParameters } from '@/utils/urlParsing/urlParameterParser';
 import { synchronizeDashboardState, synchronizeLayoutChanges } from '@/utils/urlSync/urlStateSynchronizer';
 import { initializeLayouts } from '@/utils/layout/layoutManager';
+import { processWidgetSettings, getDefaultWidgetSettings } from '@/utils/settings/widgetSettingsProcessor';
 
 export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets) {
   const [inputs, setInputs] = useState<Ciphertext[]>([{
@@ -113,23 +114,26 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       if (params.layoutLocked !== undefined) {
         setLayoutLocked(params.layoutLocked);
       }
-      if (params.frequencyAnalysisSettings) {
-        setFrequencyAnalysisSettings(params.frequencyAnalysisSettings);
+      // Process widget settings using the registry-based processor
+      const widgetSettings = processWidgetSettings(params);
+
+      if (widgetSettings['frequency-analysis']) {
+        setFrequencyAnalysisSettings(widgetSettings['frequency-analysis']);
       }
-      if (params.shannonEntropySettings) {
-        setShannonEntropySettings(params.shannonEntropySettings);
+      if (widgetSettings['shannon-entropy']) {
+        setShannonEntropySettings(widgetSettings['shannon-entropy']);
       }
-      if (params.asciiDistributionSettings) {
-        setAsciiDistributionSettings(params.asciiDistributionSettings);
+      if (widgetSettings['ascii-distribution']) {
+        setAsciiDistributionSettings(widgetSettings['ascii-distribution']);
       }
-      if (params.indexOfCoincidenceSettings) {
-        setIndexOfCoincidenceSettings(params.indexOfCoincidenceSettings);
+      if (widgetSettings['index-of-coincidence']) {
+        setIndexOfCoincidenceSettings(widgetSettings['index-of-coincidence']);
       }
-      if (params.kolmogorovSmirnovSettings) {
-        setKolmogorovSmirnovSettings(params.kolmogorovSmirnovSettings);
+      if (widgetSettings['kolmogorov-smirnov']) {
+        setKolmogorovSmirnovSettings(widgetSettings['kolmogorov-smirnov']);
       }
-      if (params.chiSquaredSettings) {
-        setChiSquaredSettings(params.chiSquaredSettings);
+      if (widgetSettings['chi-squared']) {
+        setChiSquaredSettings(widgetSettings['chi-squared']);
       }
 
       setLoading(false);
