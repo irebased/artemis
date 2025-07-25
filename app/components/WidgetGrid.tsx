@@ -17,6 +17,14 @@ import { defaultGridSize as icDefault } from '@/components/widgets/IndexOfCoinci
 import { defaultGridSize as entropyDefault } from '@/components/widgets/ShannonEntropyWidget/useShannonEntropyChart';
 import { defaultGridSize as ksDefault } from '@/components/widgets/KolmogrovSmirnovWidget/useKolmogorovSmirnov';
 import { defaultGridSize as chiSquaredDefault } from '@/components/widgets/ChiSquaredWidget/useChiSquaredChart';
+import {
+  FrequencyAnalysisSettings,
+  AsciiDistributionSettings,
+  IndexOfCoincidenceSettings,
+  ShannonEntropySettings,
+  ChiSquaredSettings,
+  KolmogorovSmirnovSettings,
+} from '@/types/widgets/widgetSettingsTypes';
 
 const WIDGET_DEFAULTS = {
   frequency: freqDefault,
@@ -43,20 +51,20 @@ interface WidgetGridProps {
   entropyWindow: number;
   setEntropyWindow: (n: number) => void;
   layoutLocked: boolean;
-  frequencyAnalysisSettings: { ngramSize: number; ngramMode: 'sliding' | 'block' };
-  setFrequencyAnalysisSettings: (settings: { ngramSize: number; ngramMode: 'sliding' | 'block' }) => void;
-  shannonEntropySettings: { mode: 'raw' | 'sliding'; windowSize: 16 | 32 | 64 | 128 | 256 };
-  setShannonEntropySettings: (settings: { mode: 'raw' | 'sliding'; windowSize: 16 | 32 | 64 | 128 | 256 }) => void;
+  frequencyAnalysisSettings: FrequencyAnalysisSettings;
+  setFrequencyAnalysisSettings: (settings: FrequencyAnalysisSettings) => void;
+  shannonEntropySettings: ShannonEntropySettings;
+  setShannonEntropySettings: (settings: ShannonEntropySettings) => void;
   anyModalOpen: boolean;
   setAnyModalOpen: (open: boolean) => void;
-  asciiDistributionSettings: { range: 'extended' | 'ascii' | 'input' };
-  setAsciiDistributionSettings: (settings: { range: 'extended' | 'ascii' | 'input' }) => void;
-  indexOfCoincidenceSettings: { mode: 'summary' | 'period' };
-  setIndexOfCoincidenceSettings: (settings: { mode: 'summary' | 'period' }) => void;
-  kolmogorovSmirnovSettings: { ngramSize: number; ngramMode: 'sliding' | 'block' };
-  setKolmogorovSmirnovSettings: (settings: { ngramSize: number; ngramMode: 'sliding' | 'block' }) => void;
-  chiSquaredSettings: { selectedTextIndex: number; baseDataIndex: number | 'sample' };
-  setChiSquaredSettings: (settings: { selectedTextIndex: number; baseDataIndex: number | 'sample' }) => void;
+  asciiDistributionSettings: AsciiDistributionSettings;
+  setAsciiDistributionSettings: (settings: AsciiDistributionSettings) => void;
+  indexOfCoincidenceSettings: IndexOfCoincidenceSettings;
+  setIndexOfCoincidenceSettings: (settings: IndexOfCoincidenceSettings) => void;
+  kolmogorovSmirnovSettings: KolmogorovSmirnovSettings;
+  setKolmogorovSmirnovSettings: (settings: KolmogorovSmirnovSettings) => void;
+  chiSquaredSettings: ChiSquaredSettings;
+  setChiSquaredSettings: (settings: ChiSquaredSettings) => void;
 }
 
 export default function WidgetGrid({

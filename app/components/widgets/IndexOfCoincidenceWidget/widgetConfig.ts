@@ -6,6 +6,7 @@ export const indexOfCoincidenceWidgetConfig: WidgetConfig = {
   name: 'Index of Coincidence',
   description: 'Calculate the index of coincidence for text analysis',
   settingsKey: 'indexOfCoincidenceSettings',
+  settingsType: 'IndexOfCoincidenceSettings',
   defaultSettings: {
     mode: 'summary',
     ngramSize: 2,

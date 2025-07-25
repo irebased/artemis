@@ -7,6 +7,7 @@ const asciiDistributionConfig: WidgetConfig = {
   name: 'ASCII Distribution',
   description: 'Analyze ASCII character distribution',
   settingsKey: 'asciiDistributionSettings',
+  settingsType: 'AsciiDistributionSettings',
   defaultSettings: DEFAULT_ASCII_DISTRIBUTION_SETTINGS,
   parser: (value: any): AsciiDistributionSettings => ({
     range: value.range ?? 'extended',

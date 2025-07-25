@@ -7,6 +7,7 @@ const shannonEntropyConfig: WidgetConfig = {
   name: 'Shannon Entropy',
   description: 'Calculate information entropy',
   settingsKey: 'shannonEntropySettings',
+  settingsType: 'ShannonEntropySettings',
   defaultSettings: DEFAULT_SHANNON_ENTROPY_SETTINGS,
   parser: (value: any): ShannonEntropySettings => ({
     mode: value.mode ?? 'raw',

@@ -7,6 +7,7 @@ const frequencyAnalysisConfig: WidgetConfig = {
   name: 'Frequency Analysis',
   description: 'Analyze character frequency in text',
   settingsKey: 'frequencyAnalysisSettings',
+  settingsType: 'FrequencyAnalysisSettings',
   defaultSettings: DEFAULT_FREQUENCY_ANALYSIS_SETTINGS,
   parser: (value: any): FrequencyAnalysisSettings => ({
     ngramSize: value.ngramSize ?? 2,

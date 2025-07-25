@@ -6,6 +6,7 @@ export const chiSquaredWidgetConfig: WidgetConfig = {
   name: 'Chi-Squared Test',
   description: 'Perform Chi-squared statistical test',
   settingsKey: 'chiSquaredSettings',
+  settingsType: 'ChiSquaredSettings',
   defaultSettings: {
     selectedTextIndex: 0,
     baseDataIndex: 'sample',
