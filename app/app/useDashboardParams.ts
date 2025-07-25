@@ -35,7 +35,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     text: '',
     encoding: 'ascii',
     ignorePunctuation: false,
-    ignoreWhitespace: false,
+    ignoreWhitespace: true,
     ignoreCasing: false,
     color: INPUT_COLORS[0],
   }]);
@@ -102,9 +102,8 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       if (params.ignorePunctuation !== undefined) {
         setInputs(prev => prev.map(input => ({ ...input, ignorePunctuation: params.ignorePunctuation! })));
       }
-      if (params.ignoreWhitespace !== undefined) {
-        setInputs(prev => prev.map(input => ({ ...input, ignoreWhitespace: params.ignoreWhitespace! })));
-      }
+      // ignoreWhitespace defaults to true if not specified in URL
+      setInputs(prev => prev.map(input => ({ ...input, ignoreWhitespace: params.ignoreWhitespace ?? true })));
       if (params.ignoreCasing !== undefined) {
         setInputs(prev => prev.map(input => ({ ...input, ignoreCasing: params.ignoreCasing! })));
       }

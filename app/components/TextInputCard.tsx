@@ -56,7 +56,7 @@ export default function TextInputCard({
         text: '',
         encoding: 'ascii',
         ignorePunctuation: false,
-        ignoreWhitespace: false,
+        ignoreWhitespace: true,
         ignoreCasing: false,
         color: INPUT_COLORS[0],
       }]);
@@ -98,7 +98,7 @@ export default function TextInputCard({
         text: '',
         encoding: 'ascii',
         ignorePunctuation: false,
-        ignoreWhitespace: false,
+        ignoreWhitespace: true,
         ignoreCasing: false,
         color: nextColor,
       },
