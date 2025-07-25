@@ -7,6 +7,7 @@ import ShannonEntropySettingsForm from './ShannonEntropySettingsForm';
 import ShannonEntropyInformation from './ShannonEntropyInformation';
 import { useChartResize } from '@/hooks/useChartResize';
 import BarChartSkeleton from '@/components/BarChartSkeleton';
+import { getProcessedText } from '@/utils/textUtils';
 
 interface ShannonEntropyWidgetProps {
   inputs: Ciphertext[];
@@ -60,7 +61,7 @@ export default function ShannonEntropyWidget({
                 <tr key={i}>
                   <td className="p-2" style={{ color: r.color }}>
                     <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: r.color, display: 'inline-block' }} />
-                    {r.text.slice(0, 7)}{r.text.length > 7 ? '...' : ''}
+                    {getProcessedText(inputs[i]).slice(0, 7)}{getProcessedText(inputs[i]).length > 7 ? '...' : ''}
                   </td>
                   <td className="p-2 font-bold">{r.entropy.toFixed(4)}</td>
                   <td className="p-2 text-gray-400">{r.baseline.toFixed(4)}</td>

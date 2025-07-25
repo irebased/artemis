@@ -1,5 +1,6 @@
 import React from 'react';
 import { Ciphertext } from '@/types/ciphertext';
+import { getProcessedText } from '@/utils/textUtils';
 
 export type ChiSquaredSettings = {
   selectedTextIndex: number;
@@ -42,11 +43,14 @@ export default function ChiSquaredSettingsForm({
             onChange={handleSelectedTextChange}
             className="p-2 border rounded text-sm w-40"
           >
-            {inputs.map((input, index) => (
-              <option key={index} value={index}>
-                {input.text.slice(0, 20) + (input.text.length > 20 ? '...' : '')}
-              </option>
-            ))}
+            {inputs.map((input, index) => {
+              const processed = getProcessedText(input);
+              return (
+                <option key={index} value={index}>
+                  {processed.slice(0, 20) + (processed.length > 20 ? '...' : '')}
+                </option>
+              );
+            })}
           </select>
         </label>
 
@@ -58,11 +62,14 @@ export default function ChiSquaredSettingsForm({
             className="p-2 border rounded text-sm w-40"
           >
             <option value="sample">Sample text</option>
-            {inputs.map((input, index) => (
-              <option key={index} value={index}>
-                {input.text.slice(0, 20) + (input.text.length > 20 ? '...' : '')}
-              </option>
-            ))}
+            {inputs.map((input, index) => {
+              const processed = getProcessedText(input);
+              return (
+                <option key={index} value={index}>
+                  {processed.slice(0, 20) + (processed.length > 20 ? '...' : '')}
+                </option>
+              );
+            })}
           </select>
         </label>
       </div>

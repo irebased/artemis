@@ -3,6 +3,7 @@
 
 import { Ciphertext } from '@/types/ciphertext';
 import { useFrequencyStdDev, defaultGridSize } from './useFrequencyStdDev';
+import { getProcessedText } from '@/utils/textUtils';
 
 interface FrequencyStdDevWidgetProps {
   inputs: Ciphertext[];
@@ -32,7 +33,7 @@ export default function FrequencyStdDevWidget({ inputs, width, height, gridH }: 
               <tr key={i}>
                 <td className="p-2" style={{ color: r.color }}>
                   <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: r.color, display: 'inline-block' }} />
-                  {r.text.slice(0, 7)}{r.text.length > 7 ? '...' : ''}
+                  {getProcessedText(inputs[i]).slice(0, 7)}{getProcessedText(inputs[i]).length > 7 ? '...' : ''}
                 </td>
                 <td className="p-2 text-gray-400">{r.mean.toFixed(2)}</td>
                 <td className="p-2 font-bold text-gray-400">{r.stdDev.toFixed(5)}</td>

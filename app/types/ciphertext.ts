@@ -7,6 +7,7 @@ export type Ciphertext = {
   ignorePunctuation: boolean;
   ignoreWhitespace: boolean;
   ignoreCasing: boolean;
+  ignoreGenericization: boolean;
   color: string;
   hidden?: boolean;
 };

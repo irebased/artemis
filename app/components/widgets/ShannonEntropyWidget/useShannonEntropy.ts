@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
+import { getProcessedText } from '@/utils/textUtils';
 
 export const ENTROPY_BASELINES = {
   ascii: { english: 4.321011139059028, random: 5.696167170226023 },
@@ -24,7 +25,7 @@ export function useShannonEntropy(inputs: Ciphertext[], windowSize: number = 1) 
   return useMemo(() => {
     return inputs.map(input => {
       try {
-        const text = input.text;
+        const text = getProcessedText(input);
         if (!text) {
           return {
             text: input.text,

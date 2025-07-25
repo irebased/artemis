@@ -37,6 +37,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     ignorePunctuation: false,
     ignoreWhitespace: true,
     ignoreCasing: false,
+    ignoreGenericization: false,
     color: INPUT_COLORS[0],
   }]);
   const [dashboardName, setDashboardName] = useState<string>('Artemis Dashboard');

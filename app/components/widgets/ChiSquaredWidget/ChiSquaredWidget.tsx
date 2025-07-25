@@ -6,6 +6,7 @@ import { useChiSquared } from './useChiSquared';
 import WidgetWithSettings from '../WidgetWithSettings';
 import ChiSquaredSettingsForm, { ChiSquaredSettings } from './ChiSquaredSettingsForm';
 import ChiSquaredInformation from './ChiSquaredInformation';
+import { getProcessedText } from '@/utils/textUtils';
 
 interface ChiSquaredWidgetProps {
   inputs: Ciphertext[];
@@ -101,7 +102,7 @@ export default function ChiSquaredWidget({
                 <div className="flex items-center">
                   <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: inputs[selectedTextIndex]?.color || '#666', display: 'inline-block' }} />
                   <span style={{ color: inputs[selectedTextIndex]?.color || '#666' }}>
-                    {inputs[selectedTextIndex]?.text.slice(0, 7)}{inputs[selectedTextIndex]?.text.length > 7 ? '...' : ''}
+                    {getProcessedText(inputs[selectedTextIndex])?.slice(0, 7)}{getProcessedText(inputs[selectedTextIndex])?.length > 7 ? '...' : ''}
                   </span>
                 </div>
                 <div className="text-xs text-gray-500 mt-1">{result.selectedTextLength} characters</div>
@@ -115,7 +116,7 @@ export default function ChiSquaredWidget({
                   <div className="flex items-center">
                     <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: inputs[baseDataIndex]?.color || '#666', display: 'inline-block' }} />
                     <span style={{ color: inputs[baseDataIndex]?.color || '#666' }}>
-                      {inputs[baseDataIndex]?.text.slice(0, 7)}{inputs[baseDataIndex]?.text.length > 7 ? '...' : ''}
+                      {getProcessedText(inputs[baseDataIndex])?.slice(0, 7)}{getProcessedText(inputs[baseDataIndex])?.length > 7 ? '...' : ''}
                     </span>
                   </div>
                 )}

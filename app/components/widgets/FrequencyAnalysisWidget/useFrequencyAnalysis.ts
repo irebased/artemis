@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
+import { getProcessedText } from '@/utils/textUtils';
 
 export function useFrequencyAnalysis(inputs: Ciphertext[], ngramSize: number = 1, ngramMode: 'sliding' | 'block' = 'sliding') {
   return useMemo(() => {
     const frequencies = inputs.map(input => {
-      const text = input.text;
+      const text = getProcessedText(input);
       const freq: Record<string, number> = {};
       const n = Math.max(1, ngramSize);
       let total = 0;

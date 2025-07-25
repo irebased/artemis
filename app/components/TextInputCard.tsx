@@ -4,6 +4,7 @@ import { BaseType } from '@/types/bases';
 import { Ciphertext } from '@/types/ciphertext';
 import { useTheme } from 'next-themes';
 import useDebounce from '@/hooks/useDebounce';
+import { genericizeText } from '@/utils/textUtils';
 
 interface TextInputCardProps {
   inputs: Ciphertext[];
@@ -41,13 +42,29 @@ export default function TextInputCard({
 
   useEffect(() => {
     if (debouncedText !== inputs[activeTab]?.text) {
+      // Apply other filters to get preprocessed text for genericization
+      let preprocessedText = debouncedText;
+      const currentInput = inputs[activeTab];
+
+      if (currentInput?.ignoreWhitespace) {
+        preprocessedText = preprocessedText.replace(/\s/g, '');
+      }
+
+      if (currentInput?.ignorePunctuation) {
+        preprocessedText = preprocessedText.replace(/[!"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~]/g, '');
+      }
+
+      if (currentInput?.ignoreCasing) {
+        preprocessedText = preprocessedText.toLowerCase();
+      }
+
+      const genericized = preprocessedText ? genericizeText(preprocessedText) : undefined;
       const updatedInputs = inputs.map((input, idx) =>
-        idx === activeTab ? { ...input, text: debouncedText } : input
+        idx === activeTab ? { ...input, text: debouncedText, genericizedText: genericized } : input
       );
       setInputs(updatedInputs);
     }
   }, [debouncedText]);
-
 
   useEffect(() => {
     if (inputs.length === 0) {
@@ -58,6 +75,7 @@ export default function TextInputCard({
         ignorePunctuation: false,
         ignoreWhitespace: true,
         ignoreCasing: false,
+        ignoreGenericization: false,
         color: INPUT_COLORS[0],
       }]);
     }
@@ -80,12 +98,11 @@ export default function TextInputCard({
       const newLocalTexts = new Map(localTexts);
       newLocalTexts.set(activeTab, value);
       setLocalTexts(newLocalTexts);
-    } else {
-      const updatedInputs = inputs.map((input, idx) =>
-        idx === activeTab ? { ...input, [field]: value } : input
-      );
-      setInputs(updatedInputs);
     }
+    const updatedInputs = inputs.map((input, idx) =>
+      idx === activeTab ? { ...input, [field]: value } : input
+    );
+    setInputs(updatedInputs);
   }, [activeTab, inputs, localTexts, setInputs]);
 
   const handleAddInput = useCallback(() => {
@@ -100,6 +117,7 @@ export default function TextInputCard({
         ignorePunctuation: false,
         ignoreWhitespace: true,
         ignoreCasing: false,
+        ignoreGenericization: false,
         color: nextColor,
       },
     ]);
@@ -223,6 +241,10 @@ export default function TextInputCard({
             <label className="flex items-center gap-1">
               <input type="checkbox" checked={activeInput.ignoreCasing} onChange={e => handleInputChange('ignoreCasing', e.target.checked)} />
               <span>Ignore casing</span>
+            </label>
+            <label className="flex items-center gap-1">
+              <input type="checkbox" checked={activeInput.ignoreGenericization} onChange={e => handleInputChange('ignoreGenericization', e.target.checked)} />
+              <span>Genericize text</span>
             </label>
           </div>
         </CardBody>

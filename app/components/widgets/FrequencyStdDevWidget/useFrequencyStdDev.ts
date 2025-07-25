@@ -1,14 +1,16 @@
 import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
+import { getProcessedText } from '@/utils/textUtils';
 
 export function useFrequencyStdDev(inputs: Ciphertext[]) {
   return useMemo(() => {
     if (!inputs) return [];
     return inputs.map(input => {
       try {
+        const processedText = getProcessedText(input);
         const freq: Record<string, number> = {};
-        const total = input.text.length;
-        for (const char of input.text) {
+        const total = processedText.length;
+        for (const char of processedText) {
           freq[char] = (freq[char] || 0) + 1;
         }
         const percentages: Record<string, number> = {};

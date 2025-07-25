@@ -1,9 +1,7 @@
 import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
-import { decodeText } from '@/utils/decoderUtils';
+import { getProcessedText } from '@/utils/textUtils';
 import { sampleTexts } from '@/data/samples';
-
-
 
 export function useChiSquared(
   inputs: Ciphertext[],
@@ -16,17 +14,17 @@ export function useChiSquared(
     }
 
     const selectedInput = inputs[selectedTextIndex];
-    const selectedText = decodeText(selectedInput.text, selectedInput.encoding);
+    const selectedText = getProcessedText(selectedInput);
 
     let baseText: string;
     if (baseDataIndex === 'sample') {
-      baseText = decodeText(sampleTexts[selectedInput.encoding] || sampleTexts.ascii, selectedInput.encoding);
+      baseText = sampleTexts[selectedInput.encoding] || sampleTexts.ascii;
     } else {
       if (baseDataIndex < 0 || baseDataIndex >= inputs.length) {
         return { chiSquared: null, pValue: null, degreesOfFreedom: null };
       }
       const baseInput = inputs[baseDataIndex];
-      baseText = decodeText(baseInput.text, baseInput.encoding);
+      baseText = getProcessedText(baseInput);
     }
 
     // Calculate character frequencies for both texts
@@ -68,7 +66,7 @@ export function useChiSquared(
     // Subtract 1 for the constraint that frequencies sum to the same total
     degreesOfFreedom = Math.max(0, degreesOfFreedom - 1);
 
-            // Calculate p-value using chi-squared distribution
+    // Calculate p-value using chi-squared distribution
     let pValue = null;
     if (degreesOfFreedom > 0) {
       if (chiSquared === 0) {

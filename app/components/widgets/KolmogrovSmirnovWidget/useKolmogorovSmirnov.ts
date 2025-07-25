@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
 import { getReferenceDistribution } from './englishReferenceDistributions';
+import { getProcessedText } from '@/utils/textUtils';
 
 export const defaultGridSize = { w: 6, h: 2, minW: 4, minH: 2 }
 
@@ -39,27 +40,28 @@ function ksPValue(D: number, n: number): number {
 export function useKolmogorovSmirnov(inputs: Ciphertext[]) {
   return useMemo(() => {
     return inputs.map(input => {
-      const { encoding, text, color } = input;
+      const { encoding, color } = input;
+      const processedText = getProcessedText(input);
       // Get symbol array for this encoding
       let symbols: string[];
       if (encoding === 'ascii') {
-        symbols = text.split('');
+        symbols = processedText.split('');
       } else if (encoding === 'octal') {
-        symbols = Array.from(text).map(c => c.charCodeAt(0).toString(8).padStart(3, '0'));
+        symbols = Array.from(processedText).map(c => c.charCodeAt(0).toString(8).padStart(3, '0'));
       } else if (encoding === 'decimal') {
-        symbols = Array.from(text).map(c => c.charCodeAt(0).toString(10).padStart(3, '0'));
+        symbols = Array.from(processedText).map(c => c.charCodeAt(0).toString(10).padStart(3, '0'));
       } else if (encoding === 'hex') {
-        symbols = Array.from(text).map(c => c.charCodeAt(0).toString(16).padStart(2, '0'));
+        symbols = Array.from(processedText).map(c => c.charCodeAt(0).toString(16).padStart(2, '0'));
       } else if (encoding === 'base64') {
         if (typeof Buffer !== 'undefined') {
-          symbols = Buffer.from(text, 'utf-8').toString('base64').split('');
+          symbols = Buffer.from(processedText, 'utf-8').toString('base64').split('');
         } else if (typeof btoa !== 'undefined') {
-          symbols = btoa(unescape(encodeURIComponent(text))).split('');
+          symbols = btoa(unescape(encodeURIComponent(processedText))).split('');
         } else {
-          symbols = text.split('');
+          symbols = processedText.split('');
         }
       } else {
-        symbols = text.split('');
+        symbols = processedText.split('');
       }
       // Empirical distribution
       const freq: Record<string, number> = {};
@@ -71,7 +73,7 @@ export function useKolmogorovSmirnov(inputs: Ciphertext[]) {
       // p-value (approximate, using input length)
       const p = ksPValue(D, symbols.length);
       return {
-        text,
+        text: processedText,
         color,
         encoding,
         ksStatistic: D,

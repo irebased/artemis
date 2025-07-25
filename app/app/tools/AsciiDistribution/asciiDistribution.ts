@@ -1,5 +1,5 @@
 import { Ciphertext } from "@/types/ciphertext";
-import { decodeText } from "@/utils/decoderUtils";
+import { getProcessedText } from "@/utils/textUtils";
 
 /**
  * Count the frequency of each ASCII character in the given text
@@ -23,10 +23,11 @@ function countAsciiCharacters(text: string): number[] {
  * @returns Object containing the input data and character counts
  */
 function processCiphertextInput(input: Ciphertext) {
-    const decodedText = decodeText(input.text, input.encoding);
-    const counts = countAsciiCharacters(decodedText);
+    const processedText = getProcessedText(input);
+    const counts = countAsciiCharacters(processedText);
     return {
         text: input.text,
+        processedText,
         color: input.color,
         encoding: input.encoding,
         counts

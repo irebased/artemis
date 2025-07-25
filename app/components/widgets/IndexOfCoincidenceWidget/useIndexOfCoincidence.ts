@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
 import { getNgrams } from './ngramUtils';
+import { getProcessedText } from '@/utils/textUtils';
 
 export const IC_BASELINES = {
   ascii: { english: 0.0616, random: 0.01805 },
@@ -18,7 +19,7 @@ export function useIndexOfCoincidence(
   return useMemo(() => {
     return inputs.map(input => {
       try {
-        const text = input.text;
+        const text = getProcessedText(input);
         const n = Math.max(0, Math.floor(ngramSize || 1)); // Ensure non-negative integer
         const mode = ngramMode || 'sliding';
         const ngrams = getNgrams(text, n, mode);
