@@ -12,11 +12,17 @@ const frequencyAnalysisConfig: WidgetConfig = {
   parser: (value: any): FrequencyAnalysisSettings => ({
     ngramSize: value.ngramSize ?? 2,
     ngramMode: value.ngramMode ?? 'sliding',
+    showTableView: value.showTableView ?? false,
+    sortByInput: value.sortByInput,
+    sortDirection: value.sortDirection,
   }),
   validator: (settings: any): boolean => {
     return (
       typeof settings.ngramSize === 'number' &&
-      ['sliding', 'block'].includes(settings.ngramMode)
+      ['sliding', 'block'].includes(settings.ngramMode) &&
+      (settings.showTableView === undefined || typeof settings.showTableView === 'boolean') &&
+      (settings.sortByInput === undefined || (typeof settings.sortByInput === 'number' && settings.sortByInput >= 0)) &&
+      (settings.sortDirection === undefined || ['asc', 'desc'].includes(settings.sortDirection))
     );
   },
 };

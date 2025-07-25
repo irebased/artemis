@@ -13,12 +13,29 @@ ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, Title)
 
 export const defaultGridSize = { w: 4, h: 4, minW: 3, minH: 3 };
 
-export function useFrequencyAnalysisChart({ frequencies, sortedChars }) {
+export function useFrequencyAnalysisChart({ frequencies, sortedChars }, sortByInput?: number, sortDirection?: 'asc' | 'desc') {
   const data = useMemo(() => {
-    const visibleLabels = sortedChars.map(label => label.replace(/ /g, '\u2027'));
+    // Apply sorting if specified
+    let sortedLabels = [...sortedChars];
+    if (sortByInput !== undefined && sortDirection !== undefined) {
+      const inputFrequencies = frequencies[sortByInput]?.frequencies || {};
+
+      sortedLabels.sort((a, b) => {
+        const aFreq = inputFrequencies[a] || 0;
+        const bFreq = inputFrequencies[b] || 0;
+
+        if (sortDirection === 'asc') {
+          return aFreq - bFreq;
+        } else {
+          return bFreq - aFreq;
+        }
+      });
+    }
+
+    const visibleLabels = sortedLabels.map(label => label.replace(/ /g, '\u2027'));
     const datasets = frequencies.map(freq => ({
       label: `${freq.text.slice(0, 7)}${freq.text.length > 7 ? '...' : ''}`,
-      data: sortedChars.map(char => freq.frequencies[char] || 0),
+      data: sortedLabels.map(char => freq.frequencies[char] || 0),
       backgroundColor: freq.color,
       borderColor: freq.color,
       borderWidth: 1,
@@ -27,7 +44,7 @@ export function useFrequencyAnalysisChart({ frequencies, sortedChars }) {
       labels: visibleLabels,
       datasets,
     };
-  }, [frequencies, sortedChars]);
+  }, [frequencies, sortedChars, sortByInput, sortDirection]);
 
   const options = useMemo(() => ({
     responsive: true,

@@ -21,6 +21,9 @@ describe('dashboardSettingsManager', () => {
       expect(DEFAULT_FREQUENCY_ANALYSIS_SETTINGS).toEqual({
         ngramSize: 1,
         ngramMode: 'sliding',
+        showTableView: false,
+        sortByInput: undefined,
+        sortDirection: undefined,
       });
     });
 
@@ -65,6 +68,9 @@ describe('dashboardSettingsManager', () => {
       const validSettings = {
         ngramSize: 2,
         ngramMode: 'block' as const,
+        showTableView: true,
+        sortByInput: 1,
+        sortDirection: 'desc' as const,
       };
 
       const result = validateFrequencyAnalysisSettings(validSettings);
@@ -111,6 +117,48 @@ describe('dashboardSettingsManager', () => {
       const result = validateFrequencyAnalysisSettings({});
 
       expect(result).toEqual(DEFAULT_FREQUENCY_ANALYSIS_SETTINGS);
+    });
+
+    it('should use defaults for invalid showTableView', () => {
+      const invalidSettings = {
+        ngramSize: 1,
+        ngramMode: 'sliding' as const,
+        showTableView: 'invalid' as any,
+      };
+
+      const result = validateFrequencyAnalysisSettings(invalidSettings);
+
+      expect(result.ngramSize).toBe(1);
+      expect(result.ngramMode).toBe('sliding');
+      expect(result.showTableView).toBe(DEFAULT_FREQUENCY_ANALYSIS_SETTINGS.showTableView);
+    });
+
+    it('should use defaults for invalid sortByInput', () => {
+      const invalidSettings = {
+        ngramSize: 1,
+        ngramMode: 'sliding' as const,
+        sortByInput: 'invalid' as any,
+      };
+
+      const result = validateFrequencyAnalysisSettings(invalidSettings);
+
+      expect(result.ngramSize).toBe(1);
+      expect(result.ngramMode).toBe('sliding');
+      expect(result.sortByInput).toBe(DEFAULT_FREQUENCY_ANALYSIS_SETTINGS.sortByInput);
+    });
+
+    it('should use defaults for invalid sortDirection', () => {
+      const invalidSettings = {
+        ngramSize: 1,
+        ngramMode: 'sliding' as const,
+        sortDirection: 'invalid' as any,
+      };
+
+      const result = validateFrequencyAnalysisSettings(invalidSettings);
+
+      expect(result.ngramSize).toBe(1);
+      expect(result.ngramMode).toBe('sliding');
+      expect(result.sortDirection).toBe(DEFAULT_FREQUENCY_ANALYSIS_SETTINGS.sortDirection);
     });
   });
 

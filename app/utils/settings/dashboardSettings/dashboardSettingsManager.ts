@@ -13,6 +13,9 @@ import {
 export const DEFAULT_FREQUENCY_ANALYSIS_SETTINGS: FrequencyAnalysisSettings = {
   ngramSize: 1,
   ngramMode: 'sliding',
+  showTableView: false,
+  sortByInput: undefined,
+  sortDirection: undefined,
 };
 
 /**
@@ -70,6 +73,15 @@ export function validateFrequencyAnalysisSettings(
     ngramMode: settings.ngramMode === 'sliding' || settings.ngramMode === 'block'
       ? settings.ngramMode
       : DEFAULT_FREQUENCY_ANALYSIS_SETTINGS.ngramMode,
+    showTableView: typeof settings.showTableView === 'boolean'
+      ? settings.showTableView
+      : DEFAULT_FREQUENCY_ANALYSIS_SETTINGS.showTableView,
+    sortByInput: typeof settings.sortByInput === 'number' && settings.sortByInput >= 0
+      ? settings.sortByInput
+      : DEFAULT_FREQUENCY_ANALYSIS_SETTINGS.sortByInput,
+    sortDirection: settings.sortDirection === 'asc' || settings.sortDirection === 'desc'
+      ? settings.sortDirection
+      : DEFAULT_FREQUENCY_ANALYSIS_SETTINGS.sortDirection,
   };
 }
 

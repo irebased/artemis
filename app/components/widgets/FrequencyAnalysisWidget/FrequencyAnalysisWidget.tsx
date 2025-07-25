@@ -16,14 +16,15 @@ import { useFrequencyAnalysisChart } from './useFrequencyAnalysisChart';
 import WidgetWithSettings from '../WidgetWithSettings';
 import FrequencyAnalysisSettingsForm from './FrequencyAnalysisSettingsForm';
 import FrequencyAnalysisInformation from './FrequencyAnalysisInformation';
+import FrequencyAnalysisTable from './FrequencyAnalysisTable';
 import { useChartResize } from '@/hooks/useChartResize';
 import BarChartSkeleton from '@/components/BarChartSkeleton';
 
 interface FrequencyAnalysisWidgetProps {
   inputs: Ciphertext[];
   gridH?: number;
-  frequencyAnalysisSettings: { ngramSize: number; ngramMode: 'sliding' | 'block' };
-  setFrequencyAnalysisSettings: (settings: { ngramSize: number; ngramMode: 'sliding' | 'block' }) => void;
+  frequencyAnalysisSettings: { ngramSize: number; ngramMode: 'sliding' | 'block'; showTableView?: boolean; sortByInput?: number; sortDirection?: 'asc' | 'desc' };
+  setFrequencyAnalysisSettings: (settings: { ngramSize: number; ngramMode: 'sliding' | 'block'; showTableView?: boolean; sortByInput?: number; sortDirection?: 'asc' | 'desc' }) => void;
   setAnyModalOpen?: (open: boolean) => void;
 }
 
@@ -34,9 +35,9 @@ export default function FrequencyAnalysisWidget({
   setFrequencyAnalysisSettings,
   setAnyModalOpen,
 }: FrequencyAnalysisWidgetProps) {
-  const { ngramSize, ngramMode } = frequencyAnalysisSettings;
+  const { ngramSize, ngramMode, showTableView = false, sortByInput, sortDirection } = frequencyAnalysisSettings;
   const results = useFrequencyAnalysis(inputs, ngramSize, ngramMode);
-  const { data: barData, options: barOptions } = useFrequencyAnalysisChart(results, ngramSize);
+  const { data: barData, options: barOptions } = useFrequencyAnalysisChart(results, sortByInput, sortDirection);
   const { chartRef, containerRef, isResizing } = useChartResize();
 
   return (
@@ -49,12 +50,20 @@ export default function FrequencyAnalysisWidget({
         <FrequencyAnalysisSettingsForm
           settings={frequencyAnalysisSettings}
           setSettings={setFrequencyAnalysisSettings}
+          inputs={inputs}
         />
       }
       setAnyModalOpen={setAnyModalOpen}
     >
       <div ref={containerRef} className="flex-1 w-full h-full relative">
-        {isResizing ? (
+                {showTableView ? (
+          <FrequencyAnalysisTable
+            frequencies={results.frequencies}
+            sortedNgrams={results.sortedChars}
+            sortByInput={sortByInput}
+            sortDirection={sortDirection}
+          />
+        ) : isResizing ? (
           <BarChartSkeleton />
         ) : barData ? (
           <Bar

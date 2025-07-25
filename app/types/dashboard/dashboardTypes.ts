@@ -5,6 +5,9 @@ export const INPUT_COLORS = ['#3b82f6', '#ef4444', '#22c55e', '#eab308', '#a855f
 export type FrequencyAnalysisSettings = {
   ngramSize: number;
   ngramMode: 'sliding' | 'block';
+  showTableView?: boolean;
+  sortByInput?: number;
+  sortDirection?: 'asc' | 'desc';
 };
 
 export type ShannonEntropySettings = {
