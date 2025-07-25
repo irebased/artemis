@@ -11,17 +11,20 @@ export const indexOfCoincidenceWidgetConfig: WidgetConfig = {
     mode: 'summary',
     ngramSize: 2,
     ngramMode: 'sliding',
+    showAverageLines: true,
   },
   parser: (value: any): IndexOfCoincidenceSettings => ({
     mode: value.mode ?? 'summary',
     ngramSize: value.ngramSize ?? 2,
     ngramMode: value.ngramMode ?? 'sliding',
+    showAverageLines: value.showAverageLines ?? true,
   }),
   validator: (settings: IndexOfCoincidenceSettings): boolean => {
     return (
       ['summary', 'period'].includes(settings.mode) &&
       (!settings.ngramSize || (typeof settings.ngramSize === 'number' && settings.ngramSize >= 1)) &&
-      (!settings.ngramMode || ['sliding', 'block'].includes(settings.ngramMode))
+      (!settings.ngramMode || ['sliding', 'block'].includes(settings.ngramMode)) &&
+      (settings.showAverageLines === undefined || typeof settings.showAverageLines === 'boolean')
     );
   },
 };

@@ -64,6 +64,25 @@ jest.mock('@/components/widgets/widgetRegistry', () => ({
         return ['extended', 'ascii', 'input'].includes(settings.range);
       },
     }],
+    ['index-of-coincidence', {
+      id: 'index-of-coincidence',
+      name: 'Index of Coincidence',
+      description: 'Calculate the Index of Coincidence',
+      settingsKey: 'indexOfCoincidenceSettings',
+      defaultSettings: { mode: 'summary', ngramSize: 1, ngramMode: 'sliding', showAverageLines: true },
+      parser: (value: any) => ({
+        mode: value.mode ?? 'summary',
+        ngramSize: value.ngramSize ?? 1,
+        ngramMode: value.ngramMode ?? 'sliding',
+        showAverageLines: value.showAverageLines ?? true,
+      }),
+      validator: (settings: any) => {
+        return ['summary', 'period'].includes(settings.mode) &&
+               [1, 2, 3, 4, 5].includes(settings.ngramSize) &&
+               ['sliding', 'block'].includes(settings.ngramMode) &&
+               (settings.showAverageLines === undefined || typeof settings.showAverageLines === 'boolean');
+      },
+    }],
   ]),
 }));
 
@@ -175,6 +194,64 @@ describe('widgetSettingsProcessor', () => {
     });
   });
 
+  describe('Index of Coincidence settings', () => {
+    it('should process showAverageLines setting correctly', () => {
+      const params = {
+        indexOfCoincidenceSettings: {
+          mode: 'period',
+          ngramSize: 2,
+          ngramMode: 'sliding',
+          showAverageLines: false,
+        },
+      } as ParsedUrlParameters;
+
+      const result = processWidgetSettings(params);
+
+      expect(result['index-of-coincidence']).toEqual({
+        mode: 'period',
+        ngramSize: 2,
+        ngramMode: 'sliding',
+        showAverageLines: false,
+      });
+    });
+
+    it('should default showAverageLines to true when not provided', () => {
+      const params = {
+        indexOfCoincidenceSettings: {
+          mode: 'summary',
+          ngramSize: 1,
+          ngramMode: 'sliding',
+          // showAverageLines is not provided
+        },
+      } as ParsedUrlParameters;
+
+      const result = processWidgetSettings(params);
+
+      expect(result['index-of-coincidence']).toEqual({
+        mode: 'summary',
+        ngramSize: 1,
+        ngramMode: 'sliding',
+        showAverageLines: true, // Should default to true
+      });
+    });
+
+    it('should validate showAverageLines as boolean', () => {
+      const params = {
+        indexOfCoincidenceSettings: {
+          mode: 'period',
+          ngramSize: 2,
+          ngramMode: 'sliding',
+          showAverageLines: 'invalid', // Invalid type
+        },
+      } as ParsedUrlParameters;
+
+      const result = processWidgetSettings(params);
+
+      // Should skip invalid settings and not include them
+      expect(result['index-of-coincidence']).toBeUndefined();
+    });
+  });
+
   describe('validateWidgetSettings', () => {
     it('should return true for valid settings', () => {
       const settings: WidgetSettings = {
@@ -226,6 +303,7 @@ describe('widgetSettingsProcessor', () => {
         'frequency-analysis': { ngramSize: 2, ngramMode: 'sliding' },
         'shannon-entropy': { mode: 'raw', windowSize: 64 },
         'ascii-distribution': { range: 'extended' },
+        'index-of-coincidence': { mode: 'summary', ngramSize: 1, ngramMode: 'sliding', showAverageLines: true },
       });
     });
   });

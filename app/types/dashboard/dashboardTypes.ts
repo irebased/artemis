@@ -20,6 +20,7 @@ export type IndexOfCoincidenceSettings = {
   mode: 'summary' | 'period';
   ngramSize?: number;
   ngramMode?: 'sliding' | 'block';
+  showAverageLines?: boolean;
 };
 
 export type KolmogorovSmirnovSettings = {

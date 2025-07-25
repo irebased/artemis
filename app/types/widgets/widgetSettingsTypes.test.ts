@@ -26,6 +26,7 @@ describe('WidgetSettingsTypes', () => {
         mode: 'summary',
         ngramSize: 2,
         ngramMode: 'sliding',
+        showAverageLines: true,
       };
 
       const entropySettings: ShannonEntropySettings = {
@@ -67,6 +68,7 @@ describe('WidgetSettingsTypes', () => {
           mode: 'summary',
           ngramSize: 2,
           ngramMode: 'sliding',
+          showAverageLines: true,
         },
         shannonEntropySettings: {
           mode: 'raw',
@@ -115,6 +117,7 @@ describe('WidgetSettingsTypes', () => {
         mode: 'summary',
         ngramSize: 2,
         ngramMode: 'sliding',
+        showAverageLines: true,
       };
 
       const entropySettings: EntropyType = {

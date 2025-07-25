@@ -1,10 +1,5 @@
 import React from 'react';
-
-export type IndexOfCoincidenceSettings = {
-  mode: 'summary' | 'period';
-  ngramSize?: number;
-  ngramMode?: 'sliding' | 'block';
-};
+import { IndexOfCoincidenceSettings } from '@/types/dashboard/dashboardTypes';
 
 interface IndexOfCoincidenceSettingsFormProps {
   settings: IndexOfCoincidenceSettings;
@@ -12,7 +7,7 @@ interface IndexOfCoincidenceSettingsFormProps {
 }
 
 export default function IndexOfCoincidenceSettingsForm({ settings, setSettings }: IndexOfCoincidenceSettingsFormProps) {
-  const { mode, ngramSize = 1, ngramMode = 'sliding' } = settings;
+  const { mode, ngramSize = 1, ngramMode = 'sliding', showAverageLines = true } = settings;
 
   const handleModeChange = (mode: 'summary' | 'period') => {
     setSettings({ ...settings, mode });
@@ -22,6 +17,9 @@ export default function IndexOfCoincidenceSettingsForm({ settings, setSettings }
   };
   const handleNgramModeChange = (ngramMode: 'sliding' | 'block') => {
     setSettings({ ...settings, ngramMode });
+  };
+  const handleShowAverageLinesChange = (show: boolean) => {
+    setSettings({ ...settings, showAverageLines: show });
   };
 
   return (
@@ -93,6 +91,22 @@ export default function IndexOfCoincidenceSettingsForm({ settings, setSettings }
           </div>
         </div>
       </div>
+      {mode === 'period' && (
+        <div>
+          <div className="font-semibold text-lg mb-3">Chart options</div>
+          <div className="space-y-2">
+            <label className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={showAverageLines}
+                onChange={(e) => handleShowAverageLinesChange(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <span>Show average lines</span>
+            </label>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

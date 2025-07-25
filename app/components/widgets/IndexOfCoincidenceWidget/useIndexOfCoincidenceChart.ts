@@ -30,7 +30,7 @@ ChartJS.register(
 
 export const defaultGridSize = { w: 6, h: 2, minW: 4, minH: 2 };
 
-export function useIndexOfCoincidenceChart(results, view, baseline) {
+export function useIndexOfCoincidenceChart(results, view, baseline, showAverageLines = true) {
   const data = useMemo(() => {
     if (!results.length) return null;
 
@@ -82,7 +82,7 @@ export function useIndexOfCoincidenceChart(results, view, baseline) {
       datalabels: {
         display: false,
       },
-      annotation: view === 'period' ? {
+      annotation: view === 'period' && showAverageLines ? {
         annotations: {
           englishLine: {
             type: 'line' as const,
@@ -128,7 +128,7 @@ export function useIndexOfCoincidenceChart(results, view, baseline) {
         }
       }
     }
-  }), [results, view, baseline]);
+  }), [results, view, baseline, showAverageLines]);
 
   return { data, options };
 }

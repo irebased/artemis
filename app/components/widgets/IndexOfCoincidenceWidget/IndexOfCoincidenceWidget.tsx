@@ -3,7 +3,8 @@ import { Ciphertext } from '@/types/ciphertext';
 import { useIndexOfCoincidence, IC_BASELINES } from './useIndexOfCoincidence';
 import { useIndexOfCoincidenceChart } from './useIndexOfCoincidenceChart';
 import WidgetWithSettings from '../WidgetWithSettings';
-import IndexOfCoincidenceSettingsForm, { IndexOfCoincidenceSettings } from './IndexOfCoincidenceSettingsForm';
+import IndexOfCoincidenceSettingsForm from './IndexOfCoincidenceSettingsForm';
+import { IndexOfCoincidenceSettings } from '@/types/dashboard/dashboardTypes';
 import { BaseType } from '@/types/bases';
 import IndexOfCoincidenceInformation from './IndexOfCoincidenceInformation';
 import { useChartResize } from '@/hooks/useChartResize';
@@ -24,10 +25,10 @@ export default function IndexOfCoincidenceWidget({
   setIndexOfCoincidenceSettings,
   setAnyModalOpen,
 }: IndexOfCoincidenceWidgetProps) {
-  const { mode, ngramSize = 1, ngramMode = 'sliding' } = indexOfCoincidenceSettings;
+  const { mode, ngramSize = 1, ngramMode = 'sliding', showAverageLines = true } = indexOfCoincidenceSettings;
   const results = useIndexOfCoincidence(inputs, ngramSize, ngramMode);
   const baseline = IC_BASELINES[base];
-  const { data: periodLineData, options: lineOptions } = useIndexOfCoincidenceChart(results, mode, baseline);
+  const { data: periodLineData, options: lineOptions } = useIndexOfCoincidenceChart(results, mode, baseline, showAverageLines);
   const { chartRef, containerRef, isResizing } = useChartResize<'line'>();
 
   return (
