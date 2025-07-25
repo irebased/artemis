@@ -78,7 +78,7 @@ jest.mock('@/components/widgets/widgetRegistry', () => ({
       }),
       validator: (settings: any) => {
         return ['summary', 'period'].includes(settings.mode) &&
-               [1, 2, 3, 4, 5].includes(settings.ngramSize) &&
+               (typeof settings.ngramSize === 'number' && settings.ngramSize >= 0) &&
                ['sliding', 'block'].includes(settings.ngramMode) &&
                (settings.showAverageLines === undefined || typeof settings.showAverageLines === 'boolean');
       },
@@ -242,6 +242,62 @@ describe('widgetSettingsProcessor', () => {
           ngramSize: 2,
           ngramMode: 'sliding',
           showAverageLines: 'invalid', // Invalid type
+        },
+      } as ParsedUrlParameters;
+
+      const result = processWidgetSettings(params);
+
+      // Should skip invalid settings and not include them
+      expect(result['index-of-coincidence']).toBeUndefined();
+    });
+
+    it('should allow n-gram size of 0', () => {
+      const params = {
+        indexOfCoincidenceSettings: {
+          mode: 'summary',
+          ngramSize: 0,
+          ngramMode: 'sliding',
+          showAverageLines: true,
+        },
+      } as ParsedUrlParameters;
+
+      const result = processWidgetSettings(params);
+
+      expect(result['index-of-coincidence']).toEqual({
+        mode: 'summary',
+        ngramSize: 0,
+        ngramMode: 'sliding',
+        showAverageLines: true,
+      });
+    });
+
+    it('should allow large n-gram sizes', () => {
+      const params = {
+        indexOfCoincidenceSettings: {
+          mode: 'summary',
+          ngramSize: 100,
+          ngramMode: 'sliding',
+          showAverageLines: true,
+        },
+      } as ParsedUrlParameters;
+
+      const result = processWidgetSettings(params);
+
+      expect(result['index-of-coincidence']).toEqual({
+        mode: 'summary',
+        ngramSize: 100,
+        ngramMode: 'sliding',
+        showAverageLines: true,
+      });
+    });
+
+    it('should reject negative n-gram sizes', () => {
+      const params = {
+        indexOfCoincidenceSettings: {
+          mode: 'summary',
+          ngramSize: -1,
+          ngramMode: 'sliding',
+          showAverageLines: true,
         },
       } as ParsedUrlParameters;
 

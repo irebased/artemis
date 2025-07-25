@@ -13,7 +13,8 @@ export default function IndexOfCoincidenceSettingsForm({ settings, setSettings }
     setSettings({ ...settings, mode });
   };
   const handleNgramSizeChange = (size: number) => {
-    setSettings({ ...settings, ngramSize: size });
+    const validSize = Math.max(0, Math.floor(size));
+    setSettings({ ...settings, ngramSize: validSize });
   };
   const handleNgramModeChange = (ngramMode: 'sliding' | 'block') => {
     setSettings({ ...settings, ngramMode });
@@ -58,12 +59,14 @@ export default function IndexOfCoincidenceSettingsForm({ settings, setSettings }
             <span className="min-w-[60px]">Size:</span>
             <input
               type="number"
-              min={1}
-              max={10}
+              min={0}
               value={ngramSize}
-              onChange={e => handleNgramSizeChange(Math.max(1, Math.min(3, Number(e.target.value))))}
+              onChange={e => handleNgramSizeChange(Number(e.target.value))}
               className="p-2 border rounded text-sm w-24"
             />
+            <span className="text-sm text-gray-500">
+              {ngramSize === 0 ? '(single characters)' : ngramSize === 1 ? '(bigrams)' : `(${ngramSize}-grams)`}
+            </span>
           </label>
           <div className="space-y-2">
             <label className="flex items-center gap-3">

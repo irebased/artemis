@@ -22,7 +22,7 @@ export const indexOfCoincidenceWidgetConfig: WidgetConfig = {
   validator: (settings: IndexOfCoincidenceSettings): boolean => {
     return (
       ['summary', 'period'].includes(settings.mode) &&
-      (!settings.ngramSize || (typeof settings.ngramSize === 'number' && settings.ngramSize >= 1)) &&
+      (!settings.ngramSize || (typeof settings.ngramSize === 'number' && settings.ngramSize >= 0)) &&
       (!settings.ngramMode || ['sliding', 'block'].includes(settings.ngramMode)) &&
       (settings.showAverageLines === undefined || typeof settings.showAverageLines === 'boolean')
     );
