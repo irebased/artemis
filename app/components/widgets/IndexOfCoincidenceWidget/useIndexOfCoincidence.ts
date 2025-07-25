@@ -19,7 +19,8 @@ export function useIndexOfCoincidence(
   return useMemo(() => {
     return inputs.map(input => {
       try {
-        const text = getProcessedText(input);
+        const processedText = getProcessedText(input);
+        const text = processedText;
         const n = Math.max(0, Math.floor(ngramSize || 1)); // Ensure non-negative integer
         const mode = ngramMode || 'sliding';
         const ngrams = getNgrams(text, n, mode);
@@ -28,6 +29,7 @@ export function useIndexOfCoincidence(
         if (ngrams.length === 0) {
           return {
             text: input.text,
+            processedText,
             color: input.color,
             ioc: 0,
             uniqueNgrams: 0,
@@ -77,6 +79,7 @@ export function useIndexOfCoincidence(
 
         return {
           text: input.text,
+          processedText,
           color: input.color,
           ioc,
           uniqueNgrams,
@@ -86,8 +89,10 @@ export function useIndexOfCoincidence(
         };
       } catch (error) {
         console.error('Error processing text:', error);
+        const processedText = getProcessedText(input);
         return {
           text: input.text,
+          processedText,
           color: input.color,
           ioc: 0,
           uniqueNgrams: 0,

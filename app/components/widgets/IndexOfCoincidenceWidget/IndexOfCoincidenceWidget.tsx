@@ -64,7 +64,7 @@ export default function IndexOfCoincidenceWidget({
                 <tr key={i}>
                   <td className="p-2" style={{ color: r.color }}>
                     <span className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: r.color, display: 'inline-block' }} />
-                    {getProcessedText(inputs[i]).slice(0, 7)}{getProcessedText(inputs[i]).length > 7 ? '...' : ''}
+                    {r.processedText.slice(0, 7)}{r.processedText.length > 7 ? '...' : ''}
                   </td>
                   <td className="p-2 font-bold text-gray-400">{r.ioc.toFixed(4)}</td>
                   { ngramSize == 1 &&

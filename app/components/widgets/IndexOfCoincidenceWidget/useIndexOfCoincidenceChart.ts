@@ -49,7 +49,7 @@ export function useIndexOfCoincidenceChart(results, view, baseline, showAverageL
       const maxPeriod = Math.max(...results.map(r => r.periodicity.length));
       const labels = Array.from({ length: maxPeriod }, (_, i) => (i + 2).toString());
       const datasets = results.map(r => ({
-        label: r.text.slice(0, 7) + (r.text.length > 7 ? '...' : ''),
+        label: r.processedText.slice(0, 7) + (r.processedText.length > 7 ? '...' : ''),
         data: r.periodicity.map(p => p.ic),
         borderColor: r.color,
         backgroundColor: r.color,

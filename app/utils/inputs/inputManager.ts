@@ -19,6 +19,7 @@ export function addInput(
       ignorePunctuation: false,
       ignoreWhitespace: false,
       ignoreCasing: false,
+      ignoreGenericization: false,
       color: INPUT_COLORS[prev.length]
     }]);
   }
@@ -68,6 +69,7 @@ export function createNewInput(id: number, colorIndex: number): Ciphertext {
     ignorePunctuation: false,
     ignoreWhitespace: false,
     ignoreCasing: false,
+    ignoreGenericization: false,
     color: INPUT_COLORS[colorIndex]
   };
 }
