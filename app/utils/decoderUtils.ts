@@ -13,7 +13,9 @@ export function decodeText(
         break;
       case 'hex':
         if (/^[0-9A-Fa-f\s]*$/.test(text)) {
-          decoded = text.match(/.{1,2}/g)?.map(byte => String.fromCharCode(parseInt(byte, 16))).join('') || '';
+          // Remove spaces and split into 2-character pairs
+          const cleanText = text.replace(/\s/g, '');
+          decoded = cleanText.match(/.{1,2}/g)?.map(byte => String.fromCharCode(parseInt(byte, 16))).join('') || '';
         }
         break;
       case 'decimal':

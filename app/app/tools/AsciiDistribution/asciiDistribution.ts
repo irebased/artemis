@@ -1,5 +1,6 @@
 import { Ciphertext } from "@/types/ciphertext";
-import { getProcessedText } from "@/utils/textUtils";
+import { getProcessedText, genericizeText } from "@/utils/textUtils";
+import { decodeText } from "@/utils/decoderUtils";
 
 /**
  * Count the frequency of each ASCII character in the given text
@@ -23,7 +24,33 @@ function countAsciiCharacters(text: string): number[] {
  * @returns Object containing the input data and character counts
  */
 function processCiphertextInput(input: Ciphertext) {
-    const processedText = getProcessedText(input);
+    let textForAnalysis = input.text;
+
+    // Apply encoding conversion rules for ASCII distribution:
+    // - If text is ascii, we will not decode
+    // - If text is non-ascii:
+    //   - If it is genericized, we will NOT decode
+    //   - If it is not genericized, we WILL decode
+    if (input.encoding !== 'ascii' && !input.ignoreGenericization) {
+        // Non-ascii and not genericized: decode to ASCII
+        textForAnalysis = decodeText(input.text, input.encoding);
+    }
+
+    // Apply filters to the text for analysis
+    let processedText = textForAnalysis;
+    if (input.ignoreWhitespace) {
+        processedText = processedText.replace(/\s/g, '');
+    }
+    if (input.ignorePunctuation) {
+        processedText = processedText.replace(/[!"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~]/g, '');
+    }
+    if (input.ignoreCasing) {
+        processedText = processedText.toLowerCase();
+    }
+    if (input.ignoreGenericization) {
+        processedText = processedText ? genericizeText(processedText) : '';
+    }
+
     const counts = countAsciiCharacters(processedText);
     return {
         text: input.text,

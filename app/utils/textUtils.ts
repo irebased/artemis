@@ -65,7 +65,7 @@ export function getProcessedText(input: Ciphertext): string {
     processedText = processedText.replace(/\s/g, '');
   }
   if (input.ignorePunctuation) {
-    processedText = processedText.replace(/[!"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~]/g, '');
+    processedText = processedText.replace(/[!"#$%&'()*+,\-./:;<=>?@[\\]^_`{|}~]/g, '');
   }
   if (input.ignoreCasing) {
     processedText = processedText.toLowerCase();

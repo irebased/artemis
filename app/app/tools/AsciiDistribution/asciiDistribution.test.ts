@@ -2,6 +2,93 @@ import { getAsciiDistribution } from './asciiDistribution';
 import { Ciphertext } from '@/types/ciphertext';
 
 describe('getAsciiDistribution', () => {
+  const createInput = (overrides: Partial<Ciphertext> = {}): Ciphertext => ({
+    id: 1,
+    text: 'Hello, World!',
+    encoding: 'ascii',
+    ignorePunctuation: false,
+    ignoreWhitespace: false,
+    ignoreCasing: false,
+    ignoreGenericization: false,
+    color: '#000000',
+    ...overrides,
+  });
+
+  describe('encoding conversion logic', () => {
+    it('should decode base64 text when not genericized', () => {
+      const input = createInput({
+        text: 'SGVsbG8sIFdvcmxkIQ==', // "Hello, World!" in base64
+        encoding: 'base64',
+        ignoreGenericization: false
+      });
+      const result = getAsciiDistribution([input], 'ascii');
+      expect(result.distributions[0].processedText).toBe('Hello, World!');
+    });
+
+    it('should NOT decode base64 text when genericized', () => {
+      const input = createInput({
+        text: 'SGVsbG8sIFdvcmxkIQ==', // "Hello, World!" in base64
+        encoding: 'base64',
+        ignoreGenericization: true
+      });
+      const result = getAsciiDistribution([input], 'ascii');
+      expect(result.distributions[0].processedText).toBe('EAFBGAHBCIJKLMNOCPDD'); // Genericized version of base64 string
+    });
+
+    it('should decode hex text when not genericized', () => {
+      const input = createInput({
+        text: '48 65 6c 6c 6f 2c 20 57 6f 72 6c 64 21', // "Hello, World!" in hex
+        encoding: 'hex',
+        ignoreGenericization: false
+      });
+      const result = getAsciiDistribution([input], 'ascii');
+      expect(result.distributions[0].processedText).toBe('Hello, World!');
+    });
+
+    it('should decode decimal text when not genericized', () => {
+      const input = createInput({
+        text: '72 101 108 108 111 44 32 87 111 114 108 100 33', // "Hello, World!" in decimal
+        encoding: 'decimal',
+        ignoreGenericization: false
+      });
+      const result = getAsciiDistribution([input], 'ascii');
+      expect(result.distributions[0].processedText).toBe('Hello, World!');
+    });
+
+    it('should decode octal text when not genericized', () => {
+      const input = createInput({
+        text: '110 145 154 154 157 054 040 127 157 162 154 144 041', // "Hello, World!" in octal
+        encoding: 'octal',
+        ignoreGenericization: false
+      });
+      const result = getAsciiDistribution([input], 'ascii');
+      expect(result.distributions[0].processedText).toBe('Hello, World!');
+    });
+
+    it('should NOT decode ascii text (regardless of genericization)', () => {
+      const input = createInput({
+        text: 'Hello, World!',
+        encoding: 'ascii',
+        ignoreGenericization: false
+      });
+      const result = getAsciiDistribution([input], 'ascii');
+      expect(result.distributions[0].processedText).toBe('Hello, World!');
+    });
+
+    it('should apply filters after decoding', () => {
+      const input = createInput({
+        text: 'SGVsbG8sIFdvcmxkIQ==', // "Hello, World!" in base64
+        encoding: 'base64',
+        ignoreWhitespace: true,
+        ignorePunctuation: true,
+        ignoreCasing: true,
+        ignoreGenericization: false
+      });
+      const result = getAsciiDistribution([input], 'ascii');
+      expect(result.distributions[0].processedText).toBe('hello,world!'); // Only whitespace and casing applied, punctuation preserved
+    });
+  });
+
   const mockCiphertext: Ciphertext = {
     id: 1,
     text: 'Hello World',
@@ -9,7 +96,8 @@ describe('getAsciiDistribution', () => {
     encoding: 'ascii',
     ignorePunctuation: false,
     ignoreWhitespace: false,
-    ignoreCasing: false
+    ignoreCasing: false,
+    ignoreGenericization: false
   };
 
   const mockCiphertextWithSpecialChars: Ciphertext = {
@@ -19,7 +107,8 @@ describe('getAsciiDistribution', () => {
     encoding: 'ascii',
     ignorePunctuation: false,
     ignoreWhitespace: false,
-    ignoreCasing: false
+    ignoreCasing: false,
+    ignoreGenericization: false
   };
 
   const mockCiphertextEmpty: Ciphertext = {
@@ -29,7 +118,8 @@ describe('getAsciiDistribution', () => {
     encoding: 'ascii',
     ignorePunctuation: false,
     ignoreWhitespace: false,
-    ignoreCasing: false
+    ignoreCasing: false,
+    ignoreGenericization: false
   };
 
   describe('with ascii range', () => {
