@@ -123,34 +123,57 @@ export function useIndexOfCoincidenceChart(results, view, baseline, showAverageL
         datalabels: {
           display: false,
         },
-        annotation: view === 'period' && showAverageLines ? {
+        annotation: view === 'period' ? {
           annotations: {
-            englishLine: {
-              type: 'line' as const,
-              yMin: baseline.english,
-              yMax: baseline.english,
-              borderColor: 'rgba(255, 99, 132, 0.5)',
-              borderWidth: 2,
-              borderDash: [5, 5],
-              label: {
-                content: 'English',
-                enabled: true,
-                position: 'start'
+            // English baseline (only if showAverageLines is true)
+            ...(showAverageLines ? {
+              englishLine: {
+                type: 'line' as const,
+                yMin: baseline.english,
+                yMax: baseline.english,
+                borderColor: 'rgba(255, 99, 132, 0.5)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                label: {
+                  content: 'English',
+                  enabled: true,
+                  position: 'start'
+                }
+              },
+              randomLine: {
+                type: 'line' as const,
+                yMin: baseline.random,
+                yMax: baseline.random,
+                borderColor: 'rgba(54, 162, 235, 0.5)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                label: {
+                  content: 'Random',
+                  enabled: true,
+                  position: 'start'
+                }
               }
-            },
-            randomLine: {
-              type: 'line' as const,
-              yMin: baseline.random,
-              yMax: baseline.random,
-              borderColor: 'rgba(54, 162, 235, 0.5)',
-              borderWidth: 2,
-              borderDash: [5, 5],
-              label: {
-                content: 'Random',
-                enabled: true,
-                position: 'start'
-              }
-            }
+            } : {}),
+            // Overall IC lines for each text (always visible)
+            ...results.reduce((acc, result, index) => {
+              acc[`overallIC_${index}`] = {
+                type: 'line' as const,
+                yMin: result.ioc,
+                yMax: result.ioc,
+                borderColor: result.color + '80', // Add transparency
+                borderWidth: 1,
+                borderDash: [3, 3], // Smaller dash pattern
+                label: {
+                  content: `Overall IC: ${result.ioc.toFixed(5)}`,
+                  enabled: true,
+                  position: 'end',
+                  font: {
+                    size: 10
+                  }
+                }
+              };
+              return acc;
+            }, {} as any)
           }
         } : undefined
       },
