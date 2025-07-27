@@ -60,75 +60,111 @@ export function useIndexOfCoincidenceChart(results, view, baseline, showAverageL
     }
   }, [results, view]);
 
-  const options: ChartOptions<'line'> = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
+  const options: ChartOptions<'line'> = useMemo(() => {
+    // Calculate dynamic Y-axis range for period view
+    let yAxisConfig: any = {
+      beginAtZero: true,
       title: {
-        display: false,
-        text: '',
-      },
-      tooltip: {
-        callbacks: {
-          label: function(context) {
-            const value = context.parsed.y.toFixed(5);
-            return `${context.dataset.label}: ${value}`;
+        display: true,
+        text: 'Index of Coincidence'
+      }
+    };
+
+    if (view === 'period' && results.length > 0) {
+      // Find the minimum and maximum values across all datasets
+      let minValue = Infinity;
+      let maxValue = -Infinity;
+
+      results.forEach(result => {
+        if (result.periodicity && result.periodicity.length > 0) {
+          result.periodicity.forEach(p => {
+            if (p.ic < minValue) minValue = p.ic;
+            if (p.ic > maxValue) maxValue = p.ic;
+          });
+        }
+      });
+
+      // If we found valid data, set dynamic range
+      if (minValue !== Infinity && maxValue !== -Infinity) {
+        const range = maxValue - minValue;
+        const padding = range * 0.1; // 10% padding
+
+        yAxisConfig = {
+          beginAtZero: false,
+          min: Math.max(0, minValue - padding), // Don't go below 0 for IC values
+          max: maxValue + padding,
+          title: {
+            display: true,
+            text: 'Index of Coincidence'
           }
-        }
-      },
-      datalabels: {
-        display: false,
-      },
-      annotation: view === 'period' && showAverageLines ? {
-        annotations: {
-          englishLine: {
-            type: 'line' as const,
-            yMin: baseline.english,
-            yMax: baseline.english,
-            borderColor: 'rgba(255, 99, 132, 0.5)',
-            borderWidth: 2,
-            borderDash: [5, 5],
-            label: {
-              content: 'English',
-              enabled: true,
-              position: 'start'
-            }
-          },
-          randomLine: {
-            type: 'line' as const,
-            yMin: baseline.random,
-            yMax: baseline.random,
-            borderColor: 'rgba(54, 162, 235, 0.5)',
-            borderWidth: 2,
-            borderDash: [5, 5],
-            label: {
-              content: 'Random',
-              enabled: true,
-              position: 'start'
-            }
-          }
-        }
-      } : undefined
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: 'Index of Coincidence'
-        }
-      },
-      x: {
-        title: {
-          display: true,
-          text: view === 'period' ? 'Period' : 'Text'
-        }
+        };
       }
     }
-  }), [results, view, baseline, showAverageLines]);
+
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top' as const,
+        },
+        title: {
+          display: false,
+          text: '',
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const value = context.parsed.y.toFixed(5);
+              return `${context.dataset.label}: ${value}`;
+            }
+          }
+        },
+        datalabels: {
+          display: false,
+        },
+        annotation: view === 'period' && showAverageLines ? {
+          annotations: {
+            englishLine: {
+              type: 'line' as const,
+              yMin: baseline.english,
+              yMax: baseline.english,
+              borderColor: 'rgba(255, 99, 132, 0.5)',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              label: {
+                content: 'English',
+                enabled: true,
+                position: 'start'
+              }
+            },
+            randomLine: {
+              type: 'line' as const,
+              yMin: baseline.random,
+              yMax: baseline.random,
+              borderColor: 'rgba(54, 162, 235, 0.5)',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              label: {
+                content: 'Random',
+                enabled: true,
+                position: 'start'
+              }
+            }
+          }
+        } : undefined
+      },
+      scales: {
+        y: yAxisConfig,
+        x: {
+          title: {
+            display: true,
+            text: view === 'period' ? 'Period' : 'Text'
+          }
+        }
+      }
+    };
+  }, [results, view, baseline, showAverageLines]);
 
   return { data, options };
 }
