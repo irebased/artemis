@@ -24,6 +24,7 @@ export type IndexOfCoincidenceSettings = {
   ngramSize?: number;
   ngramMode?: 'sliding' | 'block';
   showAverageLines?: boolean;
+  maxPeriod?: number;
 };
 
 export type KolmogorovSmirnovSettings = {

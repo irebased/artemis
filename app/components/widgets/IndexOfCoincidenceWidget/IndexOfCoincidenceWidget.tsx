@@ -26,8 +26,8 @@ export default function IndexOfCoincidenceWidget({
   setIndexOfCoincidenceSettings,
   setAnyModalOpen,
 }: IndexOfCoincidenceWidgetProps) {
-  const { mode, ngramSize = 1, ngramMode = 'sliding', showAverageLines = true } = indexOfCoincidenceSettings;
-  const results = useIndexOfCoincidence(inputs, ngramSize, ngramMode);
+  const { mode, ngramSize = 1, ngramMode = 'sliding', showAverageLines = true, maxPeriod = 20 } = indexOfCoincidenceSettings;
+  const results = useIndexOfCoincidence(inputs, ngramSize, ngramMode, maxPeriod);
   const baseline = IC_BASELINES[base];
   const { data: periodLineData, options: lineOptions } = useIndexOfCoincidenceChart(results, mode, baseline, showAverageLines);
   const { chartRef, containerRef, isResizing } = useChartResize<'line'>();

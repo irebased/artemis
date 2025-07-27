@@ -7,13 +7,13 @@ interface IndexOfCoincidenceSettingsFormProps {
 }
 
 export default function IndexOfCoincidenceSettingsForm({ settings, setSettings }: IndexOfCoincidenceSettingsFormProps) {
-  const { mode, ngramSize = 1, ngramMode = 'sliding', showAverageLines = true } = settings;
+  const { mode, ngramSize = 1, ngramMode = 'sliding', showAverageLines = true, maxPeriod = 20 } = settings;
 
   const handleModeChange = (mode: 'summary' | 'period') => {
     setSettings({ ...settings, mode });
   };
   const handleNgramSizeChange = (size: number) => {
-    const validSize = Math.max(0, Math.floor(size));
+    const validSize = Math.max(1, Math.floor(size));
     setSettings({ ...settings, ngramSize: validSize });
   };
   const handleNgramModeChange = (ngramMode: 'sliding' | 'block') => {
@@ -21,6 +21,10 @@ export default function IndexOfCoincidenceSettingsForm({ settings, setSettings }
   };
   const handleShowAverageLinesChange = (show: boolean) => {
     setSettings({ ...settings, showAverageLines: show });
+  };
+  const handleMaxPeriodChange = (maxPeriod: number) => {
+    const validMaxPeriod = Math.max(1, Math.floor(maxPeriod));
+    setSettings({ ...settings, maxPeriod: validMaxPeriod });
   };
 
   return (
@@ -59,13 +63,13 @@ export default function IndexOfCoincidenceSettingsForm({ settings, setSettings }
             <span className="min-w-[60px]">Size:</span>
             <input
               type="number"
-              min={0}
+              min={1}
               value={ngramSize}
               onChange={e => handleNgramSizeChange(Number(e.target.value))}
               className="p-2 border rounded text-sm w-24"
             />
             <span className="text-sm text-gray-500">
-              {ngramSize === 0 ? '(single characters)' : ngramSize === 1 ? '(bigrams)' : `(${ngramSize}-grams)`}
+              {ngramSize === 1 ? '(single characters)' : ngramSize === 2 ? '(bigrams)' : `(${ngramSize}-grams)`}
             </span>
           </label>
           <div className="space-y-2">
@@ -106,6 +110,19 @@ export default function IndexOfCoincidenceSettingsForm({ settings, setSettings }
                 className="w-4 h-4"
               />
               <span>Show average lines</span>
+            </label>
+            <label className="flex items-center gap-3">
+              <span className="min-w-[60px]">Max period:</span>
+              <input
+                type="number"
+                min={1}
+                value={maxPeriod}
+                onChange={e => handleMaxPeriodChange(Number(e.target.value))}
+                className="p-2 border rounded text-sm w-24"
+              />
+              <span className="text-sm text-gray-500">
+                (default: {20})
+              </span>
             </label>
           </div>
         </div>

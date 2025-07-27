@@ -40,6 +40,7 @@ export const DEFAULT_INDEX_OF_COINCIDENCE_SETTINGS: IndexOfCoincidenceSettings =
   mode: 'summary',
   ngramSize: 1,
   ngramMode: 'sliding',
+  maxPeriod: 20,
 };
 
 /**
@@ -132,12 +133,18 @@ export function validateIndexOfCoincidenceSettings(
     mode: settings.mode === 'summary' || settings.mode === 'period'
       ? settings.mode
       : DEFAULT_INDEX_OF_COINCIDENCE_SETTINGS.mode,
-    ngramSize: typeof settings.ngramSize === 'number' && settings.ngramSize > 0
+    ngramSize: typeof settings.ngramSize === 'number' && settings.ngramSize >= 1
       ? settings.ngramSize
       : DEFAULT_INDEX_OF_COINCIDENCE_SETTINGS.ngramSize,
     ngramMode: settings.ngramMode === 'sliding' || settings.ngramMode === 'block'
       ? settings.ngramMode
       : DEFAULT_INDEX_OF_COINCIDENCE_SETTINGS.ngramMode,
+    showAverageLines: typeof settings.showAverageLines === 'boolean'
+      ? settings.showAverageLines
+      : DEFAULT_INDEX_OF_COINCIDENCE_SETTINGS.showAverageLines,
+    maxPeriod: typeof settings.maxPeriod === 'number' && settings.maxPeriod > 0
+      ? settings.maxPeriod
+      : DEFAULT_INDEX_OF_COINCIDENCE_SETTINGS.maxPeriod,
   };
 }
 

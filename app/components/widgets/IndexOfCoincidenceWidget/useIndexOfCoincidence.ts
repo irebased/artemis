@@ -14,14 +14,15 @@ export const IC_BASELINES = {
 export function useIndexOfCoincidence(
   inputs: Ciphertext[],
   ngramSize: number = 1,
-  ngramMode: 'sliding' | 'block' = 'sliding'
+  ngramMode: 'sliding' | 'block' = 'sliding',
+  maxPeriod: number = 20
 ) {
   return useMemo(() => {
     return inputs.map(input => {
       try {
         const processedText = getProcessedText(input);
         const text = processedText;
-        const n = Math.max(0, Math.floor(ngramSize || 1)); // Ensure non-negative integer
+        const n = Math.max(1, Math.floor(ngramSize || 1)); // Ensure positive integer
         const mode = ngramMode || 'sliding';
         const ngrams = getNgrams(text, n, mode);
 
@@ -51,7 +52,7 @@ export function useIndexOfCoincidence(
         const periodicity = [];
         // Only calculate periodicity if we have enough n-grams
         if (N >= 2) {
-          for (let period = 2; period <= Math.min(20, Math.floor(N / 2)); period++) {
+          for (let period = 2; period <= Math.min(maxPeriod, Math.floor(N / 2)); period++) {
             // Split ngrams into groups by index mod period
             const groups = Array.from({ length: period }, () => []);
             for (let i = 0; i < N; i++) {
@@ -102,5 +103,5 @@ export function useIndexOfCoincidence(
         };
       }
     });
-  }, [inputs, ngramSize, ngramMode]);
+  }, [inputs, ngramSize, ngramMode, maxPeriod]);
 }
