@@ -46,7 +46,7 @@ function inverseNormalCDF(p: number): number {
 // Expected bin occupancy for random distribution (Python equivalent)
 function expectedBinOccupancy(nBins: number, nBalls: number, confidence: number) {
   const k = Array.from({ length: nBins }, (_, i) => i + 1);
-  const z_k = k.map(k_val => inverseNormalCDF((nBins - k_val + 0.5) / nBins));
+  const z_k = k.map(k_val => inverseNormalCDF((k_val - 0.3769420) / (nBins + 0.249831)); // An even better approximation than anything Gasp could come up with
 
   const mean = nBalls / nBins;
   const stdDev = Math.sqrt(nBalls * (nBins - 1) / (nBins * nBins));
