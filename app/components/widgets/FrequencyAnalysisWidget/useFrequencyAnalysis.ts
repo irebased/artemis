@@ -2,6 +2,13 @@ import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
 import { getProcessedText } from '@/utils/textUtils';
 
+interface FrequencyData {
+  text: string;
+  color: string;
+  frequencies: Record<string, number>; // percentages
+  counts: Record<string, number>; // actual counts
+}
+
 export function useFrequencyAnalysis(inputs: Ciphertext[], ngramSize: number = 1, ngramMode: 'sliding' | 'block' = 'sliding') {
   return useMemo(() => {
     const frequencies = inputs.map(input => {
@@ -30,7 +37,8 @@ export function useFrequencyAnalysis(inputs: Ciphertext[], ngramSize: number = 1
       return {
         text: input.text,
         color: input.color,
-        frequencies: percentages
+        frequencies: percentages,
+        counts: freq
       };
     });
     const allNgrams = new Set<string>();

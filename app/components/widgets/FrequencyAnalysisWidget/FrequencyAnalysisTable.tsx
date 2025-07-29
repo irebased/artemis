@@ -3,7 +3,8 @@ import React from 'react';
 interface FrequencyData {
   text: string;
   color: string;
-  frequencies: Record<string, number>;
+  frequencies: Record<string, number>; // percentages
+  counts: Record<string, number>; // actual counts
 }
 
 interface FrequencyAnalysisTableProps {
@@ -17,30 +18,6 @@ export default function FrequencyAnalysisTable({ frequencies, sortedNgrams, sort
   if (!frequencies || frequencies.length === 0) {
     return <p>No data to display.</p>;
   }
-
-    // Calculate total n-grams for each input
-  const getTotalNgrams = (freqData: FrequencyData) => {
-    // Since we're working with percentages, we need to find the total
-    // by looking at the text length and n-gram size
-    // For now, let's use a simpler approach: sum all percentages and assume they add to 100
-    const totalPercentage = Object.values(freqData.frequencies).reduce((sum, p) => sum + p, 0);
-    if (totalPercentage === 0) return 0;
-
-    // Find the smallest non-zero percentage to estimate total
-    const nonZeroPercentages = Object.values(freqData.frequencies).filter(p => p > 0);
-    if (nonZeroPercentages.length === 0) return 0;
-
-    const minPercentage = Math.min(...nonZeroPercentages);
-    // If min percentage is 1%, then total is roughly 100
-    // If min percentage is 10%, then total is roughly 10
-    return Math.round(100 / minPercentage);
-  };
-
-  // Calculate count from percentage
-  const getCountFromPercentage = (percentage: number, totalNgrams: number) => {
-    if (percentage === 0) return 0;
-    return Math.round((percentage / 100) * totalNgrams);
-  };
 
   // Sort n-grams based on sort settings
   const getSortedNgrams = () => {
@@ -125,42 +102,38 @@ export default function FrequencyAnalysisTable({ frequencies, sortedNgrams, sort
             </tr>
           </thead>
                       <tbody>
-              {getSortedNgrams().map((ngram, ngramIndex) => {
-                const totalNgrams = frequencies.map(freqData => getTotalNgrams(freqData));
+            {getSortedNgrams().map((ngram, ngramIndex) => (
+              <tr key={ngramIndex} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800">
+                <td className="p-2 font-mono sticky left-0 bg-white dark:bg-gray-900 z-10 border-r">
+                  {ngram}
+                </td>
+                {frequencies.map((freqData, inputIndex) => {
+                  const percentage = freqData.frequencies[ngram] || 0;
+                  const count = freqData.counts[ngram] || 0;
 
-              return (
-                <tr key={ngramIndex} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <td className="p-2 font-mono sticky left-0 bg-white dark:bg-gray-900 z-10 border-r">
-                    {ngram}
-                  </td>
-                  {frequencies.map((freqData, inputIndex) => {
-                    const percentage = freqData.frequencies[ngram] || 0;
-                    const count = getCountFromPercentage(percentage, totalNgrams[inputIndex]);
-
-                    return (
-                      <React.Fragment key={inputIndex}>
-                                                <td
-                          className="p-2 text-center border-l"
-                          style={{
-                            borderLeftColor: freqData.color,
-                            borderLeftWidth: '2px'
-                          }}
-                        >
-                          <span style={{ color: freqData.color }}>
-                            {count > 0 ? `x${count}` : 'x0'}
-                          </span>
-                        </td>
-                        <td className="p-2 text-center">
-                          <span style={{ color: freqData.color }}>
-                            ({percentage.toFixed(1)}%)
-                          </span>
-                        </td>
-                      </React.Fragment>
-                    );
-                  })}
-                </tr>
-              );
-            })}
+                  return (
+                    <React.Fragment key={inputIndex}>
+                      <td
+                        className="p-2 text-center border-l"
+                        style={{
+                          borderLeftColor: freqData.color,
+                          borderLeftWidth: '2px'
+                        }}
+                      >
+                        <span style={{ color: freqData.color }}>
+                          {count > 0 ? `x${count}` : 'x0'}
+                        </span>
+                      </td>
+                      <td className="p-2 text-center">
+                        <span style={{ color: freqData.color }}>
+                          ({percentage.toFixed(1)}%)
+                        </span>
+                      </td>
+                    </React.Fragment>
+                  );
+                })}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
