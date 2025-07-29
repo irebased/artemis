@@ -140,22 +140,27 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     });
   }, []);
 
-    useEffect(() => {
-    synchronizeDashboardState({
-      inputs,
-      inputsForUrlSync,
-      widgets,
-      layouts,
-      asciiDistributionSettings,
-      indexOfCoincidenceSettings,
-      loading,
-      layoutLocked,
-      frequencyAnalysisSettings,
-      shannonEntropySettings,
-      kolmogorovSmirnovSettings,
-      chiSquaredSettings,
-      dashboardName,
-    });
+  useEffect(() => {
+    // Throttle URL synchronization to prevent excessive updates
+    const timeoutId = setTimeout(() => {
+      synchronizeDashboardState({
+        inputs,
+        inputsForUrlSync,
+        widgets,
+        layouts,
+        asciiDistributionSettings,
+        indexOfCoincidenceSettings,
+        loading,
+        layoutLocked,
+        frequencyAnalysisSettings,
+        shannonEntropySettings,
+        kolmogorovSmirnovSettings,
+        chiSquaredSettings,
+        dashboardName,
+      });
+    }, 500); // 500ms throttle
+
+    return () => clearTimeout(timeoutId);
   }, [inputs, inputsForUrlSync, widgets, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings, kolmogorovSmirnovSettings, chiSquaredSettings, dashboardName]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {

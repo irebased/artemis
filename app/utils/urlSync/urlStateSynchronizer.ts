@@ -160,21 +160,33 @@ export async function buildLegacyUrlParameters(state: LegacyState): Promise<{
  * @param compressedData Optional compressed data for legacy format
  */
 export function updateBrowserUrl(params: URLSearchParams, compressedData?: string): void {
-  let newUrl: string;
+  try {
+    let newUrl: string;
 
-  if (compressedData) {
-    const legacyQuery = params.toString();
-    // Choose between compressed and legacy format based on length
-    if (compressedData.length + 2 < legacyQuery.length) {
-      newUrl = `${window.location.pathname}?lzdata=${compressedData}`;
+    if (compressedData) {
+      const legacyQuery = params.toString();
+      // Choose between compressed and legacy format based on length
+      if (compressedData.length + 2 < legacyQuery.length) {
+        newUrl = `${window.location.pathname}?lzdata=${compressedData}`;
+      } else {
+        newUrl = `${window.location.pathname}?${legacyQuery}`;
+      }
     } else {
-      newUrl = `${window.location.pathname}?${legacyQuery}`;
+      newUrl = `${window.location.pathname}?${params.toString()}`;
     }
-  } else {
-    newUrl = `${window.location.pathname}?${params.toString()}`;
-  }
 
-  window.history.replaceState(null, '', newUrl);
+    // Check if URL is too long (browsers have limits)
+    if (newUrl.length > 2000) {
+      console.warn('URL too long, skipping URL update to prevent browser errors');
+      return;
+    }
+
+    window.history.replaceState(null, '', newUrl);
+  } catch (error) {
+    // Handle "operation is insecure" and other URL-related errors
+    console.warn('Failed to update URL:', error);
+    // Don't throw - this prevents the app from crashing
+  }
 }
 
 /**
