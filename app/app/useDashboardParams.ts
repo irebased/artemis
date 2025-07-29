@@ -14,6 +14,7 @@ import {
   IndexOfCoincidenceSettings,
   KolmogorovSmirnovSettings,
   ChiSquaredSettings,
+  ExpectedBinOccupancySettings,
 } from '@/types/dashboard/dashboardTypes';
 import { addInput, removeInput, updateInputText } from '@/utils/inputs/inputManager';
 import {
@@ -23,6 +24,7 @@ import {
   DEFAULT_INDEX_OF_COINCIDENCE_SETTINGS,
   DEFAULT_KOLMOGOROV_SMIRNOV_SETTINGS,
   DEFAULT_CHI_SQUARED_SETTINGS,
+  DEFAULT_EXPECTED_BIN_OCCUPANCY_SETTINGS,
 } from '@/utils/settings/dashboardSettings/dashboardSettingsManager';
 import { parseAllUrlParameters } from '@/utils/urlParsing/urlParameterParser';
 import { synchronizeDashboardState, synchronizeLayoutChanges } from '@/utils/urlSync/urlStateSynchronizer';
@@ -60,6 +62,7 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
   const [indexOfCoincidenceSettings, setIndexOfCoincidenceSettings] = useState<IndexOfCoincidenceSettings>(DEFAULT_INDEX_OF_COINCIDENCE_SETTINGS);
   const [kolmogorovSmirnovSettings, setKolmogorovSmirnovSettings] = useState<KolmogorovSmirnovSettings>(DEFAULT_KOLMOGOROV_SMIRNOV_SETTINGS);
   const [chiSquaredSettings, setChiSquaredSettings] = useState<ChiSquaredSettings>(DEFAULT_CHI_SQUARED_SETTINGS);
+  const [expectedBinOccupancySettings, setExpectedBinOccupancySettings] = useState<ExpectedBinOccupancySettings>(DEFAULT_EXPECTED_BIN_OCCUPANCY_SETTINGS);
 
   const handleAddInput = useCallback(() => {
     addInput(inputs, setInputs);
@@ -135,14 +138,25 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
       if (widgetSettings['chi-squared']) {
         setChiSquaredSettings(widgetSettings['chi-squared']);
       }
+      if (widgetSettings['expected-bin-occupancy']) {
+        setExpectedBinOccupancySettings(widgetSettings['expected-bin-occupancy']);
+      }
 
       setLoading(false);
     });
   }, []);
 
   useEffect(() => {
+    console.log('URL sync useEffect triggered with:', {
+      inputsCount: inputs.length,
+      widgetsCount: widgets.length,
+      layoutLocked,
+      loading
+    });
+
     // Throttle URL synchronization to prevent excessive updates
     const timeoutId = setTimeout(() => {
+      console.log('Executing URL sync after throttle...');
       synchronizeDashboardState({
         inputs,
         inputsForUrlSync,
@@ -156,12 +170,13 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
         shannonEntropySettings,
         kolmogorovSmirnovSettings,
         chiSquaredSettings,
+        expectedBinOccupancySettings,
         dashboardName,
       });
     }, 500); // 500ms throttle
 
     return () => clearTimeout(timeoutId);
-  }, [inputs, inputsForUrlSync, widgets, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings, kolmogorovSmirnovSettings, chiSquaredSettings, dashboardName]);
+  }, [inputs, inputsForUrlSync, widgets, layouts, asciiDistributionSettings, indexOfCoincidenceSettings, loading, layoutLocked, frequencyAnalysisSettings, shannonEntropySettings, kolmogorovSmirnovSettings, chiSquaredSettings, expectedBinOccupancySettings, dashboardName]);
 
   const handleLayoutChange = useCallback((currentLayout, allLayouts) => {
     setLayouts(allLayouts);
@@ -214,6 +229,8 @@ export function useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeL
     setKolmogorovSmirnovSettings,
     chiSquaredSettings,
     setChiSquaredSettings,
+    expectedBinOccupancySettings,
+    setExpectedBinOccupancySettings,
     dashboardName,
     setDashboardName,
   };

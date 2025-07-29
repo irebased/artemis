@@ -9,6 +9,7 @@ import {
   IndexOfCoincidenceSettings,
   KolmogorovSmirnovSettings,
   ChiSquaredSettings,
+  ExpectedBinOccupancySettings,
   AsciiRange
 } from '@/types/dashboard/dashboardTypes';
 import { BaseType } from '@/types/bases';
@@ -26,6 +27,7 @@ export interface DashboardState {
   shannonEntropySettings: ShannonEntropySettings;
   kolmogorovSmirnovSettings: KolmogorovSmirnovSettings;
   chiSquaredSettings: ChiSquaredSettings;
+  expectedBinOccupancySettings: ExpectedBinOccupancySettings;
   dashboardName: string;
 }
 
@@ -80,6 +82,10 @@ export async function buildUrlParameters(state: DashboardState): Promise<URLSear
   }
   if (state.chiSquaredSettings) {
     params.set('chiSquaredSettings', compressSettings(state.chiSquaredSettings));
+  }
+  if (state.expectedBinOccupancySettings) {
+    console.log('Saving expectedBinOccupancySettings:', state.expectedBinOccupancySettings);
+    params.set('expectedBinOccupancySettings', compressSettings(state.expectedBinOccupancySettings));
   }
 
   // Add dashboard name if not default
@@ -175,12 +181,6 @@ export function updateBrowserUrl(params: URLSearchParams, compressedData?: strin
       newUrl = `${window.location.pathname}?${params.toString()}`;
     }
 
-    // Check if URL is too long (browsers have limits)
-    if (newUrl.length > 2000) {
-      console.warn('URL too long, skipping URL update to prevent browser errors');
-      return;
-    }
-
     window.history.replaceState(null, '', newUrl);
   } catch (error) {
     // Handle "operation is insecure" and other URL-related errors
@@ -195,10 +195,23 @@ export function updateBrowserUrl(params: URLSearchParams, compressedData?: strin
  * @returns Promise that resolves when synchronization is complete
  */
 export async function synchronizeDashboardState(state: DashboardState): Promise<void> {
-  if (state.loading) return;
+  console.log('synchronizeDashboardState called with:', {
+    loading: state.loading,
+    widgets: state.widgets,
+    layoutLocked: state.layoutLocked,
+    inputsCount: state.inputs.length
+  });
 
+  if (state.loading) {
+    console.log('Skipping URL sync - loading state is true');
+    return;
+  }
+
+  console.log('Building URL parameters...');
   const params = await buildUrlParameters(state);
+  console.log('URL parameters built:', params.toString());
   updateBrowserUrl(params);
+  console.log('URL update completed');
 }
 
 /**

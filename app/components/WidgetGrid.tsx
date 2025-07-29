@@ -7,6 +7,7 @@ import IndexOfCoincidenceWidget from '../components/widgets/IndexOfCoincidenceWi
 import ShannonEntropyWidget from '../components/widgets/ShannonEntropyWidget/ShannonEntropyWidget';
 import KolmogorovSmirnovWidget from '../components/widgets/KolmogrovSmirnovWidget/KolmogorovSmirnovWidget';
 import ChiSquaredWidget from '../components/widgets/ChiSquaredWidget/ChiSquaredWidget';
+import { ExpectedBinOccupancyWidget } from '../components/widgets/ExpectedBinOccupancyWidget/ExpectedBinOccupancyWidget';
 import { BaseType } from '@/types/bases';
 import FrequencyStdDevInformation from './widgets/FrequencyStdDevWidget/FrequencyStdDevInformation';
 import KolmogrovSmirnovInformation from './widgets/KolmogrovSmirnovWidget/KolmogrovSmirnovInformation';
@@ -17,6 +18,7 @@ import { defaultGridSize as icDefault } from '@/components/widgets/IndexOfCoinci
 import { defaultGridSize as entropyDefault } from '@/components/widgets/ShannonEntropyWidget/useShannonEntropyChart';
 import { defaultGridSize as ksDefault } from '@/components/widgets/KolmogrovSmirnovWidget/useKolmogorovSmirnov';
 import { defaultGridSize as chiSquaredDefault } from '@/components/widgets/ChiSquaredWidget/useChiSquaredChart';
+import { defaultGridSize as expectedBinOccupancyDefault } from '@/components/widgets/ExpectedBinOccupancyWidget/useExpectedBinOccupancyChart';
 import {
   FrequencyAnalysisSettings,
   AsciiDistributionSettings,
@@ -24,6 +26,7 @@ import {
   ShannonEntropySettings,
   ChiSquaredSettings,
   KolmogorovSmirnovSettings,
+  ExpectedBinOccupancySettings,
 } from '@/types/widgets/widgetSettingsTypes';
 
 const WIDGET_DEFAULTS = {
@@ -34,6 +37,7 @@ const WIDGET_DEFAULTS = {
   entropy: entropyDefault,
   ks: ksDefault,
   chisquared: chiSquaredDefault,
+  expectedBinOccupancy: expectedBinOccupancyDefault,
 };
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -65,6 +69,8 @@ interface WidgetGridProps {
   setKolmogorovSmirnovSettings: (settings: KolmogorovSmirnovSettings) => void;
   chiSquaredSettings: ChiSquaredSettings;
   setChiSquaredSettings: (settings: ChiSquaredSettings) => void;
+  expectedBinOccupancySettings: ExpectedBinOccupancySettings;
+  setExpectedBinOccupancySettings: (settings: ExpectedBinOccupancySettings) => void;
 }
 
 export default function WidgetGrid({
@@ -94,6 +100,8 @@ export default function WidgetGrid({
   setKolmogorovSmirnovSettings,
   chiSquaredSettings,
   setChiSquaredSettings,
+  expectedBinOccupancySettings,
+  setExpectedBinOccupancySettings,
 }: WidgetGridProps) {
   return (
     <ResponsiveGridLayout
@@ -179,6 +187,14 @@ export default function WidgetGrid({
               chiSquaredSettings={chiSquaredSettings}
               setChiSquaredSettings={setChiSquaredSettings}
               setAnyModalOpen={setAnyModalOpen}
+            />
+          );
+        } else if (widget === 'expectedBinOccupancy') {
+          WidgetComponent = (
+            <ExpectedBinOccupancyWidget
+              inputs={adjustedTexts}
+              settings={expectedBinOccupancySettings}
+              onSettingsChange={setExpectedBinOccupancySettings}
             />
           );
         }

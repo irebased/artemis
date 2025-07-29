@@ -5,6 +5,7 @@ import {
   IndexOfCoincidenceSettings,
   KolmogorovSmirnovSettings,
   ChiSquaredSettings,
+  ExpectedBinOccupancySettings,
 } from '@/types/dashboard/dashboardTypes';
 
 /**
@@ -57,6 +58,15 @@ export const DEFAULT_KOLMOGOROV_SMIRNOV_SETTINGS: KolmogorovSmirnovSettings = {
 export const DEFAULT_CHI_SQUARED_SETTINGS: ChiSquaredSettings = {
   selectedTextIndex: 0,
   baseDataIndex: 'sample',
+};
+
+/**
+ * Default settings for Expected Bin Occupancy widget
+ */
+export const DEFAULT_EXPECTED_BIN_OCCUPANCY_SETTINGS: ExpectedBinOccupancySettings = {
+  confidenceLevel: 0.95,
+  showConfidenceBands: true,
+  showExpectedCurve: true,
 };
 
 /**
@@ -185,6 +195,28 @@ export function validateChiSquaredSettings(
 }
 
 /**
+ * Validate Expected Bin Occupancy settings
+ * @param settings Settings to validate
+ * @returns Validated settings or defaults
+ */
+export function validateExpectedBinOccupancySettings(
+  settings: Partial<ExpectedBinOccupancySettings>
+): ExpectedBinOccupancySettings {
+  return {
+    confidenceLevel: typeof settings.confidenceLevel === 'number' &&
+      settings.confidenceLevel >= 0.68 && settings.confidenceLevel <= 0.997
+      ? settings.confidenceLevel
+      : DEFAULT_EXPECTED_BIN_OCCUPANCY_SETTINGS.confidenceLevel,
+    showConfidenceBands: typeof settings.showConfidenceBands === 'boolean'
+      ? settings.showConfidenceBands
+      : DEFAULT_EXPECTED_BIN_OCCUPANCY_SETTINGS.showConfidenceBands,
+    showExpectedCurve: typeof settings.showExpectedCurve === 'boolean'
+      ? settings.showExpectedCurve
+      : DEFAULT_EXPECTED_BIN_OCCUPANCY_SETTINGS.showExpectedCurve,
+  };
+}
+
+/**
  * Get all default settings
  * @returns Object containing all default settings
  */
@@ -196,6 +228,7 @@ export function getDefaultSettings() {
     indexOfCoincidence: DEFAULT_INDEX_OF_COINCIDENCE_SETTINGS,
     kolmogorovSmirnov: DEFAULT_KOLMOGOROV_SMIRNOV_SETTINGS,
     chiSquared: DEFAULT_CHI_SQUARED_SETTINGS,
+    expectedBinOccupancy: DEFAULT_EXPECTED_BIN_OCCUPANCY_SETTINGS,
   };
 }
 
@@ -211,6 +244,7 @@ export function validateAllSettings(settings: {
   indexOfCoincidence?: Partial<IndexOfCoincidenceSettings>;
   kolmogorovSmirnov?: Partial<KolmogorovSmirnovSettings>;
   chiSquared?: Partial<ChiSquaredSettings>;
+  expectedBinOccupancy?: Partial<ExpectedBinOccupancySettings>;
 }) {
   return {
     frequencyAnalysis: validateFrequencyAnalysisSettings(settings.frequencyAnalysis || {}),
@@ -219,5 +253,6 @@ export function validateAllSettings(settings: {
     indexOfCoincidence: validateIndexOfCoincidenceSettings(settings.indexOfCoincidence || {}),
     kolmogorovSmirnov: validateKolmogorovSmirnovSettings(settings.kolmogorovSmirnov || {}),
     chiSquared: validateChiSquaredSettings(settings.chiSquared || {}),
+    expectedBinOccupancy: validateExpectedBinOccupancySettings(settings.expectedBinOccupancy || {}),
   };
 }

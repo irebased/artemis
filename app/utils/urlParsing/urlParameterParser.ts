@@ -22,6 +22,7 @@ export interface ParsedUrlParameters {
   indexOfCoincidenceSettings?: any;
   kolmogorovSmirnovSettings?: any;
   chiSquaredSettings?: any;
+  expectedBinOccupancySettings?: any;
 }
 
 export interface LoadingState {
@@ -186,8 +187,11 @@ export function parseCompressedSettings(settingsParam: string | null): any | und
   }
 
   try {
-    return decompressSettings(settingsParam);
+    const result = decompressSettings(settingsParam);
+    console.log('Successfully parsed compressed settings:', result);
+    return result;
   } catch (e) {
+    console.error('Failed to parse compressed settings:', e);
     // Return undefined on error
   }
   return undefined;
@@ -228,9 +232,20 @@ export async function parseAllUrlParameters(
   const icSettingsParam = query.get('icSettings');
   const ksSettingsParam = query.get('ksSettings');
   const chiSquaredSettingsParam = query.get('chiSquaredSettings');
+  const expectedBinOccupancySettingsParam = query.get('expectedBinOccupancySettings');
   const nameParam = query.get('name');
 
-  return {
+  console.log('Parsing URL parameters:', {
+    freqSettings: !!freqSettingsParam,
+    entropySettings: !!entropySettingsParam,
+    asciiSettings: !!asciiSettingsParam,
+    icSettings: !!icSettingsParam,
+    ksSettings: !!ksSettingsParam,
+    chiSquaredSettings: !!chiSquaredSettingsParam,
+    expectedBinOccupancySettings: !!expectedBinOccupancySettingsParam,
+  });
+
+  const parsedParams = {
     inputs,
     layouts: layouts || parseLegacyLayout(layoutParam),
     widgets: parseWidgets(widgetParam, widgetDefaults),
@@ -248,7 +263,20 @@ export async function parseAllUrlParameters(
     indexOfCoincidenceSettings: parseCompressedSettings(icSettingsParam),
     kolmogorovSmirnovSettings: parseCompressedSettings(ksSettingsParam),
     chiSquaredSettings: parseCompressedSettings(chiSquaredSettingsParam),
+    expectedBinOccupancySettings: parseCompressedSettings(expectedBinOccupancySettingsParam),
   };
+
+  console.log('Parsed settings:', {
+    frequencyAnalysis: !!parsedParams.frequencyAnalysisSettings,
+    shannonEntropy: !!parsedParams.shannonEntropySettings,
+    asciiDistribution: !!parsedParams.asciiDistributionSettings,
+    indexOfCoincidence: !!parsedParams.indexOfCoincidenceSettings,
+    kolmogorovSmirnov: !!parsedParams.kolmogorovSmirnovSettings,
+    chiSquared: !!parsedParams.chiSquaredSettings,
+    expectedBinOccupancy: !!parsedParams.expectedBinOccupancySettings,
+  });
+
+  return parsedParams;
 }
 
 /**

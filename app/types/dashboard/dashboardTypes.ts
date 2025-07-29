@@ -36,3 +36,9 @@ export type ChiSquaredSettings = {
   selectedTextIndex: number;
   baseDataIndex: number | 'sample';
 };
+
+export type ExpectedBinOccupancySettings = {
+  confidenceLevel: number; // 0.90, 0.95, 0.99
+  showConfidenceBands: boolean;
+  showExpectedCurve: boolean;
+};

@@ -8,6 +8,7 @@ import { defaultGridSize as freqDefault } from '@/components/widgets/FrequencyAn
 import { defaultGridSize as asciiDefault } from '@/components/widgets/AsciiDistributionWidget/useAsciiDistributionChart';
 import { defaultGridSize as ksDefault } from '@/components/widgets/KolmogrovSmirnovWidget/useKolmogorovSmirnov';
 import { defaultGridSize as chiSquaredDefault } from '@/components/widgets/ChiSquaredWidget/useChiSquaredChart';
+import { defaultGridSize as expectedBinOccupancyDefault } from '@/components/widgets/ExpectedBinOccupancyWidget/useExpectedBinOccupancyChart';
 import { BASE_OPTIONS } from '@/types/bases';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
@@ -27,6 +28,7 @@ const AVAILABLE_WIDGETS = {
   entropy: 'Shannon Entropy',
   ks: 'Kolmogorov-Smirnov Test',
   chisquared: 'Chi-Squared Test',
+  expectedBinOccupancy: 'Expected Bin Occupancy',
 };
 
 type WidgetKey = keyof typeof AVAILABLE_WIDGETS;
@@ -41,6 +43,7 @@ const WIDGET_DEFAULTS: Record<string, { w: number; h: number }> = {
   entropy: entropyDefault,
   ks: ksDefault,
   chisquared: chiSquaredDefault,
+  expectedBinOccupancy: expectedBinOccupancyDefault,
 };
 
 const BREAKPOINTS = { lg: 1024, md: 768, sm: 0 };
@@ -136,6 +139,8 @@ export default function DashboardPage() {
     setChiSquaredSettings,
     dashboardName,
     setDashboardName,
+    expectedBinOccupancySettings,
+    setExpectedBinOccupancySettings,
   } = useDashboardParams(WIDGET_DEFAULTS, COLS, generateLayout, mergeLayoutsWithWidgets);
 
   const { theme } = useTheme();
@@ -280,6 +285,8 @@ export default function DashboardPage() {
         setKolmogorovSmirnovSettings={setKolmogorovSmirnovSettings}
         chiSquaredSettings={chiSquaredSettings}
         setChiSquaredSettings={setChiSquaredSettings}
+        expectedBinOccupancySettings={expectedBinOccupancySettings}
+        setExpectedBinOccupancySettings={setExpectedBinOccupancySettings}
       />
     </div>
   );

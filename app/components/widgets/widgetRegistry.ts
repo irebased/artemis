@@ -17,6 +17,7 @@ const WIDGET_FOLDER_PATTERN = /Widget$/;
 const WIDGET_FOLDERS = [
   'AsciiDistributionWidget',
   'ChiSquaredWidget',
+  'ExpectedBinOccupancyWidget',
   'FrequencyAnalysisWidget',
   'FrequencyStdDevWidget',
   'IndexOfCoincidenceWidget',
@@ -33,6 +34,7 @@ function initializeWidgetRegistry(): void {
   const configs = [
     require('./AsciiDistributionWidget/widgetConfig').default,
     require('./ChiSquaredWidget/widgetConfig').default,
+    require('./ExpectedBinOccupancyWidget/widgetConfig').default,
     require('./FrequencyAnalysisWidget/widgetConfig').default,
     require('./FrequencyStdDevWidget/widgetConfig').default,
     require('./IndexOfCoincidenceWidget/widgetConfig').default,
