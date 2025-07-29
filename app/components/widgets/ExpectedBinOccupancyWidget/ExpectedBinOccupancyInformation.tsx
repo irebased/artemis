@@ -73,7 +73,6 @@ export function ExpectedBinOccupancyInformation() {
       <p className="text-sm text-gray-600">
         This analysis is particularly useful for detecting non-random patterns in text, such as those found in ciphers,
         encoded messages, or natural language with unusual character distributions compared to random allocation.
-        The approach exactly matches the Python statistical implementation.
       </p>
     </div>
   );
