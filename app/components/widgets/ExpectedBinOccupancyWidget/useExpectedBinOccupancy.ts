@@ -52,6 +52,14 @@ function expectedBinOccupancy(nBins: number, nBalls: number, confidence: number)
   const stdDev = Math.sqrt(nBalls * (nBins - 1) / (nBins * nBins));
   const expected = z_k.map(z => mean + stdDev * z);
 
+  // Ensure expected values are monotonically decreasing (sorted by frequency descending)
+  // This is crucial for the statistical model - expected values should never increase
+  for (let i = 1; i < expected.length; i++) {
+    if (expected[i] > expected[i - 1]) {
+      expected[i] = expected[i - 1];
+    }
+  }
+
   // Confidence bands
   const zBand = inverseNormalCDF(0.5 + confidence / 2);
   const upper = expected.map(exp => exp + zBand * stdDev);
