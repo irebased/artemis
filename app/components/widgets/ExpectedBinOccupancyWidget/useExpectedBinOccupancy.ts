@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Ciphertext } from '@/types/ciphertext';
 import { ExpectedBinOccupancySettings } from '@/types/dashboard/dashboardTypes';
 import { getProcessedText } from '@/utils/textUtils';
+import jStat from 'jstat';
 
 export interface BinOccupancyResult {
   input: Ciphertext;
@@ -11,42 +12,10 @@ export interface BinOccupancyResult {
   uniqueCharacters: number;
 }
 
-// Inverse normal cumulative distribution function (accurate approximation)
-function inverseNormalCDF(p: number): number {
-  // More accurate approximation that's still simpler than the original
-  // Based on the Beasley-Springer-Moro algorithm
-
-  if (p <= 0 || p >= 1) {
-    return p <= 0 ? -Infinity : Infinity;
-  }
-
-  const q = p - 0.5;
-
-  if (Math.abs(q) <= 0.42) {
-    // Central region - use polynomial approximation
-    const r = q * q;
-    return q * (((((((r * 2509.0809287301226727 + 33430.575583588128105) * r + 67265.770927008700853) * r + 45921.953931549871457) * r + 13731.693765509461125) * r + 1971.5909503065514427) * r + 133.14166789178437745) * r + 3.387132872796366608) / (((((((r * 5226.495278852854561 + 28729.085735721942674) * r + 39307.89580009271061) * r + 21213.794301586595867) * r + 5394.1960214247511077) * r + 687.1870074920579083) * r + 42.313330701600911252) * r + 1);
-  } else {
-    // Tail regions - use simpler approximation
-    const r = q < 0 ? p : 1 - p;
-    const t = Math.sqrt(-2 * Math.log(r));
-
-    if (t <= 5) {
-      // Near tail
-      const u = t - 1.6;
-      return q < 0 ? -u : u;
-    } else {
-      // Far tail
-      const u = t - 5;
-      return q < 0 ? -(5 + u) : (5 + u);
-    }
-  }
-}
-
-// Expected bin occupancy for random distribution (Python equivalent)
+// Expected bin occupancy for random distribution
 function expectedBinOccupancy(nBins: number, nBalls: number, confidence: number) {
   const k = Array.from({ length: nBins }, (_, i) => i + 1);
-  const z_k = k.map(k_val => inverseNormalCDF((k_val - 0.3769420) / (nBins + 0.249831))); // An even better approximation than anything Gasp could come up with
+  const z_k = k.map(k_val => jStat.normal.inv((nBins - k_val + 0.375) / (nBins + 0.25), 0, 1));
 
   const mean = nBalls / nBins;
   const stdDev = Math.sqrt(nBalls * (nBins - 1) / (nBins * nBins));
@@ -61,7 +30,7 @@ function expectedBinOccupancy(nBins: number, nBalls: number, confidence: number)
   }
 
   // Confidence bands
-  const zBand = inverseNormalCDF(0.5 + confidence / 2);
+  const zBand = jStat.normal.inv(0.5 + confidence / 2, 0, 1);
   const upper = expected.map(exp => exp + zBand * stdDev);
   const lower = expected.map(exp => Math.max(0, exp - zBand * stdDev));
 
