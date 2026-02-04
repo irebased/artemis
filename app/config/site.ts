@@ -12,6 +12,10 @@ export const siteConfig = {
       label: "About",
       href: "/about",
     },
+    {
+      label: "Artemis 2.0",
+      href: "https://app.cipherinspector.com",
+    },
   ],
   navMenuItems: [
   ],

@@ -9,28 +9,19 @@ export default function AboutPage() {
         <Image src="/images/artemis.PNG" alt="Artemis" width={360} height={360} />
       </div>
       <h1 className={title()}>About Artemis</h1>
+      <p className="my-4 font-bold">
+        Artemis has been deprecated as of February 4th, 2026 and is no longer being maintained. The successor, CipherInspector, has
+        officially launched. A free dashboarding tool is available via the&nbsp;
+        <a href="https://app.cipherinspector.com/playground" className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">CipherInspector Playground</a>.
+      </p>
       <p className="my-4">
-        Artemis is the only tool for cryptographers to create visualization dashboards of their ciphers, and share them with the world.
-        This tool brings cryptanalysis to a new level, allowing you to see the patterns in your ciphers in a way that is not possible with
+        Artemis is a prototype to build the only tool for cryptographers to create visualization dashboards of their ciphers, and
+        share them with the world. This tool brings cryptanalysis to a new level, allowing you to see the patterns in your ciphers in a way that is not possible with
         traditional tools which require you to hop between tools.
       </p>
       <p className="my-4">
         This tool was created as part of an effort to solve some decade-old ciphers constructed by Jason Blundell, a well-known
         executive producer in the video game industry that has a knack for creating ciphers.
-      </p>
-      <p className="my-4">
-        More widgets, tools, and features will continue to be added to Artemis as we continue to make it awesome.
-      </p>
-      <p className="my-4">
-        For any questions, comments, or feature requests, please file an issue on the <a href="https://github.com/irebased/artemis/issues" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline-offset-2 underline">GitHub repository</a>.
-      </p>
-      <h3 className={subtitle()}>FAQ</h3>
-      <h4 className="pb-8 pt-8">
-        <strong>Is Artemis free?</strong>
-      </h4>
-      <p>
-        Yes, Artemis is free to use. As it scales, it's likely that I will need to add a backend to handle the larger dashboard links for
-        minification of URLs. The site <strong>will</strong> eventually have a monetization model via non-intrusive ads.
       </p>
       <h4 className="pb-8 pt-8"><strong>How do you calculate the IC and entropy of different bases for English text?</strong></h4>
       <p>
@@ -80,7 +71,7 @@ export default function AboutPage() {
         creating an equally flat distribution of characters across the entire character set for any given base, which is pretty good for
         simulating randomness. There are other ways to represent a perfectly random string in any base. This is not perfect if randomness
         also considers a lack of repeating patterns (such as period) but for this tool I find it sufficient. The values are not computed
-        on the fly, they are hard-coded. So if you have better values and can share how you got to them, feel free to reach out.
+        on the fly, they are hard-coded.
       </p>
     </div>
   );

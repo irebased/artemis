@@ -8,7 +8,6 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
 import { Analytics } from "@vercel/analytics/next"
-import { GithubIcon } from "@/components/icons";
 
 
 export const metadata: Metadata = {
@@ -49,6 +48,14 @@ export default function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
             <Navbar />
+            <div className="rounded-lg bg-yellow-800 bg-opacity-40 m-8 p-2 border-yellow-700 border-2 flex-col">
+                <h2 className="text-xl font-bold">Artemis 1.0 end of life</h2>
+                Thank you for using the Artemis dashboard project! As of February 4, 2026, this version
+                is no longer being maintained and may contain bugs. "Artemis 2.0" is called
+                CipherInspector and has officially launched. The comparable tool to this dashbaord can be
+                found&nbsp;<a href="https://app.cipherinspector.com/playground" target="_blank" className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600">here.</a>
+                &nbsp;Thank you for your support!
+            </div>
             <main className="margin-auto px-16 pt-8 flex-grow w-100">
               {children}
             </main>

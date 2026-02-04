@@ -1,8 +1,11 @@
 # Welcome to Artemis
 
-Artemis is an open source tool which enables cryptanalysts to create sharable dashboards of cryptanalysis datapoints for ciphers.
+> [!TIP]
+> This project is no longer being maintained as of February 4th, 2026. The project successor is [CipherInspector](https://app.cipherinspector.com), which contains almost every feature from Artemis in an improved architecture with proper support for saving and sharing dashboards and ciphertexts.
 
-This tool is useful for analyzing ciphers to deduce how they were created, comparing them to other ciphers. It is also useful for
+Artemis was an open source tool which enables cryptanalysts to create sharable dashboards of cryptanalysis datapoints for ciphers.
+
+This tool was useful for analyzing ciphers to deduce how they were created, comparing them to other ciphers. It was also useful for
 testing how strong a cipher of your creation is.
 
 ## Features
